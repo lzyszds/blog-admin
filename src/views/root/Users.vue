@@ -15,11 +15,16 @@ const { state: searchCondition, reset } = useResetRefState({
   username: "",
   power: "",
 });
-const data = ref([]);
+const data = ref([]); //表格数据
+const loading = ref(false); //加载中
 
 function handleSearch() {
+  loading.value = true;
   getUsersList(searchCondition.value).then((res) => {
     data.value = res.data;
+    setTimeout(() => {
+      loading.value = false;
+    }, 500);
   });
 }
 
@@ -79,6 +84,7 @@ const search = () => {
           :columns="columns"
           :data-source="data"
           :scroll="scrollConfig"
+          :loading="loading"
         />
       </main>
     </a-card>
