@@ -1,0 +1,201 @@
+@import url('./font');
+
+:root {
+  --themeColor: #5161ce;
+  --bgcolor: #fff !important;
+  --selectionColor: #344449;
+  --themeGreen: #00CE3E;
+  --darkBgcolor: rgb(27, 28, 37);
+  --darkColor: rgb(255, 255, 255, .8);
+  --textcolor: #fe9600;
+  --borderColor: #ffe14d;
+  --delColor: #dc143c;
+  --article-cover: linear-gradient(180deg, hsla(0, 0%, 98%, 0) 0, hsla(0, 0%, 98%, .013) 8.1%, hsla(0, 0%, 98%, .049) 15.5%, hsla(0, 0%, 98%, .104) 22.5%, hsla(0, 0%, 98%, .175) 29%, hsla(0, 0%, 98%, .259) 35.3%, hsla(0, 0%, 98%, .352) 41.2%, hsla(0, 0%, 98%, .45) 47.1%, hsla(0, 0%, 98%, .55) 52.9%, hsla(0, 0%, 98%, .648) 58.8%, hsla(0, 0%, 98%, .741) 64.7%, hsla(0, 0%, 98%, .825) 71%, hsla(0, 0%, 98%, .896) 77.5%, hsla(0, 0%, 98%, .951) 84.5%, hsla(0, 0%, 98%, .987) 91.9%, #fff);
+  --broRadius: 9px;
+  --breakpoint-sm: 576px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 992px;
+  --breakpoint-xl: 1200px;
+  --breakpoint-xxl: 1600px;
+  --purple: rgb(123, 31, 162);
+  --violet: rgb(103, 58, 183);
+  --pink: rgb(244, 143, 177);
+}
+
+::selection {
+  background: #344449;
+  color: #fff;
+  text-shadow: none;
+}
+
+/* @tailwind base;
+@tailwind components;
+@tailwind utilities; */
+
+
+
+.Cannotbeobtained {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+img {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+body,
+html,
+#app {
+  font-size: 16px;
+  margin: 0;
+  padding: 0;
+  min-width: 380px;
+  font-family: 'Red Hat Display';
+  min-height: 100vh;
+}
+
+a {
+  list-style: none;
+  text-decoration: none;
+  color: var(--themeColor);
+}
+
+.dark {
+  transition: .3s;
+}
+
+svg {
+  display: initial;
+}
+
+
+.decoration {
+  font-family: 'almama';
+  color: #fff;
+  text-shadow: 1px 3px 3px #000;
+  transition: .6s;
+  background: linear-gradient(#fff, #fff) no-repeat left 100%/0 2px;
+}
+
+.decoration:hover {
+  color: #5161ce;
+  fill: #5161ce !important;
+  text-shadow: 1px -1px 3px #fff;
+  background: linear-gradient(#fff, #fff) no-repeat left 100% / 100% 2px;
+}
+
+.lzy-center {
+  width: 100%;
+  text-align: center;
+}
+
+.fa-comment {
+  width: 50px;
+  height: 50px;
+}
+
+.iconfont {
+  font-family: "iconfont" !important;
+  font-size: 16px;
+  font-style: normal;
+  vertical-align: bottom;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+[class^="icon-"],
+[class*=" icon-"] {
+  font-family: "iconfont" !important;
+  font-size: 16px;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.icon {
+  width: 1em;
+  height: 1em;
+  vertical-align: -0.15em;
+  fill: currentColor;
+  overflow: hidden;
+}
+
+.md.hydrated {
+  font-family: "iconfont" !important;
+  font-size: 16px;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+}
+
+
+/* 修改谷歌浏览器存储密码 自动给input添加样式 */
+input:-webkit-autofill,
+textarea:-webkit-autofill,
+select:-webkit-autofill {
+  -webkit-text-fill-color: #000 !important;
+  /* //这个地方的颜色是字体颜色，可以根据实际情况修改 */
+  -webkit-box-shadow: 0 0 0px 1000px transparent inset !important;
+  /* //设置input输入框的背景颜色为透明色 */
+  background-color: transparent;
+  /* //设置input输入框的背景颜色为透明色 */
+  background-image: none;
+  transition: background-color 50000s ease-in-out 0s;
+}
+
+input {
+  background-color: transparent;
+  /* //设置input输入框的背景颜色为透明色 */
+}
+
+input:-webkit-autofill::selection {
+  -webkit-text-fill-color: #fff !important;
+}
+
+body::-webkit-scrollbar-track {
+  -webkit-box-shadow: inset 0 0 6px rgb(245, 245, 245);
+  background-color: #F5F5F5;
+}
+
+::-webkit-scrollbar {
+  width: 7px;
+  height: 8px;
+  background-color: rgb(245, 245, 245);
+}
+
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--themeColor) !important;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--themeColor);
+  border-radius: 20px;
+  border: 1px solid rgb(245, 245, 245);
+  transition: 1s all;
+}
+
+.compensate-for-scrollbar {
+  padding: 0 !important;
+}
+
+
+html,
+body {
+  scroll-behavior: smooth;
+  font-family: 'firaCode' !important;
+}
+
+html.dark {
+  background-color: var(--darkBgcolor)
+}
+
+#nprogress .bar {
+  background: rgb(255, 0, 119) !important;
+}

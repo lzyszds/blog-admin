@@ -1,0 +1,30 @@
+/* @font-face {
+  font-family: 'almama';
+  src: url('./almama2.0.ttf');
+} */
+
+@font-face {
+  font-family: 'dindin';
+  src: url('../assets/font/dindinjinbuti/DingTalk_JinBuTi_Regular.woff2');
+  /* 优先加载 */
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'almama';
+  src: url('../assets/font/alibaba/Alimama_ShuHeiTi_Bold.woff2');
+  font-display: swap;
+}
+
+
+@font-face {
+  font-family: 'firaCode';
+  src: url('../assets/font/FiraCode.ttf');
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'black-Magic';
+  src: url('../assets/font/Black-Magic/Black-Magic-2.ttf');
+  font-display: swap;
+}
