@@ -51,7 +51,7 @@ onMounted(() => {
           class="menuitem"
         >
           <span class="anticon anticon-user">
-            <LzyIcon :name="item.uicon" />
+            <LzyIcon :name="item.uicon" style="font-weight: 600;" />
           </span>
           <span>{{ item.name }}</span>
         </a-menu-item>
@@ -88,9 +88,8 @@ onMounted(() => {
       <!-- 内容 -->
       <a-layout-content
         :style="{
-          margin: '24px 16px',
           padding: '14px',
-          minHeight: '280px',
+          minHeight: '780px',
         }"
       >
         <Transition name="router" mode="out-in">

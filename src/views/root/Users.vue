@@ -38,7 +38,7 @@ const search = () => {
 </script>
 
 <template>
-  <section style="display: flex; flex-direction: column; gap: 20px">
+  <section style="display: grid; grid-template-rows: auto 1fr; gap: 20px">
     <a-card title="搜索工具" :bordered="false">
       <main class="searchCard">
         <section>
