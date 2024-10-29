@@ -7,7 +7,7 @@ const collapsed = ref<boolean>(false); // 是否折叠
 const layout = templateRef<HTMLElement>("layout"); // 布局ref
 const loading = ref(false); // 加载中新路由
 const router = useRouter();
-
+const isFixed = ref(false); // 控制是否应用 `fixed` 样式
 /* 跳转路由  */
 const pushRouter = (item) => {
   selected.value = item;
@@ -18,6 +18,12 @@ const pushRouter = (item) => {
     router.push({ name: item.component });
   }, 300);
 };
+
+/* 监听屏幕宽度 变化时，控制是否应用 `fixed` 样式 */
+const handleBreakpoint = (broken) => {
+  isFixed.value = broken;
+};
+
 onMounted(() => {
   const { width } = useElementSize(layout);
   watchEffect(() => {
@@ -32,11 +38,21 @@ onMounted(() => {
 
 <template>
   <a-layout class="ant-layout" ref="layout">
+    <!-- 菜单遮罩 -->
+    <div
+      :class="{ show: isFixed && !collapsed, mask: true }"
+      @click="collapsed = true"
+    ></div>
+
     <a-layout-sider
       v-model:collapsed="collapsed"
       :trigger="null"
       style="background-color: #fff"
       collapsible
+      :collapsed-width="!isFixed ? 80 : 0"
+      breakpoint="sm"
+      :class="{ fixed: isFixed }"
+      @breakpoint="handleBreakpoint"
     >
       <div class="logo">
         <h2>{{ collapsed ? "Jz" : "Jz 博客管理系统" }}</h2>
@@ -51,7 +67,7 @@ onMounted(() => {
           class="menuitem"
         >
           <span class="anticon anticon-user">
-            <LzyIcon :name="item.uicon" style="font-weight: 600;" />
+            <LzyIcon :name="item.uicon" style="font-weight: 600" />
           </span>
           <span>{{ item.name }}</span>
         </a-menu-item>
@@ -61,17 +77,28 @@ onMounted(() => {
       <!-- 头部 -->
       <a-layout-header class="ant-layout-header">
         <!-- 折叠按钮 -->
-        <a-tooltip placement="bottomLeft" mouseLeaveDelay="0">
-          <template #title>
-            <span>折叠菜单</span>
-          </template>
+        <template v-if="!isFixed">
+          <a-tooltip placement="bottomLeft" mouseLeaveDelay="0">
+            <template #title>
+              <span>折叠菜单</span>
+            </template>
+            <button v-if="collapsed" @click="() => (collapsed = !collapsed)">
+              <LzyIcon class="trigger" name="ant-design:menu-unfold-outlined" />
+            </button>
+            <button v-else @click="() => (collapsed = !collapsed)">
+              <LzyIcon class="trigger" name="ant-design:menu-fold-outlined" />
+            </button>
+          </a-tooltip>
+        </template>
+        <template v-else>
           <button v-if="collapsed" @click="() => (collapsed = !collapsed)">
             <LzyIcon class="trigger" name="ant-design:menu-unfold-outlined" />
           </button>
           <button v-else @click="() => (collapsed = !collapsed)">
             <LzyIcon class="trigger" name="ant-design:menu-fold-outlined" />
           </button>
-        </a-tooltip>
+        </template>
+
         <!-- 面包屑 -->
         <Transition name="fade" mode="out-in">
           <a-breadcrumb :key="selected.index">
@@ -89,8 +116,9 @@ onMounted(() => {
       <a-layout-content
         :style="{
           padding: '14px',
-          minHeight: '780px',
+          overflow: 'auto',
         }"
+        ref="mainRef"
       >
         <Transition name="router" mode="out-in">
           <RouterView v-if="!loading" />
@@ -152,6 +180,28 @@ onMounted(() => {
   align-items: center;
   font-size: 14px;
   font-weight: 500;
+}
+
+.fixed {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  z-index: 1000;
+}
+
+.mask {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  background-color: rgba(0, 0, 0, 0.25);
+  width: 100vw;
+  height: 100vh;
+}
+.show.mask {
+  display: block;
 }
 
 .fade-enter-active,

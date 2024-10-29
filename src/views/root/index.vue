@@ -7,9 +7,13 @@ onMounted(() => {
   watchEffect(() => {
     if (width.value < 768) {
       layoutMain.value.style.padding = "0";
+      layoutMain.value.style.height = "calc(100vh)";
       //@ts-ignore
       layoutMain.value.querySelector(".ant-layout")!.style.borderRadius = "0";
     } else if (width.value < 992) {
+      layoutMain.value.style.padding = "20px";
+      layoutMain.value.style.height = "calc(100vh - 40px)";
+    } else if (width.value < 1300) {
       layoutMain.value.style.padding = "40px";
       layoutMain.value.style.height = "calc(100vh - 80px)";
     } else {
