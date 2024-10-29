@@ -4,7 +4,7 @@ export function useTableScroll(scrollX: MaybeRef<number> = 702) {
 
   const scrollConfig = computed(() => {
     return {
-      y: wrapperElHeight.value - 72,
+      y: wrapperElHeight.value,
       x: toValue(scrollX)
     };
   });

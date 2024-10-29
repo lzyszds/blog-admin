@@ -2,9 +2,10 @@
 import { getUsersList } from "@/api/usersApi";
 import LzyIcon from "@/components/LzyIcon.vue";
 import useResetRefState from "@/hook/useResetRefState";
-import { columns } from "@/typings/usersTable";
+import { columns } from "@/typings/UsersTable";
+import { useRequest } from "@/hook/useRequest";
 import { useTableScroll } from "@/hook/useTable";
-
+/* 获取表格滚动条高度 */
 const { tableWrapperRef, scrollConfig } = useTableScroll();
 
 /* 搜索条件 */
@@ -15,31 +16,17 @@ const { state: searchCondition, reset } = useResetRefState({
   username: "",
   power: "",
 });
-const data = ref([]); //表格数据
-const loading = ref(false); //加载中
 
-function handleSearch() {
-  loading.value = true;
-  getUsersList(searchCondition.value).then((res) => {
-    data.value = res.data;
-    setTimeout(() => {
-      loading.value = false;
-    }, 500);
-  });
-}
-
-handleSearch();
 /* 表格选中项 */
 const selectedRowKeys = ref([]);
 
-const search = () => {
-  handleSearch();
-};
+const { data: tableData, loading, throttledRequest } = useRequest(getUsersList, 500);
+throttledRequest(searchCondition.value);
 </script>
 
 <template>
-  <section style="display: grid; grid-template-rows: auto 1fr; gap: 20px">
-    <a-card title="搜索工具" :bordered="false">
+  <section style="display: flex; flex-direction: column; gap: 20px">
+    <a-card title="搜索工具" :bordered="false" ref="searchWrapperRef">
       <main class="searchCard">
         <section>
           <span>用户名：</span>
@@ -69,7 +56,7 @@ const search = () => {
           <a-button @click="reset">
             <LzyIcon name="hugeicons:exchange-01" /> 重置
           </a-button>
-          <a-button @click="search">
+          <a-button @click="throttledRequest(searchCondition)">
             <LzyIcon name="hugeicons:search-area" /> 搜索
           </a-button>
         </section>
@@ -82,9 +69,12 @@ const search = () => {
           ref="tableWrapperRef"
           :row-selection="{ selectedRowKeys }"
           :columns="columns"
-          :data-source="data"
+          :data-source="tableData ? tableData.data : []"
           :scroll="scrollConfig"
           :loading="loading"
+          size="small"
+          row-key="id"
+          class="h-full"
         />
       </main>
     </a-card>
@@ -93,9 +83,8 @@ const search = () => {
 
 <style scoped>
 :deep(.searchCard) {
-  display: grid;
+  display: flex;
   gap: 20px;
-  grid-template-columns: repeat(6, 1fr);
   section {
     display: flex;
     align-items: center;
@@ -110,6 +99,21 @@ const search = () => {
         margin-right: 5px;
       }
     }
+    .ant-input {
+      max-width: 160px;
+    }
+  }
+  .ant-select-selector {
+    min-width: 120px;
+  }
+}
+:deep(.ant-table-body) {
+  overflow-y: hidden !important;
+}
+
+@media (max-width: 1280px) {
+  :deep(.searchCard) {
+    flex-wrap: wrap;
   }
 }
 </style>

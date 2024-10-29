@@ -1,3 +1,4 @@
+import { message } from "ant-design-vue";
 
 /**
  * 请求封装，返回 loading、error、data 等状态
@@ -11,22 +12,19 @@ export function useRequest(apiFunction: (...args: any[]) => Promise<any>, thrott
   const nextRequest = async (...args) => {
     loading.value = true;      // 开始请求时设置 loading 状态
     error.value = null;
-    console.log(123);
 
     try {
       data.value = await apiFunction(...args);
     } catch (err: any) {
       error.value = err;       // 捕获错误
-      if (error) {
-        console.error(JSON.stringify(apiFunction));
-      }
+      message.error(err.message + ' 请稍后重试');
+      console.error(err, apiFunction);
     } finally {
       loading.value = false;   // 请求完成后取消 loading 状态
     }
   };
-
   // 使用 useThrottleFn 包装 request 函数，实现节流
-  const throttledRequest = '' //useThrottleFn(nextRequest, throttleDelay)
+  const throttledRequest = useThrottleFn(nextRequest, throttleDelay)
 
-  return { data, loading, error, nextRequest, throttledRequest };
+  return { data, loading, error, throttledRequest };
 }

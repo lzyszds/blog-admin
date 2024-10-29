@@ -1,6 +1,4 @@
 import request from '@/utils/request';
-
-
 export const getUsersList = async (params: any) => {
   let { pages, limit, search } = params
   return await request({

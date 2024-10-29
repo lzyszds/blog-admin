@@ -1,4 +1,7 @@
-import { Avatar } from 'ant-design-vue';
+import { Avatar, Tag, Button } from 'ant-design-vue';
+import LzyIcon from '@/components/LzyIcon.vue';
+
+
 export interface DataType {
   uid: number;
   uname: string;
@@ -48,7 +51,23 @@ export const columns = [
     title: "权限",
     dataIndex: "power",
     key: "power",
-    width: "80px",
+    width: "70px",
+    customRender: ({ text }) => {
+
+      return h(Tag, {
+        color: text !== 0 ? 'var(--themeColor)' : '#cd201f',
+        icon: h(LzyIcon, {
+          name: text !== 0 ? 'iconoir:user-square' : 'iconoir:user-crown',
+          size: 16
+        }),
+        style: {
+          display: 'flex',
+          alignItems: 'center',
+          gap: '4px',
+          maxWidth: '70px'
+        }
+      }, text !== 0 ? 'user' : 'admin')
+    },
   },
   {
     title: "创建日期",
@@ -57,7 +76,7 @@ export const columns = [
     customRender: ({ text }) => {
       return useDateFormat(text, 'YYYY-MM-DD').value
     },
-    width: "100px",
+    width: "120px",
   },
   {
     title: "登录日期",
@@ -66,7 +85,8 @@ export const columns = [
     width: "100px",
     customRender: ({ text }) => {
       if (!text) return '暂无'
-      return useDateFormat(text, 'YYYY-MM-DD').value
+      return useTimeAgo(text).value
+      // return useDateFormat(text, 'YYYY-MM-DD').value
     },
   },
   {
@@ -75,4 +95,35 @@ export const columns = [
     key: "lastLoginIp",
     width: "120px",
   },
+  {
+    title: "操作",
+    dataIndex: "action",
+    key: "action",
+    width: "120px",
+    customRender: ({ record }) => {
+      return [
+        h(Button, {
+          type: 'primary',
+          size: 'small',
+          style: {
+            fontSize: '12px'
+          },
+        },
+          { default: () => '编辑' } // 插槽内容
+        ),
+        h(Button, {
+          type: 'primary',
+          size: 'small',
+          danger: true,
+          style: {
+            fontSize: '12px',
+            marginLeft: '10px'
+          },
+        },
+          { default: () => '删除' } // 插槽内容
+        )
+      ]
+    }
+  }
+
 ];
