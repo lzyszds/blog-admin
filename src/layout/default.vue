@@ -70,8 +70,8 @@ onMounted(() => {
       </div>
 
       <!-- 菜单 -->
-      <a-menu v-model:selectedKeys="selectedKeys" mode="inline">
-        <a-menu-item
+      <AMenu v-model:selectedKeys="selectedKeys" mode="inline">
+        <AMenu-item
           v-for="item in items"
           :key="item.key"
           @click="pushRouter(item)"
@@ -81,8 +81,8 @@ onMounted(() => {
             <LzyIcon :name="item.uicon" style="font-weight: 600" />
           </span>
           <span class="menu-title-item">{{ item.name }}</span>
-        </a-menu-item>
-      </a-menu>
+        </AMenu-item>
+      </AMenu>
     </a-layout-sider>
     <a-layout>
       <!-- 头部 -->

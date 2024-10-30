@@ -37,8 +37,8 @@ const handleOpenChange = (flag: boolean) => {
   >
     <slot></slot>
     <template #overlay>
-      <a-menu>
-        <a-menu-item
+      <AMenu>
+        <AMenu-item
           v-for="item in menuItem"
           :key="item.key"
           :disabled="
@@ -49,8 +49,8 @@ const handleOpenChange = (flag: boolean) => {
             <LzyIcon name="ant-design:menu-unfold-outlined" />
             {{ item.label }}
           </a>
-        </a-menu-item>
-      </a-menu>
+        </AMenu-item>
+      </AMenu>
     </template>
   </a-dropdown>
 </template>

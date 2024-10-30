@@ -4,14 +4,14 @@
   <RouterView />
 
   <!-- antd 配置基础样式 -->
-  <a-config-provider
+  <AConfig-provider
     :theme="{
       token: {
         colorPrimary: '#5161ce',
       },
     }"
   >
-  </a-config-provider>
+  </AConfig-provider>
 </template>
 
 <style scoped></style>

@@ -1,3 +1,4 @@
+import { message } from 'ant-design-vue';
 import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
 
 interface AxiosConfig {
@@ -66,7 +67,7 @@ export default async function makeRequest<T = any>({
     //@ts-ignore
     if (response.code !== 200) {
       //@ts-ignore
-      ElMessage.error(response.msg);
+      throw new Error(response.msg);
     }
     if (response.data !== undefined) {
       return response.data;
@@ -75,6 +76,7 @@ export default async function makeRequest<T = any>({
   } catch (error) {
     // 处理请求失败的情况
     console.error('Request failed:', error);
-    throw error;
+    message.error('请求失败，请稍后重试');
+    return null as any;
   }
 }

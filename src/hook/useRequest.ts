@@ -22,6 +22,8 @@ export function useRequest(apiFunction: (...args: any[]) => Promise<any>, thrott
     } finally {
       loading.value = false;   // 请求完成后取消 loading 状态
     }
+    console.log(data.value);
+    
   };
   // 使用 useThrottleFn 包装 request 函数，实现节流
   const throttledRequest = useThrottleFn(nextRequest, throttleDelay)
