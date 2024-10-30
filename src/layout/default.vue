@@ -1,16 +1,27 @@
 <script lang="ts" setup>
 import LzyIcon from "@/components/LzyIcon.vue";
 import items from "./config";
+import { useTabsState } from "@/store/useTabsState";
+import ToolsMenu from "@/components/ToolsMenu.vue";
+
 const selected = useStorage("selected", items[0]);
-const selectedKeys = ref<string[]>([selected.value.index]); // 选中的菜单
+const selectedKeys = ref<string[]>([selected.value.key]); // 选中的菜单
 const collapsed = ref<boolean>(false); // 是否折叠
 const layout = templateRef<HTMLElement>("layout"); // 布局ref
 const loading = ref(false); // 加载中新路由
 const router = useRouter();
 const isFixed = ref(false); // 控制是否应用 `fixed` 样式
+const tabsState = useTabsState();
+const tabsRef = templateRef<HTMLElement>("tabsRef");
+
 /* 跳转路由  */
 const pushRouter = (item) => {
+  if (typeof item == "number") {
+    item = tabsState.getKeyArr(item);
+  }
   selected.value = item;
+  tabsState.setKeyArr(item);
+
   loading.value = true;
   /* 实现脱离动画 */
   setTimeout(() => {
@@ -62,14 +73,14 @@ onMounted(() => {
       <a-menu v-model:selectedKeys="selectedKeys" mode="inline">
         <a-menu-item
           v-for="item in items"
-          :key="item.index"
+          :key="item.key"
           @click="pushRouter(item)"
           class="menuitem"
         >
           <span class="anticon anticon-user">
             <LzyIcon :name="item.uicon" style="font-weight: 600" />
           </span>
-          <span>{{ item.name }}</span>
+          <span class="menu-title-item">{{ item.name }}</span>
         </a-menu-item>
       </a-menu>
     </a-layout-sider>
@@ -101,7 +112,7 @@ onMounted(() => {
 
         <!-- 面包屑 -->
         <Transition name="fade" mode="out-in">
-          <a-breadcrumb :key="selected.index">
+          <a-breadcrumb :key="selected.key">
             <a-breadcrumb-item>
               <LzyIcon
                 :name="selected.uicon"
@@ -112,11 +123,43 @@ onMounted(() => {
           </a-breadcrumb>
         </Transition>
       </a-layout-header>
+
+      <!-- 右键打开 菜单 -->
+      <a-tabs
+        v-model:activeKey="tabsState.activeKey"
+        type="editable-card"
+        hide-add
+        @edit="tabsState.delKeyItem"
+        class=""
+        :animated="false"
+        @tabClick="pushRouter"
+        ref="tabsRef"
+      >
+        <a-tab-pane
+          v-for="(item, index) in tabsState.tabsKeyArr"
+          :key="index"
+          :closable="!item.noClose"
+        >
+          <template #tab>
+            <ToolsMenu :disabled-keys="['1']" :tab-id="item.key">
+              <span>
+                <LzyIcon :name="item.uicon" :size="16" style="vertical-align:sub" />
+                {{ item.name }}
+              </span>
+            </ToolsMenu>
+          </template>
+        </a-tab-pane>
+        <template #rightExtra>
+          <a-button>Right Extra Action</a-button>
+        </template>
+      </a-tabs>
+
       <!-- 内容 -->
       <a-layout-content
         :style="{
           padding: '14px',
-          overflow: 'auto',
+          overflowY: 'auto',
+          overflowX: 'hidden',
         }"
         ref="mainRef"
       >
@@ -229,5 +272,60 @@ onMounted(() => {
 .router-leave-to {
   opacity: 0;
   transform: translateX(20px);
+}
+
+:deep(.ant-layout-header) {
+  border-bottom: 1px solid #eee;
+}
+
+:deep(.ant-tabs-nav) {
+  padding: 10px 10px 4px;
+  margin: 0;
+  background-color: #fff;
+  .ant-tabs-nav-list {
+    padding: 2px;
+  }
+  .ant-tabs-tab {
+    padding: 4px 20px;
+    margin-left: 0 !important;
+    border-radius: 50px !important;
+    background-color: transparent;
+    border: none;
+    color: #999;
+    text-align: center;
+    user-select: none;
+    transition: none;
+    justify-content: center;
+    align-items: center;
+    button {
+      margin-left: 5px;
+      font-size: 14px;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding-right: 5px;
+      padding-top: 2px;
+
+      &:hover {
+        background-color: #eee;
+      }
+      span {
+        font-size: 12px !important;
+      }
+    }
+    &.ant-tabs-tab-active {
+      button {
+        color: var(--themeColor);
+      }
+    }
+  }
+}
+:deep(.menu-title-item) {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue",
+    Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
+    "Segoe UI Symbol", "Noto Color Emoji";
 }
 </style>

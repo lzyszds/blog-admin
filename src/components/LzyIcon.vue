@@ -5,7 +5,7 @@ interface Props {
   name: string;
   height?: string;
   style?: string | Object;
-  size?: number;
+  size?: number | string;
 }
 const props = defineProps<Props>();
 let style = props.style;

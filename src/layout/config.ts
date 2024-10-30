@@ -1,6 +1,6 @@
 
 type Items = {
-  index: string;
+  key: string;
   name: string;
   uicon: string;
   component?: string;
@@ -9,49 +9,49 @@ type Items = {
 
 const items: Items[] = [
   {
-    index: "1",
+    key: "1",
     name: "欢迎使用",
     uicon: 'hugeicons:home-01',
     component: "dashboard",
   },
   {
-    index: "2",
+    key: "2",
     name: "用户管理",
     uicon: 'hugeicons:edit-user-02',
     component: "users",
   },
   {
-    index: "3",
+    key: "3",
     name: "文章管理",
     uicon: 'hugeicons:property-edit',
     component: "posts",
   },
   {
-    index: "4",
+    key: "4",
     name: "评论管理",
     uicon: 'hugeicons:message-edit-01',
     component: "comments",
   },
   {
-    index: "5",
+    key: "5",
     name: "分类管理",
     uicon: 'hugeicons:dashboard-square-edit',
     component: "categories",
   },
   {
-    index: "6",
+    key: "6",
     name: "任务队列",
     uicon: 'hugeicons:task-daily-02',
     component: "plantask",
   },
   {
-    index: "7",
+    key: "7",
     name: "友链管理",
     uicon: 'hugeicons:link-01',
     component: "links",
   },
   {
-    index: "8",
+    key: "8",
     name: "网站设置",
     uicon: 'hugeicons:computer-settings',
     component: "webset",
