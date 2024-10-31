@@ -2,7 +2,7 @@
 import type { FormInstance, Rule } from "ant-design-vue/es/form";
 import { UserAdmin } from "@/typings/User";
 import LzyIcon from "../LzyIcon.vue";
-import { message, UploadProps } from "ant-design-vue";
+import { message } from "ant-design-vue";
 import { getBase64, randomPassword } from "@/utils/comment";
 
 type ModalParamsType = {

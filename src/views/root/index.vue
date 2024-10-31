@@ -17,8 +17,8 @@ onMounted(() => {
       layoutMain.value.style.padding = "40px";
       layoutMain.value.style.height = "calc(100vh - 80px)";
     } else {
-      layoutMain.value.style.padding = "70px 80px";
-      layoutMain.value.style.height = "calc(100vh - 140px)";
+      layoutMain.value.style.padding = "50px 80px";
+      layoutMain.value.style.height = "calc(100vh - 100px)";
       //@ts-ignore
       layoutMain.value.querySelector(".ant-layout")!.style.borderRadius = "10px";
     }
