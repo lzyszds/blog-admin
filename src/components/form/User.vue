@@ -50,46 +50,46 @@ const onClose = () => {
     :footer-style="{ textAlign: 'right' }"
     @close="onClose"
   >
-    <a-form :model="form" :rules="rules" layout="vertical">
+    <Aform :model="form" :rules="rules" layout="vertical">
       <a-row :gutter="16">
         <ACol :span="12">
-          <a-form-item label="Name" name="name">
-            <a-input v-model:value="form.name" placeholder="Please enter user name" />
-          </a-form-item>
+          <AformItem label="Name" name="name">
+            <AInput v-model:value="form.name" placeholder="Please enter user name" />
+          </AformItem>
         </ACol>
         <ACol :span="12">
-          <a-form-item label="Url" name="url">
-            <a-input
+          <AformItem label="Url" name="url">
+            <AInput
               v-model:value="form.url"
               style="width: 100%"
               addon-before="http://"
               addon-after=".com"
               placeholder="please enter url"
             />
-          </a-form-item>
+          </AformItem>
         </ACol>
       </a-row>
       <a-row :gutter="16">
         <ACol :span="12">
-          <a-form-item label="Owner" name="owner">
+          <AformItem label="Owner" name="owner">
             <ASelect v-model:value="form.owner" placeholder="Please AS an owner">
               <ASelect-option value="xiao">Xiaoxiao Fu</ASelect-option>
               <ASelect-option value="mao">Maomao Zhou</ASelect-option>
             </ASelect>
-          </a-form-item>
+          </AformItem>
         </ACol>
         <ACol :span="12">
-          <a-form-item label="Type" name="type">
+          <AformItem label="Type" name="type">
             <ASelect v-model:value="form.type" placeholder="Please choose the type">
               <ASelect-option value="private">Private</ASelect-option>
               <ASelect-option value="public">Public</ASelect-option>
             </ASelect>
-          </a-form-item>
+          </AformItem>
         </ACol>
       </a-row>
       <a-row :gutter="16">
         <ACol :span="12">
-          <a-form-item label="Approver" name="approver">
+          <AformItem label="Approver" name="approver">
             <ASelect
               v-model:value="form.approver"
               placeholder="Please choose the approver"
@@ -97,30 +97,30 @@ const onClose = () => {
               <ASelect-option value="jack">Jack Ma</ASelect-option>
               <ASelect-option value="tom">Tom Liu</ASelect-option>
             </ASelect>
-          </a-form-item>
+          </AformItem>
         </ACol>
         <ACol :span="12">
-          <a-form-item label="DateTime" name="dateTime">
+          <AformItem label="DateTime" name="dateTime">
             <a-date-picker
               v-model:value="form.dateTime"
               style="width: 100%"
               :get-popup-container="(trigger) => trigger.parentElement"
             />
-          </a-form-item>
+          </AformItem>
         </ACol>
       </a-row>
       <a-row :gutter="16">
         <ACol :span="24">
-          <a-form-item label="Description" name="description">
+          <AformItem label="Description" name="description">
             <a-textarea
               v-model:value="form.description"
               :rows="4"
               placeholder="please enter url description"
             />
-          </a-form-item>
+          </AformItem>
         </ACol>
       </a-row>
-    </a-form>
+    </Aform>
     <template #extra>
       <ASpace>
         <a-button @click="onClose">取消保存</a-button>

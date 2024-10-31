@@ -89,7 +89,7 @@ onMounted(() => {
       <a-layout-header class="ant-layout-header">
         <!-- 折叠按钮 -->
         <template v-if="!isFixed">
-          <a-tooltip placement="bottomLeft" mouseLeaveDelay="0">
+          <a-tooltip placement="bottomLeft" :mouseLeaveDelay="0">
             <template #title>
               <span>折叠菜单</span>
             </template>
@@ -143,7 +143,7 @@ onMounted(() => {
           <template #tab>
             <ToolsMenu :disabled-keys="['1']" :tab-id="item.key">
               <span>
-                <LzyIcon :name="item.uicon" :size="16" style="vertical-align:sub" />
+                <LzyIcon :name="item.uicon" :size="16" style="vertical-align: sub" />
                 {{ item.name }}
               </span>
             </ToolsMenu>
@@ -163,9 +163,11 @@ onMounted(() => {
         }"
         ref="mainRef"
       >
-        <Transition name="router" mode="out-in">
-          <RouterView v-if="!loading" />
-        </Transition>
+        <RouterView v-slot="{ Component }">
+          <Transition name="router" mode="out-in">
+            <component :is="Component" />
+          </Transition>
+        </RouterView>
       </a-layout-content>
     </a-layout>
   </a-layout>

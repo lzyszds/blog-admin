@@ -21,7 +21,6 @@
 
 <script setup>
 import { ref, onMounted } from "vue";
-import draggable from "vuedraggable";
 import LzyIcon from "./LzyIcon.vue";
 const props = defineProps({
   columns: Array,

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { getUsersList, addUser, delUser } from "@/api/usersApi";
+import { getUsersList, addUser, delUser } from "@/api/userApi";
 import LzyIcon from "@/components/LzyIcon.vue";
 import UserForm from "@/components/form/User.vue";
 import useResetRefState from "@/hook/useResetRefState";
@@ -73,11 +73,11 @@ const addUserModal = () => {
       <main class="searchCard">
         <section>
           <span>用户名：</span>
-          <a-input v-model:value="searchCondition.name" placeholder="请输入用户名称" />
+          <AInput v-model:value="searchCondition.name" placeholder="请输入用户名称" />
         </section>
         <section>
           <span>用户账号：</span>
-          <a-input
+          <AInput
             v-model:value="searchCondition.username"
             placeholder="请输入用户账号"
           />
@@ -129,8 +129,8 @@ const addUserModal = () => {
         />
       </main>
     </a-card>
+    <UserForm :modalParams="modalParams" />
   </section>
-  <UserForm :modalParams="modalParams" />
 </template>
 
 <style scoped>

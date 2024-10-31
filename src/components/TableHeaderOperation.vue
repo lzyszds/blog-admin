@@ -30,9 +30,7 @@ const props = defineProps({
     <ADropdown :trigger="['click']" placement="bottomRight" arrow>
       <AButton> <LzyIcon name="iconoir:settings" size="16" />列设置</AButton>
       <template #overlay>
-        <Transition name="ant-zoom-big">
-          <DraggableCard :columns="columns"></DraggableCard>
-        </Transition>
+        <DraggableCard :columns="columns"></DraggableCard>
       </template>
     </ADropdown>
   </div>

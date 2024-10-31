@@ -30,3 +30,13 @@ export const delUser = async (params: any) => {
     data: params,
   });
 };
+
+/* 账号登陆 */
+export const login = async (params: any) => {
+  if (isRef(params)) params = unref(params);
+  return await request({
+    url: '/users/login',
+    method: 'post',
+    data: params,
+  });
+};

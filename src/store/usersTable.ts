@@ -54,7 +54,7 @@ export const getUsersTable = defineStore('getUsersTable', () => {
       title: "权限",
       dataIndex: "power",
       key: "power",
-      width: "70px",
+      width: "100px",
       customRender: ({ text }) => {
 
         return h(Tag, {
@@ -67,7 +67,7 @@ export const getUsersTable = defineStore('getUsersTable', () => {
             display: 'flex',
             alignItems: 'center',
             gap: '4px',
-            maxWidth: '70px'
+            width: "65px"
           }
         }, text !== 0 ? 'user' : 'admin')
       },

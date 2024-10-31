@@ -1,5 +1,7 @@
 import { message } from 'ant-design-vue';
-import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
+import router from '@/router';
+import axios, { AxiosRequestConfig, AxiosResponse, AxiosError } from 'axios';
+
 
 interface AxiosConfig {
   baseURL?: string;
@@ -8,6 +10,7 @@ interface AxiosConfig {
     [key: string]: string;
   };
 }
+
 
 // 更具体的请求方法和响应数据类型
 export default async function makeRequest<T = any>({
@@ -24,6 +27,7 @@ export default async function makeRequest<T = any>({
       'access-control-allow-origin': '*',
       'Content-Type': 'application/json',
       'Access-Control-Allow-Origin-Type': '*',
+      'Authorization': localStorage.getItem('lzy_token') || '',
     },
   };
 
@@ -64,6 +68,7 @@ export default async function makeRequest<T = any>({
       data,
       headers
     });
+
     //@ts-ignore
     if (response.code !== 200) {
       //@ts-ignore
@@ -73,10 +78,19 @@ export default async function makeRequest<T = any>({
       return response.data;
     }
     return response as any as T
-  } catch (error) {
-    // 处理请求失败的情况
-    console.error('Request failed:', error);
-    message.error('请求失败，请稍后重试');
+  } catch (error: any) {
+    const err = error as AxiosError;
+    let msg = err.message;
+    if (err.status === 401) {
+      // 处理 token 失效的情况
+      msg = '登录状态已过期，请重新登录';
+      localStorage.removeItem('lzy_token');
+      router.push('/login');
+    } else {
+      // 处理请求失败的情况
+      console.error('Request failed:', error);
+    }
+    message.error(msg);
     return null as any;
   }
 }
