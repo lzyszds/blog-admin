@@ -9,7 +9,7 @@ type ModalParamsType = {
   modalParams: {
     isOpen: boolean;
     title: string;
-    params: {};
+    params: UserAdmin;
     headimgs: string[];
     sureCallback: {
       uploadHeadImg: Function;
@@ -25,19 +25,25 @@ const formItemLayout = {
   labelCol: { span: 6 },
   wrapperCol: { span: 14 },
 };
+// 表单Ref dom
 const formRef = ref<FormInstance>();
+// 表单数据
+const formState = ref<UserAdmin>(modalParams.params);
 
-const formState = ref<UserAdmin>({
-  uid: 0,
-  uname: "",
-  username: "",
-  password: randomPassword(14),
-  power: 1,
-  headImg: "none",
-  whetherUse: 0,
-  signature: "",
+onMounted(() => {
+  // 表单初始化设置
+  if (!modalParams.params) {
+    resetForm();
+  } else {
+    formState.value.password = "";
+    // 如果头像不是推荐的头像，则将头像设置为+号里的背景
+    if (!modalParams.headimgs.includes(formState.value.headImg!)) {
+      if (formState.value.headImg) modalParams.headimgs.push(formState.value.headImg);
+    }
+  }
 });
 
+// 表单验证规则
 const rules: Record<string, Rule[]> = {
   uname: [
     { required: true, message: "请输入用户昵称", trigger: "blur" },
@@ -59,7 +65,7 @@ const onClose = () => {
 };
 
 /* 重置表单 */
-const resetForm = () => {
+function resetForm() {
   formState.value = {
     uname: "",
     username: "",
@@ -69,8 +75,11 @@ const resetForm = () => {
     whetherUse: 0,
     signature: "",
   };
-};
-
+  file.value = undefined;
+  //@ts-ignore 删除背景图片样式
+  document.querySelector(".upload-headimg .ant-radio-button").style.backgroundImage =
+    "none";
+}
 /* 生成随机密码触发事件 */
 const setRomdomPwd = () => {
   /* 生成12-16随机的数字 */
@@ -91,9 +100,6 @@ const selectImage = (event) => {
     const base64 = file.value ? await getBase64(file.value) : "";
     //1.将file转换为base64
     event.target.parentNode.style.backgroundImage = `url(${base64})`;
-    event.target.parentNode.style.backgroundSize = "cover";
-    event.target.parentNode.style.backgroundRepeat = "no-repeat";
-    event.target.parentNode.style.backgroundPosition = "center";
   });
 };
 
@@ -135,8 +141,8 @@ const onSubmit = async () => {
     :width="720"
     :open="modalParams.isOpen"
     :body-style="{ paddingBottom: '80px' }"
-    :footer-style="{ textAlign: 'right' }"
     @close="onClose"
+    destroyOnClose
   >
     <a-form
       ref="formRef"
