@@ -1,5 +1,12 @@
 <script setup lang="ts">
-import { getUsersList, addUser, delUser } from "@/api/userApi";
+import {
+  getUsersList,
+  addUser,
+  editUser,
+  delUser,
+  getAllHeadImg,
+  uploadHeadImg,
+} from "@/api/userApi";
 import LzyIcon from "@/components/LzyIcon.vue";
 import UserForm from "@/components/form/User.vue";
 import useResetRefState from "@/hook/useResetRefState";
@@ -32,19 +39,22 @@ const modalParams = ref({
   isOpen: false,
   title: "添加用户",
   params: {},
+  headimgs: [],
   sureCallback: {
-    callback: () => addUser,
+    uploadHeadImg,
+    callback: addUser,
     refreshData: () => throttledRequest(searchCondition),
   },
 });
 
 /* 获取表格数据 并生成防抖函数  */
-const { data: tableData, loading, throttledRequest } = useRequest(getUsersList, 500);
+const { data: tableData, loading, throttledRequest } = useRequest(getUsersList);
 throttledRequest(searchCondition);
 
 /* 表格列表数据 提供的部分方法 */
 const { columns, setCallbackArr } = getUsersTable();
 
+/* 设置表格列表数据的回调方法 */
 setCallbackArr({
   getListCallbask: () => throttledRequest(searchCondition),
   delCallback: ({ uid }) => delUser({ uid }),
@@ -52,18 +62,26 @@ setCallbackArr({
 });
 
 /* 编辑用户弹窗 */
-const editUserModal = (params) => {
+const editUserModal = async (params) => {
   console.log(params);
   modalParams.value.params = params;
   modalParams.value.isOpen = true;
   modalParams.value.title = "修改用户";
+
+  /* 获取所有可用头像 */
+  const { data } = await getAllHeadImg();
+  modalParams.value.headimgs = data;
 };
 
 /* 添加用户弹窗 */
-const addUserModal = () => {
-  modalParams.value.params = {};
+const setUserModal = async (params) => {
+  modalParams.value.params = params.id ? {} : params;
   modalParams.value.isOpen = true;
-  modalParams.value.title = "添加用户";
+  modalParams.value.title = params.id ? "修改用户" : "添加用户";
+
+  /* 获取所有可用头像 */
+  const { data } = await getAllHeadImg();
+  modalParams.value.headimgs = data;
 };
 </script>
 
@@ -77,10 +95,7 @@ const addUserModal = () => {
         </section>
         <section>
           <span>用户账号：</span>
-          <AInput
-            v-model:value="searchCondition.username"
-            placeholder="请输入用户账号"
-          />
+          <AInput v-model:value="searchCondition.username" placeholder="请输入用户账号" />
         </section>
 
         <section>
@@ -110,7 +125,7 @@ const addUserModal = () => {
       <template #extra>
         <TableHeaderOperation
           :selectedRowKeys="selectedRowKeys"
-          :addModal="addUserModal"
+          :addModal="setUserModal"
           :columns="columns"
         />
       </template>

@@ -1,25 +1,22 @@
-import { Avatar, Tag, Button, Popconfirm, message } from 'ant-design-vue';
-import LzyIcon from '@/components/LzyIcon.vue';
-import { defineStore } from 'pinia'
+import { Avatar, Tag, Button, Popconfirm, message } from "ant-design-vue";
+import LzyIcon from "@/components/LzyIcon.vue";
+import { defineStore } from "pinia";
 
 interface Params {
-  getListCallbask: () => void
-  delCallback: any
-  openModal: any
+  getListCallbask: () => void;
+  delCallback: any;
+  openModal: any;
 }
 
-
-export const getUsersTable = defineStore('getUsersTable', () => {
+export const getUsersTable = defineStore("getUsersTable", () => {
   let params = ref<Params>({
-    getListCallbask: () => { },
-    delCallback: (_item: any) => { },
-    openModal: (_item: any) => { }
-  })
+    getListCallbask: () => {},
+    delCallback: (_item: any) => {},
+    openModal: (_item: any) => {},
+  });
   const setCallbackArr = (param: Params) => {
-    console.log(param);
-
-    params.value = param
-  }
+    params.value = param;
+  };
 
   const columns = ref([
     {
@@ -35,7 +32,7 @@ export const getUsersTable = defineStore('getUsersTable', () => {
       width: "80px",
       // 可用于显示图片或设置渲染方法
       customRender: ({ text }) => {
-        return h(Avatar, { src: '/hono/static' + text, shape: "square" })
+        return h(Avatar, { src: "/hono/static" + text, shape: "square" });
       },
     },
     {
@@ -56,20 +53,24 @@ export const getUsersTable = defineStore('getUsersTable', () => {
       key: "power",
       width: "100px",
       customRender: ({ text }) => {
-
-        return h(Tag, {
-          color: text !== 0 ? 'var(--themeColor)' : '#cd201f',
-          icon: h(LzyIcon, {
-            name: text !== 0 ? 'iconoir:user-square' : 'iconoir:user-crown',
-            size: 16
-          }),
-          style: {
-            display: 'flex',
-            alignItems: 'center',
-            gap: '4px',
-            width: "65px"
-          }
-        }, text !== 0 ? 'user' : 'admin')
+        return h(
+          Tag,
+          {
+            color: text !== 0 ? "var(--themeColor)" : "#cd201f",
+            icon: h(LzyIcon, {
+              name: text !== 0 ? "iconoir:user-square" : "iconoir:user-crown",
+              size: 16,
+            }),
+            style: {
+              display: "flex",
+              alignItems: "center",
+              gap: "4px",
+              width: "65px",
+            },
+            html: "inline-block",
+          },
+          text !== 0 ? "user" : "admin"
+        );
       },
     },
     {
@@ -77,7 +78,7 @@ export const getUsersTable = defineStore('getUsersTable', () => {
       dataIndex: "createDate",
       key: "createDate",
       customRender: ({ text }) => {
-        return useDateFormat(text, 'YYYY-MM-DD').value
+        return useDateFormat(text, "YYYY-MM-DD").value;
       },
       width: "120px",
     },
@@ -87,8 +88,8 @@ export const getUsersTable = defineStore('getUsersTable', () => {
       key: "lastLoginDate",
       width: "100px",
       customRender: ({ text }) => {
-        if (!text) return '暂无'
-        return useTimeAgo(text).value
+        if (!text) return "暂无";
+        return useTimeAgo(text).value;
         // return useDateFormat(text, 'YYYY-MM-DD').value
       },
     },
@@ -105,33 +106,47 @@ export const getUsersTable = defineStore('getUsersTable', () => {
       width: "120px",
       customRender: ({ record }) => {
         return [
-          h(Button, {
-            type: 'primary', size: 'small', style: { fontSize: '12px', },
-            onClick: () => params.value.openModal(record),
-          },
-            { default: () => '编辑' } // 插槽内容
+          h(
+            Button,
+            {
+              type: "primary",
+              size: "small",
+              style: { fontSize: "12px" },
+              onClick: () => params.value.openModal(record),
+            },
+            { default: () => "编辑" } // 插槽内容
           ),
-          h(Popconfirm, {
-            title: '确定删除该用户吗？',
-            cancelText: '取消',
-            okText: '确定',
-            onConfirm: async () => {
-              const result: any = await params.value.delCallback(record)
-              if (result) {
-                message.success(result)
-                params.value.getListCallbask()
-              }
+          h(
+            Popconfirm,
+            {
+              title: "确定删除该用户吗？",
+              cancelText: "取消",
+              okText: "确定",
+              onConfirm: async () => {
+                const result: any = await params.value.delCallback(record);
+                if (result) {
+                  message.success(result);
+                  params.value.getListCallbask();
+                }
+              },
+            },
+            {
+              default: () =>
+                h(
+                  Button,
+                  {
+                    type: "primary",
+                    size: "small",
+                    danger: true,
+                    style: { fontSize: "12px", marginLeft: "10px" },
+                  },
+                  { default: () => "删除" } // 插槽内容
+                ),
             }
-          }, h(Button, {
-            type: 'primary', size: 'small', danger: true,
-            style: { fontSize: '12px', marginLeft: '10px' },
-          },
-            { default: () => '删除' } // 插槽内容
-          ))
-        ]
-      }
-    }
-
-  ])
-  return { columns, setCallbackArr }
-})
+          ),
+        ];
+      },
+    },
+  ]);
+  return { columns, setCallbackArr };
+});

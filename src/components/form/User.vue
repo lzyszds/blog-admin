@@ -1,43 +1,131 @@
 <script lang="ts" setup>
-import { reactive, ref } from "vue";
-import type { Rule } from "ant-design-vue/es/form";
+import type { FormInstance, Rule } from "ant-design-vue/es/form";
+import { UserAdmin } from "@/typings/User";
+import LzyIcon from "../LzyIcon.vue";
+import { message, UploadProps } from "ant-design-vue";
+import { getBase64, randomPassword } from "@/utils/comment";
 
 type ModalParamsType = {
   modalParams: {
     isOpen: boolean;
     title: string;
     params: {};
+    headimgs: string[];
     sureCallback: {
-      callback: () => (params: any) => Promise<any>;
-      refreshData: any;
+      uploadHeadImg: Function;
+      callback: Function;
+      refreshData: Function;
     };
   };
 };
 
 const { modalParams } = defineProps<ModalParamsType>();
 
-const form = reactive({
-  name: "",
-  url: "",
-  owner: "",
-  type: "",
-  approver: "",
-  dateTime: null,
-  description: "",
+const formItemLayout = {
+  labelCol: { span: 6 },
+  wrapperCol: { span: 14 },
+};
+const formRef = ref<FormInstance>();
+
+const formState = ref<UserAdmin>({
+  uid: 0,
+  uname: "",
+  username: "",
+  password: randomPassword(14),
+  power: 1,
+  headImg: "none",
+  whetherUse: 0,
+  signature: "",
 });
 
 const rules: Record<string, Rule[]> = {
-  name: [{ required: true, message: "Please enter user name" }],
-  url: [{ required: true, message: "please enter url" }],
-  owner: [{ required: true, message: "Please select an owner" }],
-  type: [{ required: true, message: "Please choose the type" }],
-  approver: [{ required: true, message: "Please choose the approver" }],
-  dateTime: [{ required: true, message: "Please choose the dateTime", type: "object" }],
-  description: [{ required: true, message: "Please enter url description" }],
+  uname: [
+    { required: true, message: "请输入用户昵称", trigger: "blur" },
+    { min: 3, max: 16, message: "长度在 3 到 16 个字符", trigger: "blur" },
+  ],
+  username: [
+    { required: true, message: "请输入账号", trigger: "blur" },
+    { min: 3, max: 16, message: "长度在 3 到 16 个字符", trigger: "blur" },
+  ],
+  password: [
+    { required: true, message: "请输入密码", trigger: "blur" },
+    { min: 6, max: 16, message: "长度在 6 到 16 个字符", trigger: "blur" },
+  ],
 };
 
+/* 关闭 modal */
 const onClose = () => {
   modalParams.isOpen = false;
+};
+
+/* 重置表单 */
+const resetForm = () => {
+  formState.value = {
+    uname: "",
+    username: "",
+    password: randomPassword(14),
+    power: 1,
+    headImg: [] as any,
+    whetherUse: 0,
+    signature: "",
+  };
+};
+
+/* 生成随机密码触发事件 */
+const setRomdomPwd = () => {
+  /* 生成12-16随机的数字 */
+  const difficulty = Math.floor(Math.random() * (16 - 12 + 1)) + 12;
+  formState.value.password = randomPassword(difficulty);
+};
+
+/* 获取文件系统访问权限 */
+const { file, fileSize, open } = useFileSystemAccess();
+
+/* 上传头像触发事件 */
+const selectImage = (event) => {
+  //@ts-ignore
+  open().then(async () => {
+    if (fileSize.value > 1024 * 1024 * 5) {
+      return message.error("文件大小不能超过5M");
+    }
+    const base64 = file.value ? await getBase64(file.value) : "";
+    //1.将file转换为base64
+    event.target.parentNode.style.backgroundImage = `url(${base64})`;
+    event.target.parentNode.style.backgroundSize = "cover";
+    event.target.parentNode.style.backgroundRepeat = "no-repeat";
+    event.target.parentNode.style.backgroundPosition = "center";
+  });
+};
+
+// 提交表单
+const onSubmit = async () => {
+  /* 先验证表单 */
+  await formRef.value!.validateFields();
+
+  const { uploadHeadImg, callback, refreshData } = modalParams.sureCallback;
+
+  /* 提交保存用户信息 并触发以下事件 */
+  const nextCallback = () => {
+    callback(formState).then(() => {
+      message.success("2.用户信息保存成功！");
+      refreshData(); // 刷新数据
+      resetForm(); // 重置表单
+      onClose(); //关闭modal
+    });
+  };
+
+  //@ts-ignore
+  if (formState.value.headImg === "none") {
+    if (!file.value) return message.error("请选择图片或自行上传头像");
+    /* 将头像上传 */
+    uploadHeadImg(file.value).then((res) => {
+      message.success("1.头像上传成功 即将保存用户信息！");
+      formState.value.headImg = "/img/uploadHead/" + res.filename;
+      nextCallback();
+    });
+  } else {
+    nextCallback();
+  }
 };
 </script>
 
@@ -50,82 +138,173 @@ const onClose = () => {
     :footer-style="{ textAlign: 'right' }"
     @close="onClose"
   >
-    <Aform :model="form" :rules="rules" layout="vertical">
-      <a-row :gutter="16">
-        <ACol :span="12">
-          <AformItem label="Name" name="name">
-            <AInput v-model:value="form.name" placeholder="Please enter user name" />
-          </AformItem>
-        </ACol>
-        <ACol :span="12">
-          <AformItem label="Url" name="url">
-            <AInput
-              v-model:value="form.url"
-              style="width: 100%"
-              addon-before="http://"
-              addon-after=".com"
-              placeholder="please enter url"
-            />
-          </AformItem>
-        </ACol>
-      </a-row>
-      <a-row :gutter="16">
-        <ACol :span="12">
-          <AformItem label="Owner" name="owner">
-            <ASelect v-model:value="form.owner" placeholder="Please AS an owner">
-              <ASelect-option value="xiao">Xiaoxiao Fu</ASelect-option>
-              <ASelect-option value="mao">Maomao Zhou</ASelect-option>
-            </ASelect>
-          </AformItem>
-        </ACol>
-        <ACol :span="12">
-          <AformItem label="Type" name="type">
-            <ASelect v-model:value="form.type" placeholder="Please choose the type">
-              <ASelect-option value="private">Private</ASelect-option>
-              <ASelect-option value="public">Public</ASelect-option>
-            </ASelect>
-          </AformItem>
-        </ACol>
-      </a-row>
-      <a-row :gutter="16">
-        <ACol :span="12">
-          <AformItem label="Approver" name="approver">
-            <ASelect
-              v-model:value="form.approver"
-              placeholder="Please choose the approver"
-            >
-              <ASelect-option value="jack">Jack Ma</ASelect-option>
-              <ASelect-option value="tom">Tom Liu</ASelect-option>
-            </ASelect>
-          </AformItem>
-        </ACol>
-        <ACol :span="12">
-          <AformItem label="DateTime" name="dateTime">
-            <a-date-picker
-              v-model:value="form.dateTime"
-              style="width: 100%"
-              :get-popup-container="(trigger) => trigger.parentElement"
-            />
-          </AformItem>
-        </ACol>
-      </a-row>
-      <a-row :gutter="16">
-        <ACol :span="24">
-          <AformItem label="Description" name="description">
-            <a-textarea
-              v-model:value="form.description"
-              :rows="4"
-              placeholder="please enter url description"
-            />
-          </AformItem>
-        </ACol>
-      </a-row>
-    </Aform>
+    <a-form
+      ref="formRef"
+      :model="formState"
+      name="validate_other"
+      v-bind="formItemLayout"
+    >
+      <a-form-item label="选择头像">
+        <a-radio-group
+          id="headimgRadio"
+          v-model:value="formState.headImg"
+          button-style="solid"
+        >
+          <a-radio-button
+            v-for="item in modalParams.headimgs"
+            :value="item"
+            :style="{ backgroundImage: `url(/hono/static${item})` }"
+          >
+            <Transition name="fade">
+              <LzyIcon
+                size="18"
+                name="iconoir:check"
+                v-if="item === formState.headImg"
+                style="
+                  color: #fff;
+                  background: var(--themeGreen);
+                  border-radius: 10%;
+                  padding: 5px;
+                "
+              />
+            </Transition>
+          </a-radio-button>
+          <a-radio-button
+            value="none"
+            @click="selectImage"
+            class="upload-headimg ant-radio-button-wrapper-checked"
+          >
+            <LzyIcon size="20" name="iconoir:plus" />
+            <p>上传头像</p>
+          </a-radio-button>
+        </a-radio-group>
+      </a-form-item>
+
+      <a-form-item name="uname" label="昵称" has-feedback :rules="rules.uname">
+        <a-input v-model:value="formState.uname" />
+      </a-form-item>
+
+      <a-form-item name="username" label="账号" has-feedback :rules="rules.username">
+        <a-input v-model:value="formState.username" />
+      </a-form-item>
+
+      <a-form-item name="password" label="密码" has-feedback :rules="rules.password">
+        <a-input v-model:value="formState.password">
+          <template #addonAfter>
+            <ATooltip placement="right">
+              <template #title>生成随机密码</template>
+              <span @click="setRomdomPwd"><LzyIcon name="iconoir:refresh-circle" /></span>
+            </ATooltip>
+          </template>
+        </a-input>
+      </a-form-item>
+
+      <a-form-item name="power" label="权限">
+        <a-radio-group v-model:value="formState.power" button-style="solid">
+          <a-radio-button :value="1">普通用户</a-radio-button>
+          <a-radio-button :value="0">管理员</a-radio-button>
+        </a-radio-group>
+      </a-form-item>
+
+      <a-form-item name="whetherUse" label="禁用">
+        <a-switch v-model:checked="formState.whetherUse" />
+      </a-form-item>
+
+      <a-form-item name="signature" label="签名">
+        <a-textarea
+          v-model:value="formState.signature"
+          max-length="5"
+          allow-clear
+          :autoSize="{ minRows: 2, maxRows: 6 }"
+        />
+      </a-form-item>
+    </a-form>
+
     <template #extra>
       <ASpace>
         <a-button @click="onClose">取消保存</a-button>
-        <a-button type="primary" @click="onClose">提交数据</a-button>
+        <a-button @click="resetForm">重置数据</a-button>
+        <a-button type="primary" @click="onSubmit">提交数据</a-button>
       </ASpace>
     </template>
   </ADrawer>
 </template>
+
+<style scoped>
+#headimgRadio {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+
+  label {
+    height: 90px;
+    width: 90px;
+    border-radius: 10px;
+    padding: 0;
+    overflow: hidden;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    border: 1px solid #aaa;
+    display: flex;
+    align-items: end;
+    justify-content: right;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05), 0 1px 6px -1px rgba(0, 0, 0, 0.05),
+      0 2px 4px 0 rgba(0, 0, 0, 0.05);
+    & > :deep(span) {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      font-family: "dindin";
+      color: #888;
+      p {
+        margin: 0;
+      }
+    }
+
+    &.ant-radio-button-wrapper-checked {
+      background-color: #fafafa;
+      border-color: var(--themeColor);
+    }
+    &:hover {
+      border-color: var(--themeColor);
+      &.upload-headimg.ant-radio-button-wrapper-checked {
+        border-color: var(--themeColor);
+      }
+    }
+    &.upload-headimg.ant-radio-button-wrapper-checked {
+      border-color: #aaa;
+      align-items: center;
+      justify-content: center;
+      border-style: dashed;
+    }
+    &.upload-headimg :hover {
+      border-color: #aaa;
+    }
+  }
+}
+:deep(.pushImage) {
+  .ant-tooltip {
+    display: none;
+  }
+}
+:deep(.ant-input-group-addon) {
+  padding: 0;
+  width: 35px;
+  svg {
+    cursor: pointer;
+    outline: none !important;
+  }
+}
+.fade-enter-active,
+.fade-leave-active {
+  transition: 0.23s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+  transform: scale(0.5);
+}
+</style>

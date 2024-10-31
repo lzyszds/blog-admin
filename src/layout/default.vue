@@ -19,6 +19,7 @@ const pushRouter = (item) => {
   if (typeof item == "number") {
     item = tabsState.getKeyArr(item);
   }
+  selectedKeys.value = [item.key];
   selected.value = item;
   tabsState.setKeyArr(item);
 
@@ -48,14 +49,14 @@ onMounted(() => {
 </script>
 
 <template>
-  <a-layout class="ant-layout" ref="layout">
+  <ALayout class="ant-layout" ref="layout">
     <!-- 菜单遮罩 -->
     <div
       :class="{ show: isFixed && !collapsed, mask: true }"
       @click="collapsed = true"
     ></div>
 
-    <a-layout-sider
+    <ALayoutSider
       v-model:collapsed="collapsed"
       :trigger="null"
       style="background-color: #fff"
@@ -65,7 +66,7 @@ onMounted(() => {
       :class="{ fixed: isFixed }"
       @breakpoint="handleBreakpoint"
     >
-      <div class="logo">
+      <div class="logo" @click="pushRouter(items[0])">
         <h2>{{ collapsed ? "Jz" : "Jz 博客管理系统" }}</h2>
       </div>
 
@@ -83,10 +84,10 @@ onMounted(() => {
           <span class="menu-title-item">{{ item.name }}</span>
         </AMenu-item>
       </AMenu>
-    </a-layout-sider>
-    <a-layout>
+    </ALayoutSider>
+    <ALayout>
       <!-- 头部 -->
-      <a-layout-header class="ant-layout-header">
+      <ALayout-header class="ant-layout-header">
         <!-- 折叠按钮 -->
         <template v-if="!isFixed">
           <a-tooltip placement="bottomLeft" :mouseLeaveDelay="0">
@@ -116,13 +117,13 @@ onMounted(() => {
             <a-breadcrumb-item>
               <LzyIcon
                 :name="selected.uicon"
-                style="font-size: 18px; margin-right: 4px; line-height: 1"
+                style="fontsize: 18px; margin-right: 4px; line-height: 1"
               />
               <span>{{ selected.name }}</span>
             </a-breadcrumb-item>
           </a-breadcrumb>
         </Transition>
-      </a-layout-header>
+      </ALayout-header>
 
       <!-- 右键打开 菜单 -->
       <a-tabs
@@ -155,7 +156,7 @@ onMounted(() => {
       </a-tabs>
 
       <!-- 内容 -->
-      <a-layout-content
+      <ALayout-content
         :style="{
           padding: '14px',
           overflowY: 'auto',
@@ -168,9 +169,9 @@ onMounted(() => {
             <component :is="Component" />
           </Transition>
         </RouterView>
-      </a-layout-content>
-    </a-layout>
-  </a-layout>
+      </ALayout-content>
+    </ALayout>
+  </ALayout>
 </template>
 
 <style scoped>
@@ -190,6 +191,7 @@ onMounted(() => {
   color: var(--themeColor);
   font-family: "dindin";
   overflow: hidden;
+  cursor: pointer;
   h2 {
     text-wrap: nowrap;
   }
@@ -212,7 +214,7 @@ onMounted(() => {
       color: var(--themeColor);
     }
     svg.trigger {
-      font-size: 22px;
+      fontsize: 22px;
       line-height: 64px;
       cursor: pointer;
     }
@@ -223,7 +225,7 @@ onMounted(() => {
   display: flex;
   gap: 10px;
   align-items: center;
-  font-size: 14px;
+  fontsize: 14px;
   font-weight: 500;
 }
 
@@ -301,7 +303,7 @@ onMounted(() => {
     align-items: center;
     button {
       margin-left: 5px;
-      font-size: 14px;
+      fontsize: 14px;
       width: 20px;
       height: 20px;
       border-radius: 50%;
@@ -315,7 +317,7 @@ onMounted(() => {
         background-color: #eee;
       }
       span {
-        font-size: 12px !important;
+        fontsize: 12px !important;
       }
     }
     &.ant-tabs-tab-active {

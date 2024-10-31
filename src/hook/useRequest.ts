@@ -41,7 +41,8 @@ export function useRequest(
     const executeRequest = async () => {
       try {
         /* 执行请求 */
-        data.value = await apiFunction(...args);
+        data.value = (await apiFunction(...args)).data;
+
         requestAfterCall.success?.(data.value); // 使用可选链调用
       } catch (err: any) {
         /* 请求失败，重试或抛出错误 */
