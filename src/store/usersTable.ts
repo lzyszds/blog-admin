@@ -1,4 +1,4 @@
-import { Avatar, Tag, Button, Popconfirm, message } from "ant-design-vue";
+import { Avatar, Tag, Button, Popconfirm, message, } from "ant-design-vue";
 import LzyIcon from "@/components/LzyIcon.vue";
 import { defineStore } from "pinia";
 
@@ -8,17 +8,28 @@ interface Params {
   openModal: any;
 }
 
+interface Column {
+  title: string;
+  dataIndex: string;
+  key: string;
+  width?: string;
+  ellipsis?: boolean;
+  checked?: boolean;
+  customRender?: (params: any) => any;
+}
+
+
 export const getUsersTable = defineStore("getUsersTable", () => {
   let params = ref<Params>({
-    getListCallbask: () => {},
-    delCallback: (_item: any) => {},
-    openModal: (_item: any) => {},
+    getListCallbask: () => { },
+    delCallback: (_item: any) => { },
+    openModal: (_item: any) => { },
   });
   const setCallbackArr = (param: Params) => {
     params.value = param;
   };
 
-  const columns = ref([
+  const columns = ref<Column[]>([
     {
       title: "UID",
       dataIndex: "uid",
@@ -148,5 +159,10 @@ export const getUsersTable = defineStore("getUsersTable", () => {
       },
     },
   ]);
-  return { columns, setCallbackArr };
+
+  columns.value = columns.value.map((item) => {
+    return { ...item, ellipsis: true, checked: true };
+  });
+
+  return { columns, setCallbackArr, };
 });

@@ -33,6 +33,8 @@ export function useRequest(
 
   /*  节流函数 */
   const throttledRequest = useThrottleFn(async (...args: any[]) => {
+    /* 时间戳 */
+    const oldTime = Date.now()
     loading.value = true;
     error.value = null;
 
@@ -41,8 +43,14 @@ export function useRequest(
     const executeRequest = async () => {
       try {
         /* 执行请求 */
-        data.value = (await apiFunction(...args)).data;
-
+        const result = (await apiFunction(...args)).data;
+        const newTime = Date.now()
+        console.log(`请求耗时：${newTime - oldTime}ms`)
+        /* 如果耗时在 1s 以内，则延迟至 1s */
+        if (newTime - oldTime < 1000) {
+          await new Promise((resolve) => setTimeout(resolve, 1000 - (newTime - oldTime)));
+        }
+        data.value = result;
         requestAfterCall.success?.(data.value); // 使用可选链调用
       } catch (err: any) {
         /* 请求失败，重试或抛出错误 */

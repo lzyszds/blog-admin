@@ -1,63 +1,42 @@
-<template>
-  <a-card style="padding: 5px" :bodyStyle="{ padding: '5px' }">
-    <Transition name="fade" v-for="(item, index) in checkAll" :key="index">
-      <dir
-        class="draggable-item"
-        draggable="true"
-        @dragstart="onDragStart(index)"
-        @dragover.prevent="onDragOver(index)"
-        @drop="onDrop(index)"
-      >
-        <p>
-          <LzyIcon name="iconoir:dialpad" size="18" style="vertical-align: sub" />
-        </p>
-        <a-checkbox v-model:checked="checkAll" @change="onCheckAllChange">
-          {{ item.title }}
-        </a-checkbox>
-      </dir>
-    </Transition>
-  </a-card>
-</template>
+<script setup lang="ts">
+import { VueDraggable } from "vue-draggable-plus";
 
-<script setup>
-import { ref, onMounted } from "vue";
-import LzyIcon from "./LzyIcon.vue";
-const props = defineProps({
-  columns: Array,
-});
-const { cloned: checkAll } = useCloned(props.columns);
-
-let draggedItemIndex = null;
-
-const onDragStart = (index) => {
-  draggedItemIndex = index;
-};
-
-const onDragOver = (index) => {
-  console.log("drag over", index);
-
-  if (index !== draggedItemIndex) {
-    const draggedItem = checkAll.value[draggedItemIndex];
-    checkAll.value.splice(draggedItemIndex, 1); // 移除被拖拽的项
-    checkAll.value.splice(index, 0, draggedItem); // 在新的位置插入
-    draggedItemIndex = index; // 更新当前拖拽项的索引
-  }
-};
-
-const onDrop = (index) => {
-  const draggedItem = checkAll.value[draggedItemIndex];
-  checkAll.value.splice(draggedItemIndex, 1); // 移除被拖拽的项
-  checkAll.value.splice(index, 0, draggedItem); // 在新的位置插入
-};
-
-const onCheckAllChange = () => {
-  // checkAll.value = checkAll.value.length > 0 ? [] : props.columns.map((item) => item.key);
-};
+import { getUsersTable } from "@/store/usersTable";
+const usersTableData = getUsersTable();
 </script>
+
+<template>
+  <APopover placement="bottomRight" trigger="click">
+    <AButton>
+      <template #icon>
+        <LzyIcon name="iconoir:settings" size="16" />
+      </template>
+      <span>列设置</span>
+    </AButton>
+    <template #content>
+      <VueDraggable
+        v-model="usersTableData.columns"
+        :animation="150"
+        filter=".none_draggable"
+      >
+        <div
+          v-for="item in usersTableData.columns"
+          :key="item.key"
+          class="draggable-item"
+        >
+          <LzyIcon name="iconoir:dialpad" size="18" style="vertical-align: sub" />
+          <ACheckbox v-model:checked="item.checked" class="none_draggable flex-1">
+            {{ item.title }}
+          </ACheckbox>
+        </div>
+      </VueDraggable>
+    </template>
+  </APopover>
+</template>
 
 <style scoped>
 .draggable-item {
-  width: 150px;
+  width: auto;
   height: 40px;
   display: flex;
   gap: 5px;
@@ -66,7 +45,7 @@ const onCheckAllChange = () => {
   padding: 0;
   border-radius: 5px;
 
-  & > p {
+  & > svg {
     cursor: move;
     margin: 0;
     height: 100%;
@@ -77,7 +56,8 @@ const onCheckAllChange = () => {
 
   &:hover,
   &:active,
-  &:focus {
+  &:focus,
+  &.active {
     background-color: rgb(var(--themeColorRgb), 0.1);
   }
 }

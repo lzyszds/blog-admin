@@ -52,37 +52,41 @@ const { data: tableData, loading, throttledRequest } = useRequest(getUsersList);
 throttledRequest(searchCondition);
 
 /* 表格列表数据 提供的部分方法 */
-const { columns, setCallbackArr } = getUsersTable();
+const usersTableData = getUsersTable();
+
+//真正的数据Columns
+const columns = computed(() => usersTableData.columns.filter((item) => item.checked));
 
 /* 设置表格列表数据的回调方法 */
-setCallbackArr({
+usersTableData.setCallbackArr({
   getListCallbask: () => throttledRequest(searchCondition),
   delCallback: ({ uid }) => delUser({ uid }),
-  openModal: (params) => editUserModal(params),
+  openModal: (params) => setUserModal(params),
 });
 
-/* 编辑用户弹窗 */
-const editUserModal = async (params) => {
-  console.log(params);
-  modalParams.value.params = params;
-  modalParams.value.isOpen = true;
-  modalParams.value.title = "修改用户";
-
-  /* 获取所有可用头像 */
-  const { data } = await getAllHeadImg();
+/* 获取所有可用头像 */
+getAllHeadImg().then(({ data }) => {
   modalParams.value.headimgs = data;
-};
-
-/* 添加用户弹窗 */
+});
+/* 添加/编辑用户弹窗 */
 const setUserModal = async (params) => {
-  modalParams.value.params = params.id ? {} : params;
-  modalParams.value.isOpen = true;
-  modalParams.value.title = params.id ? "修改用户" : "添加用户";
+  const isEdit = !!params.uid;
 
-  /* 获取所有可用头像 */
-  const { data } = await getAllHeadImg();
-  modalParams.value.headimgs = data;
+  modalParams.value.params = isEdit ? params : {};
+  modalParams.value.isOpen = true;
+  modalParams.value.title = isEdit ? "修改用户" : "添加用户";
+  modalParams.value.sureCallback.callback = isEdit ? editUser : addUser;
 };
+
+// 动画控制 为了解决模态框关闭时 动画直接被if销毁
+const userFormHide = ref(false);
+watchEffect(async () => {
+  const { isOpen } = modalParams.value;
+  if (!isOpen) {
+    await new Promise((resolve) => setTimeout(resolve, 300));
+  }
+  userFormHide.value = isOpen;
+});
 </script>
 
 <template>
@@ -126,7 +130,8 @@ const setUserModal = async (params) => {
         <TableHeaderOperation
           :selectedRowKeys="selectedRowKeys"
           :addModal="setUserModal"
-          :columns="columns"
+          :loading="loading"
+          @refresh="throttledRequest(searchCondition)"
         />
       </template>
 
@@ -144,7 +149,7 @@ const setUserModal = async (params) => {
         />
       </main>
     </a-card>
-    <UserForm :modalParams="modalParams" />
+    <UserForm :modalParams="modalParams" v-if="userFormHide" />
   </section>
 </template>
 

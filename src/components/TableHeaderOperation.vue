@@ -1,13 +1,14 @@
 <script setup lang="ts">
 import DraggableCard from "@/components/DraggableCard.vue";
-const props = defineProps({
-  selectedRowKeys: {
-    type: Array,
-    default: () => [],
-  },
-  addModal: { type: Function, default: () => {} },
-  columns: { type: Array, default: () => [] },
-});
+interface Props {
+  selectedRowKeys: any[];
+  addModal: Function;
+  loading: boolean;
+}
+const props = defineProps<Props>();
+const emits = defineEmits(["refresh"]);
+/* 刷新表格数据 */
+const refresh = () => emits("refresh");
 </script>
 
 <template>
@@ -25,15 +26,32 @@ const props = defineProps({
       批量删除
     </AButton>
 
-    <AButton> <LzyIcon name="iconoir:refresh-double" size="15" /> 刷新 </AButton>
+    <AButton @click="refresh">
+      <LzyIcon name="iconoir:refresh-double" size="15" :class="{ spin: loading }" />
+      刷新
+    </AButton>
 
-    <ADropdown :trigger="['click']" placement="bottomRight" arrow>
-      <AButton> <LzyIcon name="iconoir:settings" size="16" />列设置</AButton>
-      <template #overlay>
-        <DraggableCard :columns="columns"></DraggableCard>
-      </template>
-    </ADropdown>
+    <DraggableCard></DraggableCard>
   </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+.actionBtn button {
+  svg {
+    margin-right: 5px;
+  }
+}
+
+/* 一直旋转 */
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+.spin {
+  animation: rotate 2s linear infinite;
+}
+</style>
