@@ -15,13 +15,14 @@ import { useRequest } from "@/hook/useRequest";
 import { useTableScroll } from "@/hook/useTable";
 import { Key } from "ant-design-vue/es/_util/type";
 import TableHeaderOperation from "@/components/TableHeaderOperation.vue";
+import { TableProps } from "ant-design-vue";
 /* 获取表格滚动条高度 */
 const { tableWrapperRef, scrollConfig } = useTableScroll();
 
 /* 搜索条件 */
 const { state: searchCondition, reset } = useResetRefState({
-  pages: 1,
-  limit: 10,
+  current: 1,
+  pageSize: 10,
   name: "",
   username: "",
   power: "",
@@ -51,6 +52,15 @@ const modalParams = ref({
 const { data: tableData, loading, throttledRequest } = useRequest(getUsersList);
 throttledRequest(searchCondition);
 
+/* 分页参数 */
+const pagination = computed(() => {
+  return {
+    total: tableData.value && tableData.value.total,
+    current: searchCondition.value.current,
+    pageSize: searchCondition.value.pageSize,
+  };
+});
+
 /* 表格列表数据 提供的部分方法 */
 const usersTableData = getUsersTable();
 
@@ -63,6 +73,11 @@ usersTableData.setCallbackArr({
   delCallback: ({ uid }) => delUser({ uid }),
   openModal: (params) => setUserModal(params),
 });
+
+const handleTableChange: TableProps["onChange"] = (pagination) => {
+  searchCondition.value.current = pagination.current;
+  throttledRequest(searchCondition);
+};
 
 /* 获取所有可用头像 */
 getAllHeadImg().then(({ data }) => {
@@ -143,9 +158,10 @@ watchEffect(async () => {
           :data-source="tableData ? tableData.data : []"
           :scroll="scrollConfig"
           :loading="loading"
+          :pagination="pagination"
           size="small"
           row-key="uid"
-          class="h-full"
+          @change="handleTableChange"
         />
       </main>
     </a-card>

@@ -4,9 +4,9 @@ import request from "@/utils/request";
 /* 获取用户列表 */
 export const getUsersList = async (params: any) => {
   if (isRef(params)) params = unref(params);
-  let { pages, limit, search } = params;
+  let { current, pageSize, search } = params;
   return await request({
-    url: `/users/getUserList?pages=${pages || ""}&limit=${limit || ""}&search=${""}`,
+    url: `/users/getUserList?pages=${current || ""}&limit=${pageSize || ""}&search=${""}`,
     method: "get",
     params,
   });
