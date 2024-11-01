@@ -21,6 +21,6 @@ if (props.size) {
 <style scoped>
 .LzyIcon {
   cursor: pointer;
-  vertical-align: text-bottom;
+  vertical-align: sub;
 }
 </style>

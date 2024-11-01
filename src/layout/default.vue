@@ -13,6 +13,7 @@ const router = useRouter();
 const isFixed = ref(false); // 控制是否应用 `fixed` 样式
 const tabsState = useTabsState();
 const tabsRef = templateRef<HTMLElement>("tabsRef");
+const refreshKey = ref(0); // 刷新路由
 
 /* 跳转路由  */
 const pushRouter = (item) => {
@@ -87,7 +88,7 @@ onMounted(() => {
     </ALayoutSider>
     <ALayout>
       <!-- 头部 -->
-      <ALayout-header class="ant-layout-header">
+      <ALayoutHeader class="ant-layout-header">
         <!-- 折叠按钮 -->
         <template v-if="!isFixed">
           <a-tooltip placement="bottomLeft" :mouseLeaveDelay="0">
@@ -117,13 +118,17 @@ onMounted(() => {
             <a-breadcrumb-item>
               <LzyIcon
                 :name="selected.uicon"
-                style="fontsize: 18px; margin-right: 4px; line-height: 1"
+                style="font-size: 18px; margin-right: 4px; line-height: 1"
               />
               <span>{{ selected.name }}</span>
             </a-breadcrumb-item>
           </a-breadcrumb>
         </Transition>
-      </ALayout-header>
+
+        <template #extra>
+        12
+        </template>
+      </ALayoutHeader>
 
       <!-- 右键打开 菜单 -->
       <a-tabs
@@ -151,7 +156,18 @@ onMounted(() => {
           </template>
         </a-tab-pane>
         <template #rightExtra>
-          <a-button>Right Extra Action</a-button>
+          <div class="rightExtra">
+            <ATooltip placement="bottom">
+              <template #title>刷新页面</template>
+              <AButton type="text">
+                <LzyIcon @click="refreshKey++" size="26" name="iconoir:refresh-circle" />
+              </AButton>
+            </ATooltip>
+            <ATooltip placement="bottom">
+              <template #title>全屏</template>
+              <AButton type="text"><LzyIcon size="26" name="iconoir:expand" /></AButton>
+            </ATooltip>
+          </div>
         </template>
       </a-tabs>
 
@@ -159,14 +175,14 @@ onMounted(() => {
       <ALayout-content
         :style="{
           padding: '14px',
-          overflowY: 'auto',
-          overflowX: 'hidden',
+          overflow: 'hidden auto',
+          minHeight: '500px',
         }"
         ref="mainRef"
       >
         <RouterView v-slot="{ Component }">
           <Transition name="router" mode="out-in">
-            <component :is="Component" />
+            <component :is="Component" :key="refreshKey" />
           </Transition>
         </RouterView>
       </ALayout-content>
@@ -214,7 +230,7 @@ onMounted(() => {
       color: var(--themeColor);
     }
     svg.trigger {
-      fontsize: 22px;
+      font-size: 22px;
       line-height: 64px;
       cursor: pointer;
     }
@@ -225,7 +241,7 @@ onMounted(() => {
   display: flex;
   gap: 10px;
   align-items: center;
-  fontsize: 14px;
+  font-size: 14px;
   font-weight: 500;
 }
 
@@ -283,7 +299,8 @@ onMounted(() => {
 }
 
 :deep(.ant-tabs-nav) {
-  padding: 10px 10px 4px;
+  height: 50px;
+  padding: 0;
   margin: 0;
   background-color: #fff;
   .ant-tabs-nav-list {
@@ -303,7 +320,7 @@ onMounted(() => {
     align-items: center;
     button {
       margin-left: 5px;
-      fontsize: 14px;
+      font-size: 14px;
       width: 20px;
       height: 20px;
       border-radius: 50%;
@@ -317,13 +334,21 @@ onMounted(() => {
         background-color: #eee;
       }
       span {
-        fontsize: 12px !important;
+        font-size: 12px !important;
       }
     }
     &.ant-tabs-tab-active {
       button {
         color: var(--themeColor);
       }
+    }
+  }
+
+  .rightExtra {
+    display: flex;
+    margin-right: 10px;
+    button {
+      height: 100%;
     }
   }
 }
