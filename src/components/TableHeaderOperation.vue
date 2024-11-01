@@ -6,9 +6,7 @@ interface Props {
   loading: boolean;
 }
 const props = defineProps<Props>();
-const emits = defineEmits(["refresh"]);
-/* 刷新表格数据 */
-const refresh = () => emits("refresh");
+const emits = defineEmits(["refresh", "multipleDel"]);
 </script>
 
 <template>
@@ -20,13 +18,14 @@ const refresh = () => emits("refresh");
     <AButton
       danger
       :disabled="!props.selectedRowKeys.length"
+      @click="$emit('multipleDel')"
       style="padding-left: 5px; padding-right: 5px"
     >
       <LzyIcon name="iconoir:trash" size="16" />
       批量删除
     </AButton>
 
-    <AButton @click="refresh">
+    <AButton @click="$emit('refresh')">
       <LzyIcon name="iconoir:refresh-double" size="15" :class="{ spin: loading }" />
       刷新
     </AButton>

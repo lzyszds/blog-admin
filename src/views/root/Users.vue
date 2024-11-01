@@ -15,7 +15,9 @@ import { useRequest } from "@/hook/useRequest";
 import { useTableScroll } from "@/hook/useTable";
 import { Key } from "ant-design-vue/es/_util/type";
 import TableHeaderOperation from "@/components/TableHeaderOperation.vue";
-import { TableProps } from "ant-design-vue";
+import { message, Modal, TableProps } from "ant-design-vue";
+import { ExclamationCircleOutlined } from "@ant-design/icons-vue";
+import { createVNode } from "vue";
 /* 获取表格滚动条高度 */
 const { tableWrapperRef, scrollConfig } = useTableScroll();
 
@@ -102,6 +104,26 @@ watchEffect(async () => {
   }
   userFormHide.value = isOpen;
 });
+
+//多选删除列表事件
+
+const multipleDel = () => {
+  Modal.confirm({
+    title: "温馨提醒",
+    icon: createVNode(ExclamationCircleOutlined),
+    content: "确定要删除这些内容吗？",
+    okText: "确定",
+    cancelText: "取消",
+    onOk() {
+      const uids = selectedRowKeys.value;
+      delUser({ uid: uids.join(",") }).then(() => {
+        selectedRowKeys.value = [];
+        throttledRequest(searchCondition);
+        message.success("删除成功");
+      });
+    },
+  });
+};
 </script>
 
 <template>
@@ -155,6 +177,7 @@ watchEffect(async () => {
           :addModal="setUserModal"
           :loading="loading"
           @refresh="throttledRequest(searchCondition)"
+          @multipleDel="multipleDel"
         />
       </template>
 
