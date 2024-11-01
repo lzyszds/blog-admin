@@ -21,8 +21,8 @@ const { tableWrapperRef, scrollConfig } = useTableScroll();
 
 /* 搜索条件 */
 const { state: searchCondition, reset } = useResetRefState({
-  current: 1,
-  pageSize: 10,
+  pages: 1,
+  limit: 10,
   name: "",
   username: "",
   power: "",
@@ -56,8 +56,8 @@ throttledRequest(searchCondition);
 const pagination = computed(() => {
   return {
     total: tableData.value && tableData.value.total,
-    current: searchCondition.value.current,
-    pageSize: searchCondition.value.pageSize,
+    pages: searchCondition.value.pages,
+    limit: searchCondition.value.limit,
   };
 });
 
@@ -75,7 +75,7 @@ usersTableData.setCallbackArr({
 });
 
 const handleTableChange: TableProps["onChange"] = (pagination) => {
-  searchCondition.value.current = pagination.current;
+  searchCondition.value.pages = pagination.current;
   throttledRequest(searchCondition);
 };
 
@@ -110,11 +110,19 @@ watchEffect(async () => {
       <main class="searchCard">
         <section>
           <span>用户名：</span>
-          <AInput v-model:value="searchCondition.name" placeholder="请输入用户名称" />
+          <AInput
+            @pressEnter="throttledRequest(searchCondition)"
+            v-model:value="searchCondition.name"
+            placeholder="请输入用户名称"
+          />
         </section>
         <section>
           <span>用户账号：</span>
-          <AInput v-model:value="searchCondition.username" placeholder="请输入用户账号" />
+          <AInput
+            @pressEnter="throttledRequest(searchCondition)"
+            v-model:value="searchCondition.username"
+            placeholder="请输入用户账号"
+          />
         </section>
 
         <section>

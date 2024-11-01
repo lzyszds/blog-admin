@@ -21,8 +21,15 @@ export default function makeRequest<T = any>({
   data,
   headers,
 }: AxiosRequestConfig): Promise<T | any> {
-
+  
   return new Promise(async (resolve, reject) => {
+
+    /* 过滤参数 params 如果某个值为空则销毁这key */
+    for (const key in params) {
+      if (params[key] === '' || params[key] === null) {
+        delete params[key];
+      }
+    }
 
     const defaultConfig: AxiosConfig = {
       baseURL: '/hono/api',

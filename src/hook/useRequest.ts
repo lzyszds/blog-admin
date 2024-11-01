@@ -47,8 +47,8 @@ export function useRequest(
         const newTime = Date.now()
         console.log(`请求耗时：${newTime - oldTime}ms`)
         /* 如果耗时在 1s 以内，则延迟至 1s */
-        if (newTime - oldTime < 1000) {
-          await new Promise((resolve) => setTimeout(resolve, 1000 - (newTime - oldTime)));
+        if (newTime - oldTime < 500) {
+          await new Promise((resolve) => setTimeout(resolve, 500 - (newTime - oldTime)));
         }
         data.value = result;
         requestAfterCall.success?.(data.value); // 使用可选链调用
