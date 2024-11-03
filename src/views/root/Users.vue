@@ -12,15 +12,14 @@ import UserForm from "@/components/form/User.vue";
 import useResetRefState from "@/hook/useResetRefState";
 import { getUsersTable } from "@/store/usersTable";
 import { useRequest } from "@/hook/useRequest";
-import { useTableScroll } from "@/hook/useTable";
+import { useScrollY } from "@/hook/useTable";
 import { Key } from "ant-design-vue/es/_util/type";
 import TableHeaderOperation from "@/components/TableHeaderOperation.vue";
 import { message, Modal, TableProps } from "ant-design-vue";
 import { ExclamationCircleOutlined } from "@ant-design/icons-vue";
 import { createVNode } from "vue";
 /* 获取表格滚动条高度 */
-const { tableWrapperRef, scrollConfig } = useTableScroll();
-
+const { scrollConfig } = useScrollY();
 /* 搜索条件 */
 const { state: searchCondition, reset } = useResetRefState({
   pages: 1,
@@ -170,7 +169,11 @@ const multipleDel = () => {
       </main>
     </ACard>
 
-    <a-card title="角色列表" style="flex: 1">
+    <ACard
+      title="角色列表"
+      :body-style="{ flex: 1, overflow: 'hidden', paddingBottom: '0' }"
+      style="height: calc(100% - 20px)"
+    >
       <template #extra>
         <TableHeaderOperation
           :selectedRowKeys="selectedRowKeys"
@@ -195,7 +198,7 @@ const multipleDel = () => {
           @change="handleTableChange"
         />
       </main>
-    </a-card>
+    </ACard>
     <UserForm :modalParams="modalParams" v-if="userFormHide" />
   </section>
 </template>
@@ -226,9 +229,11 @@ const multipleDel = () => {
     min-width: 120px;
   }
 }
+
 :deep(.ant-table-body) {
-  overflow-y: hidden !important;
+  overflow-y: auto;
 }
+
 .actionBtn {
   display: flex;
   gap: 10px;
@@ -256,5 +261,10 @@ const multipleDel = () => {
   :deep(.searchCard) {
     flex-wrap: wrap;
   }
+}
+</style>
+<style>
+::-webkit-scrollbar {
+  background-color: #fff !important;
 }
 </style>

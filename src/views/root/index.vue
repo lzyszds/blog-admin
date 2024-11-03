@@ -2,28 +2,6 @@
 import Layout from "@/layout/default.vue";
 
 const layoutMain = templateRef<HTMLElement>("layoutMain");
-onMounted(() => {
-  const { width } = useWindowSize();
-  watchEffect(() => {
-    if (width.value < 768) {
-      layoutMain.value.style.padding = "0";
-      layoutMain.value.style.height = "calc(100vh)";
-      //@ts-ignore
-      layoutMain.value.querySelector(".ant-layout")!.style.borderRadius = "0";
-    } else if (width.value < 992) {
-      layoutMain.value.style.padding = "20px";
-      layoutMain.value.style.height = "calc(100vh - 40px)";
-    } else if (width.value < 1300) {
-      layoutMain.value.style.padding = "40px";
-      layoutMain.value.style.height = "calc(100vh - 80px)";
-    } else {
-      layoutMain.value.style.padding = "50px 80px";
-      layoutMain.value.style.height = "calc(100vh - 100px)";
-      //@ts-ignore
-      layoutMain.value.querySelector(".ant-layout")!.style.borderRadius = "10px";
-    }
-  });
-});
 </script>
 
 <template>
@@ -35,11 +13,46 @@ onMounted(() => {
 <style scoped>
 .layoutMain {
   background-color: var(--themeColor);
-  height: calc(100vh - 140px);
-  padding: 70px 80px;
   overflow: hidden;
   display: flex;
   justify-content: center;
   transition: 0.1s;
+  padding: 0;
+  height: calc(100vh);
+  border-radius: 0; /* 默认样式 */
+
+  .ant-layout {
+    border-radius: 0;
+  }
+}
+
+@media screen and (min-width: 768px) and (max-width: 991px) {
+  .layoutMain {
+    padding: 15px;
+    height: calc(100vh - 30px);
+    .ant-layout {
+      border-radius: 10px;
+    }
+  }
+}
+
+@media screen and (min-width: 992px) and (max-width: 1299px) {
+  .layoutMain {
+    padding: 30px;
+    height: calc(100vh - 60px);
+    .ant-layout {
+      border-radius: 10px;
+    }
+  }
+}
+
+@media screen and (min-width: 1300px) {
+  .layoutMain {
+    padding: 40px 60px;
+    height: calc(100vh - 80px);
+    .ant-layout {
+      border-radius: 10px;
+    }
+  }
 }
 </style>

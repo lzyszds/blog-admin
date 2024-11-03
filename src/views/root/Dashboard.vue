@@ -4,7 +4,7 @@
 
 <template>
     <div>
-
+      首页欢迎
     </div>
 </template>
 

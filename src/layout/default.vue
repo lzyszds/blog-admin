@@ -37,6 +37,9 @@ const handleBreakpoint = (broken) => {
   isFixed.value = broken;
 };
 
+/* 监听全屏事件 */
+const { toggle } = useFullscreen(layout);
+
 onMounted(() => {
   const { width } = useElementSize(layout);
   watchEffect(() => {
@@ -129,8 +132,6 @@ watchEffect(() => {
             </a-breadcrumb-item>
           </a-breadcrumb>
         </Transition>
-
-        <template #extra> 12 </template>
       </ALayoutHeader>
 
       <!-- 右键打开 菜单 -->
@@ -162,13 +163,15 @@ watchEffect(() => {
           <div class="rightExtra">
             <ATooltip placement="bottom">
               <template #title>刷新页面</template>
-              <AButton type="text">
-                <LzyIcon @click="refreshKey++" size="26" name="iconoir:refresh-circle" />
+              <AButton type="text" @click="refreshKey++">
+                <LzyIcon size="20" name="iconoir:refresh-circle" />
               </AButton>
             </ATooltip>
             <ATooltip placement="bottom">
               <template #title>全屏</template>
-              <AButton type="text"><LzyIcon size="26" name="iconoir:expand" /></AButton>
+              <AButton @click="toggle" type="text"
+                ><LzyIcon size="20" name="iconoir:expand"
+              /></AButton>
             </ATooltip>
           </div>
         </template>
@@ -233,7 +236,7 @@ watchEffect(() => {
       color: var(--themeColor);
     }
     svg.trigger {
-      font-size: 22px;
+      font-size: 17px;
       line-height: 64px;
       cursor: pointer;
     }

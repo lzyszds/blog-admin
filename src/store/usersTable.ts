@@ -80,7 +80,7 @@ export const getUsersTable = defineStore("getUsersTable", () => {
             },
             html: "inline-block",
           },
-          text !== 0 ? "user" : "admin"
+          () => text !== 0 ? "user" : "admin" // 使用函数形式
         );
       },
     },
