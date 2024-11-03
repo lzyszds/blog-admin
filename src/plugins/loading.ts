@@ -37,6 +37,6 @@ export function unLoad() {
     setTimeout(() => {
       const loading = document.querySelector('#loading')
       loading?.remove()
-    }, 500)
+    }, 200)
   })
 }
