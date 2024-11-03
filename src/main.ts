@@ -1,16 +1,18 @@
 import { createApp } from 'vue'
 import '@/style/style.css'
 import App from './App.vue'
-import router from './router'
-import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
+import { setupRouter } from './router'
+import { setupStore } from './store'
+import { setupNProgress, setupLoading } from '@/plugins'
 
-import { createPinia } from 'pinia'
+async function setupApp() {
+  setupLoading();
+  setupNProgress();
 
-const pinia = createPinia().use(piniaPluginPersistedstate)
+  const app = createApp(App);
+  setupStore(app)
+  await setupRouter(app)
+  app.mount('#app')
+}
 
-
-createApp(App)
-  .use(router)
-  .use(pinia)
-
-  .mount('#app')
+setupApp();

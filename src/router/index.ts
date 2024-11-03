@@ -2,6 +2,7 @@ import { createRouter, createWebHashHistory, createWebHistory } from 'vue-router
 import type { RouteRecordRaw } from 'vue-router'
 import NProgress from 'nprogress' // 进度条
 import 'nprogress/nprogress.css' // 引入样式
+import { App } from 'vue'
 const routes: RouteRecordRaw[] = [
   {
     path: '/',
@@ -73,7 +74,7 @@ const routes: RouteRecordRaw[] = [
   //     component: undefind404 // 注意，没有重定向就会出现两个一模一样的home页面
   // },
 ]
-const router = createRouter({
+export const router = createRouter({
   history: import.meta.env.VITE_ROUTER_MODE === 'hash'
     ? createWebHashHistory()
     : createWebHistory(),
@@ -100,4 +101,13 @@ router.beforeEach((_to, _from, next) => {
 router.afterEach(() => {
   NProgress.done()
 })
-export default router
+
+
+/** Setup Vue Router */
+export async function setupRouter(app: App) {
+  app.use(router);
+  await router.isReady();
+}
+
+
+export default router; // 确保有默认导出
