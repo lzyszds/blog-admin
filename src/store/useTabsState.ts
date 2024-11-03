@@ -22,6 +22,8 @@ export const useTabsState = defineStore(
     /*  当前页签 */
     const activeKey = ref(0)
 
+    const router = useRouter()
+
     /*  tabs页签 */
     const tabsKeyArr = ref<TabskeyArr[]>([
       {
@@ -54,6 +56,11 @@ export const useTabsState = defineStore(
     const getKeyArr = (key) => {
       return tabsKeyArr.value[key]
     }
+
+    /* 根据路由获取当前页面的key */
+    watchEffect(() => {
+      activeKey.value = tabsKeyArr.value.findIndex((item) => item.component == router.currentRoute.value.name)
+    })
 
     return {
       activeKey,

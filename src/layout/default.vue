@@ -47,6 +47,11 @@ onMounted(() => {
     }
   });
 });
+
+watchEffect(() => {
+  selected.value = items.find((item) => item.component == router.currentRoute.value.name);
+  selectedKeys.value = [selected.value?.key];
+});
 </script>
 
 <template>
@@ -125,9 +130,7 @@ onMounted(() => {
           </a-breadcrumb>
         </Transition>
 
-        <template #extra>
-        12
-        </template>
+        <template #extra> 12 </template>
       </ALayoutHeader>
 
       <!-- 右键打开 菜单 -->
