@@ -1,5 +1,6 @@
 @import url('./font');
 @import url('./loading');
+@import url('./transition');
 
 :root {
   --themeColor: rgb(81, 97, 206);

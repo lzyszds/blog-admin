@@ -90,3 +90,20 @@
   opacity: 0;
   transform: scale(0);
 }
+
+
+.router-enter-active {
+  transition: 0.15s;
+}
+.router-leave-active {
+  transition: 0.3s;
+}
+.router-enter-from {
+  opacity: 0;
+  transform: translateX(-30px);
+}
+
+.router-leave-to {
+  opacity: 0;
+  transform: translateX(20px);
+}

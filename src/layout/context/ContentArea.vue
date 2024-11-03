@@ -8,7 +8,7 @@ const emit = defineEmits(["push-router"]);
 </script>
 
 <template>
-  <a-tabs
+  <ATabs
     v-model:activeKey="tabsState.activeKey"
     type="editable-card"
     hide-add
@@ -16,7 +16,7 @@ const emit = defineEmits(["push-router"]);
     :animated="false"
     @tabClick="$emit('push-router', $event)"
   >
-    <a-tab-pane
+    <ATabPane
       v-for="(item, index) in tabsState.tabsKeyArr"
       :key="index"
       :closable="!item.noClose"
@@ -29,7 +29,9 @@ const emit = defineEmits(["push-router"]);
           </span>
         </ToolsMenu>
       </template>
-    </a-tab-pane>
+    </ATabPane>
+
+    <!-- 右侧操作栏 -->
     <template #rightExtra>
       <div class="rightExtra">
         <ATooltip placement="bottom">
@@ -40,13 +42,13 @@ const emit = defineEmits(["push-router"]);
         </ATooltip>
         <ATooltip placement="bottom">
           <template #title>全屏</template>
-          <AButton @click="toggleFullscreen" type="text"
-            ><LzyIcon size="20" name="iconoir:expand"
-          /></AButton>
+          <AButton @click="toggleFullscreen" type="text">
+            <LzyIcon size="20" name="iconoir:expand" />
+          </AButton>
         </ATooltip>
       </div>
     </template>
-  </a-tabs>
+  </ATabs>
 
   <ALayout-content
     :style="{
@@ -128,21 +130,5 @@ const emit = defineEmits(["push-router"]);
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue",
     Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
     "Segoe UI Symbol", "Noto Color Emoji";
-}
-
-.router-enter-active {
-  transition: 0.15s;
-}
-.router-leave-active {
-  transition: 0.3s;
-}
-.router-enter-from {
-  opacity: 0;
-  transform: translateX(-30px);
-}
-
-.router-leave-to {
-  opacity: 0;
-  transform: translateX(20px);
 }
 </style>

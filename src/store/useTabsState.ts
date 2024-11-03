@@ -36,17 +36,20 @@ export const useTabsState = defineStore(
 
       activeKey.value = Number(newKey)
     }
-
-    const delKeyItem = (index: any) => {
-      tabsKeyArr.value.splice(index, 1)
-      if (activeKey.value === index) {
-        activeKey.value = tabsKeyArr.value.length - 1
-      }
-    }
     const getKeyArr = (key) => {
       return tabsKeyArr.value[key]
     }
 
+
+    const delKeyItem = (index: any) => {
+      tabsKeyArr.value.splice(index, 1)
+      if (activeKey.value === index) {
+        /* 删除当前激活的标签，则激活前一个标签 */
+        activeKey.value = tabsKeyArr.value.length - 1
+        router.push({ name: getKeyArr(activeKey.value).component })
+      }
+
+    }
     /* 根据路由获取当前页面的key */
     watchEffect(() => {
       activeKey.value = tabsKeyArr.value.findIndex((item) => item.component == router.currentRoute.value.name)
