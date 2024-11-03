@@ -20,11 +20,11 @@ export function useScrollY() {
     })
   }
   /* 监听窗口大小变化 */
-  watch([width, height], calculateScrollY, { immediate: true })
+  watch([width, height], () => { setTimeout(calculateScrollY, 50) }, { immediate: true })
 
   onMounted(() => {
     // 初始计算可能需要一些时间，所以我们在组件挂载后延迟执行
-    setTimeout(calculateScrollY, 100)
+    setTimeout(calculateScrollY, 50)
   })
 
   return {

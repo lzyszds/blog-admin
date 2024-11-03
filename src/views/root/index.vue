@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import Layout from "@/layout/default.vue";
+import Layout from "@/layout/base-layout/index.vue";
 
 const layoutMain = templateRef<HTMLElement>("layoutMain");
 </script>

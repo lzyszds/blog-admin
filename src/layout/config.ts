@@ -9,7 +9,7 @@ export type Items = {
 const items: Items[] = [
   {
     key: 1,
-    name: "首页",
+    name: "首页数据",
     uicon: 'hugeicons:home-01',
     component: "dashboard",
   },
