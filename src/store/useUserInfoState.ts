@@ -1,6 +1,8 @@
 import { defineStore } from 'pinia'
 import { getUserInfoToken } from '@/api/user'
 import { User } from '@/typings/User'
+import { useTabsState } from "@/store/useTabsState";
+const tabsState = useTabsState()
 
 export const useUserInfoState = defineStore('useUserInfoState', () => {
 
@@ -32,17 +34,29 @@ export const useUserInfoState = defineStore('useUserInfoState', () => {
     router.push('/login')
   }
 
+  /* 前往个人中心 */
+  const goToUserCenter = async () => {
+    tabsState.setKeyArr({
+      name: '个人中心',
+      component: 'userCenter',
+      uicon: 'ph:user-circle-gear',
+      key: 999
+    })
+    router.push({ name: 'userCenter' })
+  }
+
   // 初始化时调用一次
   fetchUserInfo()
 
   return {
-    userInfo,
-    isLogin,
-    isAdmin,
-    isEditor,
-    isUser,
-    isSuperAdmin,
-    fetchUserInfo,// 暴露 `fetchUserInfo`，可在组件中再次调用
-    logout
+    userInfo, // 用户信息
+    isLogin,  // 是否登录
+    isAdmin, // 是否是管理员
+    isEditor, // 是否是编辑者
+    isUser, // 是否是普通用户
+    isSuperAdmin, // 是否是超级管理员
+    fetchUserInfo,// 获取用户信息
+    logout, // 注销登陆
+    goToUserCenter // 前往个人中心
   }
 })

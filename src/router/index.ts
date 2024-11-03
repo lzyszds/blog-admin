@@ -56,6 +56,12 @@ const routes: RouteRecordRaw[] = [
         name: 'webset',
         component: () => import('@/views/root/WebSet.vue'),
         meta: { icon: 'computer-settings-icon', title: '网站设置' }
+      },
+      {
+        path: 'userCenter',
+        name: 'userCenter',
+        component: () => import('@/views/root/UserCenter.vue'),
+        meta: { icon: 'user-icon', title: '个人中心' }
       }
     ]
   },
@@ -98,7 +104,7 @@ router.beforeEach((_to, _from, next) => {
     } else {
       next()
     }
-  }else{
+  } else {
     next()
   }
 })

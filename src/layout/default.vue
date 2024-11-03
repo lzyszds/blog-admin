@@ -6,7 +6,7 @@ import { useUserInfoState } from "@/store/useUserInfoState";
 import ToolsMenu from "@/components/ToolsMenu.vue";
 
 const selected = useStorage("selected", items[0]);
-const selectedKeys = ref<number[]>([selected.value.key]); // 选中的菜单
+const selectedKeys = ref<number[]>([selected.value && selected.value.key]); // 选中的菜单
 const collapsed = ref<boolean>(false); // 是否折叠
 const layout = templateRef<HTMLElement>("layout"); // 布局ref
 const loading = ref(false); // 加载中新路由
@@ -17,7 +17,7 @@ const tabsRef = templateRef<HTMLElement>("tabsRef");
 const refreshKey = ref(0); // 刷新路由
 
 /* 获取用户信息 */
-const userInfo = useUserInfoState();
+const userStore = useUserInfoState();
 
 /* 跳转路由  */
 const pushRouter = (item) => {
@@ -58,7 +58,8 @@ onMounted(() => {
 
 watchEffect(() => {
   selected.value = items.find((item) => item.component == router.currentRoute.value.name);
-  selectedKeys.value = [selected.value?.key];
+  if (selected.value) selectedKeys.value = [selected.value?.key];
+  else selectedKeys.value = [];
 });
 </script>
 
@@ -127,13 +128,13 @@ watchEffect(() => {
 
         <!-- 面包屑 -->
         <Transition name="fade" mode="out-in">
-          <ABreadcrumb :key="selected.key" style="flex: 1">
+          <ABreadcrumb :key="selected && selected.key" style="flex: 1">
             <ABreadcrumb-item>
               <LzyIcon
-                :name="selected.uicon"
+                :name="selected && selected.uicon"
                 style="font-size: 18px; margin-right: 4px; line-height: 1"
               />
-              <span>{{ selected.name }}</span>
+              <span>{{ selected && selected.name }}</span>
             </ABreadcrumb-item>
           </ABreadcrumb>
         </Transition>
@@ -152,17 +153,17 @@ watchEffect(() => {
             <AButton type="text">
               <LzyIcon size="20" name="ph:user-circle-gear" />
               <span>
-                {{ userInfo.userInfo.uname ?? "Jz" }}
+                {{ userStore.userInfo.uname ?? "Jz" }}
               </span>
             </AButton>
             <template #overlay>
               <AMenu>
-                <AMenu-item key="1">
+                <AMenu-item key="1" @click="userStore.goToUserCenter">
                   <LzyIcon size="18" name="ph:user-circle-duotone" />
                   个人中心
                 </AMenu-item>
                 <AMenu-divider />
-                <AMenu-item key="2" @click="userInfo.logout">
+                <AMenu-item key="2" @click="userStore.logout">
                   <LzyIcon size="18" name="ph:sign-out" />
                   退出登陆
                 </AMenu-item>

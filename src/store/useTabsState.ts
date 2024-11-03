@@ -8,7 +8,7 @@ interface TabskeyArr extends Items {
 type TabsState = {
   activeKey: Ref<number>
   tabsKeyArr: Ref<TabskeyArr[]>
-  setKeyArr: (key: number) => void
+  setKeyArr: (item: Items) => void
   delKeyItem: (key: number) => void
   getKeyArr: (key: number) => void
 }
@@ -27,7 +27,6 @@ export const useTabsState = defineStore(
     ])
 
     const setKeyArr = (item: any) => {
-
       if (tabsKeyArr.value.findIndex((v) => v.name === item.name) === -1) {
         tabsKeyArr.value.push(item)
       }
