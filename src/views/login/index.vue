@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { login } from "@/api/userApi";
+import { login } from "@/api/user";
 import { useRouter } from "vue-router";
 import { useRequest } from "@/hook/useRequest";
 const isTransition = ref(false);

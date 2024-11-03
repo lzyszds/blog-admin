@@ -2,10 +2,11 @@
 import LzyIcon from "@/components/LzyIcon.vue";
 import items from "./config";
 import { useTabsState } from "@/store/useTabsState";
+import { useUserInfoState } from "@/store/useUserInfoState";
 import ToolsMenu from "@/components/ToolsMenu.vue";
 
 const selected = useStorage("selected", items[0]);
-const selectedKeys = ref<string[]>([selected.value.key]); // 选中的菜单
+const selectedKeys = ref<number[]>([selected.value.key]); // 选中的菜单
 const collapsed = ref<boolean>(false); // 是否折叠
 const layout = templateRef<HTMLElement>("layout"); // 布局ref
 const loading = ref(false); // 加载中新路由
@@ -14,6 +15,9 @@ const isFixed = ref(false); // 控制是否应用 `fixed` 样式
 const tabsState = useTabsState();
 const tabsRef = templateRef<HTMLElement>("tabsRef");
 const refreshKey = ref(0); // 刷新路由
+
+/* 获取用户信息 */
+const userInfo = useUserInfoState();
 
 /* 跳转路由  */
 const pushRouter = (item) => {
@@ -43,6 +47,7 @@ const { toggle } = useFullscreen(layout);
 onMounted(() => {
   const { width } = useElementSize(layout);
   watchEffect(() => {
+    if (width.value == 0) return;
     if (width.value < 768) {
       collapsed.value = true;
     } else {
@@ -122,16 +127,49 @@ watchEffect(() => {
 
         <!-- 面包屑 -->
         <Transition name="fade" mode="out-in">
-          <a-breadcrumb :key="selected.key">
-            <a-breadcrumb-item>
+          <ABreadcrumb :key="selected.key" style="flex: 1">
+            <ABreadcrumb-item>
               <LzyIcon
                 :name="selected.uicon"
                 style="font-size: 18px; margin-right: 4px; line-height: 1"
               />
               <span>{{ selected.name }}</span>
-            </a-breadcrumb-item>
-          </a-breadcrumb>
+            </ABreadcrumb-item>
+          </ABreadcrumb>
         </Transition>
+
+        <div class="right">
+          <!-- 主题配置 -->
+          <a-tooltip placement="bottom">
+            <template #title> 主题配置 </template>
+            <AButton type="text">
+              <LzyIcon size="20" name="iconoir:tools" />
+            </AButton>
+          </a-tooltip>
+
+          <!-- 个人中心 -->
+          <ADropdown :trigger="['click']">
+            <AButton type="text">
+              <LzyIcon size="20" name="ph:user-circle-gear" />
+              <span>
+                {{ userInfo.userInfo.uname ?? "Jz" }}
+              </span>
+            </AButton>
+            <template #overlay>
+              <AMenu>
+                <AMenu-item key="1">
+                  <LzyIcon size="18" name="ph:user-circle-duotone" />
+                  个人中心
+                </AMenu-item>
+                <AMenu-divider />
+                <AMenu-item key="2" @click="userInfo.logout">
+                  <LzyIcon size="18" name="ph:sign-out" />
+                  退出登陆
+                </AMenu-item>
+              </AMenu>
+            </template>
+          </ADropdown>
+        </div>
       </ALayoutHeader>
 
       <!-- 右键打开 菜单 -->
@@ -151,7 +189,7 @@ watchEffect(() => {
           :closable="!item.noClose"
         >
           <template #tab>
-            <ToolsMenu :disabled-keys="['1']" :tab-id="item.key">
+            <ToolsMenu :disabled-keys="['1']" :tab-id="item.key + ''">
               <span>
                 <LzyIcon :name="item.uicon" :size="16" style="vertical-align: sub" />
                 {{ item.name }}
@@ -223,6 +261,7 @@ watchEffect(() => {
   padding: 0;
   display: flex;
   align-items: center;
+  padding-right: 15px;
 
   button {
     padding: 8px 15px;
@@ -239,6 +278,23 @@ watchEffect(() => {
       font-size: 17px;
       line-height: 64px;
       cursor: pointer;
+    }
+  }
+
+  .right {
+    display: flex;
+
+    .ant-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      margin-left: 0;
+
+      span {
+        font-family: "dindin";
+        font-size: 18px;
+      }
     }
   }
 }

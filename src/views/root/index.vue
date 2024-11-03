@@ -6,7 +6,9 @@ const layoutMain = templateRef<HTMLElement>("layoutMain");
 
 <template>
   <main class="layoutMain" ref="layoutMain">
-    <Layout></Layout>
+    <Suspense>
+      <Layout></Layout>
+    </Suspense>
   </main>
 </template>
 

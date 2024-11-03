@@ -80,9 +80,6 @@ export const router = createRouter({
     : createWebHistory(),
   routes,
   scrollBehavior(_to, _from, _savedPosition) { // 始终滚动到顶部
-    setTimeout(() => {
-      document.querySelector('body')!.classList.remove('loading')
-    }, 1000)
     return { top: 0 }
   }
 })
@@ -94,7 +91,16 @@ NProgress.configure({ easing: 'ease', speed: 1000, showSpinner: false })
 // 进度条开始
 router.beforeEach((_to, _from, next) => {
   NProgress.start()
-  next()
+  /* 登陆验证 */
+  if (!localStorage.getItem('lzy_token')) {
+    if (_to.path !== '/login') {
+      next('/login')
+    } else {
+      next()
+    }
+  }else{
+    next()
+  }
 })
 
 // 进度条结束

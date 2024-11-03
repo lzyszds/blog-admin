@@ -1,11 +1,8 @@
+import items, { Items } from '@/layout/config'
 import { defineStore } from 'pinia'
 
-type TabskeyArr = {
-  component: string
-  key: string
-  name: string
-  uicon: string
-  noClose?: boolean
+interface TabskeyArr extends Items {
+  noClose: boolean
 }
 
 type TabsState = {
@@ -26,13 +23,7 @@ export const useTabsState = defineStore(
 
     /*  tabs页签 */
     const tabsKeyArr = ref<TabskeyArr[]>([
-      {
-        component: "dashboard",
-        key: "1",
-        name: "欢迎使用",
-        uicon: "hugeicons:home-01",
-        noClose: true
-      }
+      Object.assign({}, items[0], { noClose: true })
     ])
 
     const setKeyArr = (item: any) => {

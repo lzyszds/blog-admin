@@ -6,11 +6,11 @@ import {
   delUser,
   getAllHeadImg,
   uploadHeadImg,
-} from "@/api/userApi";
+} from "@/api/user";
 import LzyIcon from "@/components/LzyIcon.vue";
 import UserForm from "@/components/form/User.vue";
 import useResetRefState from "@/hook/useResetRefState";
-import { getUsersTable } from "@/store/usersTable";
+import { getUsersTable } from "@/store/useUserTable";
 import { useRequest } from "@/hook/useRequest";
 import { useScrollY } from "@/hook/useTable";
 import { Key } from "ant-design-vue/es/_util/type";

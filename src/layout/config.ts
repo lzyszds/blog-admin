@@ -1,57 +1,56 @@
 
-type Items = {
-  key: string;
+export type Items = {
+  key: number;
   name: string;
   uicon: string;
   component?: string;
-  handle?: () => void;
 };
 
 const items: Items[] = [
   {
-    key: "1",
-    name: "欢迎使用",
+    key: 1,
+    name: "首页",
     uicon: 'hugeicons:home-01',
     component: "dashboard",
   },
   {
-    key: "2",
+    key: 2,
     name: "用户管理",
     uicon: 'hugeicons:edit-user-02',
     component: "users",
   },
   {
-    key: "3",
+    key: 3,
     name: "文章管理",
     uicon: 'hugeicons:property-edit',
     component: "posts",
   },
   {
-    key: "4",
+    key: 4,
     name: "评论管理",
     uicon: 'hugeicons:message-edit-01',
     component: "comments",
   },
   {
-    key: "5",
+    key: 5,
     name: "分类管理",
     uicon: 'hugeicons:dashboard-square-edit',
     component: "categories",
   },
   {
-    key: "6",
+    key: 6,
     name: "任务队列",
     uicon: 'hugeicons:task-daily-02',
     component: "plantask",
   },
   {
-    key: "7",
+    key: 7,
     name: "友链管理",
     uicon: 'hugeicons:link-01',
     component: "links",
   },
   {
-    key: "8",
+    key: 8,
     name: "网站设置",
     uicon: 'hugeicons:computer-settings',
     component: "webset",
