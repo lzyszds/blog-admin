@@ -25,7 +25,7 @@ export default ({ mode }: any) => {
       Components({
         resolvers: [
           AntDesignVueResolver({
-            importStyle: false,
+            importStyle: 'css-in-js',
           }),
         ],
       }),

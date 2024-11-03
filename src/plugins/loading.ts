@@ -1,6 +1,4 @@
 // @unocss-include
-import systemLogo from '@/assets/vue.svg';
-
 export function setupLoading() {
   const themeColor = '#5161ce';
 
@@ -16,22 +14,29 @@ export function setupLoading() {
   </div>`
 
   const content2 = `
-  <div class="container loadding">
+  <div class="container loading">
     <div class="loader"></div>
     <div class="title">Jz博客管理后台</div>
   </div>`
 
-  const loading = `
-    <div style="height: 100vh; width: 100vw; display: flex; justify-content: center; align-items: center;">
-      ${content2}
-      
-    </div>
-    `;
-
-  const app = document.getElementById('app');
-
+  const app = document.querySelector('#app')
   if (app) {
-    app.innerHTML = loading;
+    /* 获取父元素 并新增#loading */
+    const parent = app.parentElement;
+    const loadEl = document.createElement('div');
+    loadEl.id = 'loading';
+    loadEl.innerHTML = content2;
+    parent?.appendChild(loadEl);
   }
+}
 
+
+/* 移除loading */
+export function unLoad() {
+  nextTick(() => {
+    setTimeout(() => {
+      const loading = document.querySelector('#loading')
+      loading?.remove()
+    }, 500)
+  })
 }

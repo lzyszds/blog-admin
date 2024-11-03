@@ -1,5 +1,5 @@
 @import url('./font');
-@import url('./loadding');
+@import url('./loading');
 
 :root {
   --themeColor: rgb(81, 97, 206);
