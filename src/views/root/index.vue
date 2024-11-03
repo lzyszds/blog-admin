@@ -25,6 +25,8 @@ const layoutMain = templateRef<HTMLElement>("layoutMain");
 
   .ant-layout {
     border-radius: 0;
+    min-height: 80vh; /* 设置布局的最小高度 */
+    overflow: hidden; /* 隐藏溢出内容 */
   }
 }
 

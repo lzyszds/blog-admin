@@ -2,10 +2,7 @@
 import items from "../config";
 const { isFixed, selectedKeys, collapsed } = inject<any>("paramsRef");
 
-const emit = defineEmits<{
-  (e: "push-router", item: any): void;
-  (e: "breakpoint", broken: boolean): void;
-}>();
+const emit = defineEmits(["breakpoint", "push-router"]);
 </script>
 
 <template>
@@ -40,32 +37,23 @@ const emit = defineEmits<{
 </template>
 
 <style scoped>
-.logo {
-  height: 60px;
-  margin: 16px;
-  text-align: center;
-  color: var(--themeColor);
-  font-family: "dindin";
-  overflow: hidden;
-  cursor: pointer;
-  h2 {
-    text-wrap: nowrap;
+.ant-layout-sider {
+  z-index: 2;
+  box-shadow: 2px 0 8px 0px rgb(29, 35, 41, 0.05);
+  .logo {
+    height: 60px;
+    margin: 16px;
+    text-align: center;
+    color: var(--themeColor);
+    font-family: "dindin";
+    overflow: hidden;
+    cursor: pointer;
+    h2 {
+      text-wrap: nowrap;
+    }
   }
-}
-
-:deep(.menuitem) .ant-menu-title-content {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-  font-size: 14px;
-  font-weight: 500;
-}
-
-.fixed {
-  position: fixed;
-  top: 0;
-  left: 0;
-  height: 100vh;
-  z-index: 1000;
+  ul.ant-menu {
+    border-inline-end: none !important;
+  }
 }
 </style>

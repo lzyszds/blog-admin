@@ -20,14 +20,14 @@ defineEmits(["toggle-collapse"]);
 
 <style scoped>
 /* Keep the relevant styles from the original component */
-
 .ant-layout-header {
   background-color: #fff;
   padding: 0;
   display: flex;
   align-items: center;
   padding: 0 15px;
-
+  border-bottom: 1px solid #eee;
+  
   .right {
     display: flex;
   }

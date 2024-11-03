@@ -1,51 +1,63 @@
 <script setup lang="ts">
-import { useTabsState } from "@/store/useTabsState";
-import items from "@/layout/config";
-import SidebarMenu from "@/layout/context/SidebarMenu.vue";
-import HeaderComponent from "@/layout/context/HeaderComponent.vue";
-import ContentArea from "@/layout/context/ContentArea.vue";
+import { useTabsState } from "@/store/useTabsState"; // 导入用于管理标签页状态的 store
+import items from "@/layout/config"; // 导入布局配置项
+import SidebarMenu from "@/layout/context/SidebarMenu.vue"; // 导入侧边菜单组件
+import HeaderComponent from "@/layout/context/HeaderComponent.vue"; // 导入头部组件
+import ContentArea from "@/layout/context/ContentArea.vue"; // 导入内容区域组件
 
+// 定义 layout 引用，用于获取布局元素
 const layout = ref<HTMLElement | null>(null);
+// 定义 collapsed 状态，表示菜单是否折叠
 const collapsed = ref(false);
+// 定义 isFixed 状态，表示菜单是否固定
 const isFixed = ref(false);
+// 使用 localStorage 存储当前选中的菜单项
 const selected = useStorage("selected", items[0]);
-const selectedKeys = ref<number[]>([selected.value && selected.value.key]); // 选中的菜单
-const router = useRouter();
-const tabsState = useTabsState();
-const refreshKey = ref(0);
+// 存储当前选中菜单项的键
+const selectedKeys = ref<number[]>([selected.value && selected.value.key]);
+const router = useRouter(); // 获取 Vue Router 实例
+const tabsState = useTabsState(); // 获取标签页状态
+const refreshKey = ref(0); // 刷新键，用于触发内容区域的刷新
 
+// 跳转到选中的路由
 const pushRouter = (item) => {
+  // 如果 item 是数字，则获取对应的菜单项
   if (typeof item == "number") {
     item = tabsState.getKeyArr(item);
   }
-  selectedKeys.value = [item.key];
-  selected.value = item;
-  tabsState.setKeyArr(item);
+  selectedKeys.value = [item.key]; // 更新选中的菜单键
+  selected.value = item; // 更新当前选中的菜单项
+  tabsState.setKeyArr(item); // 更新标签页状态
 
   /* 实现脱离动画 */
   setTimeout(() => {
-    router.push({ name: item.component });
-  }, 300);
+    if (item.component) router.push({ name: item.component }); // 路由跳转到对应的组件
+  }, 300); // 延迟 300 毫秒进行跳转，显示动画效果
 };
 
+// 处理响应式布局断点
 const handleBreakpoint = (broken) => {
-  isFixed.value = broken;
+  isFixed.value = broken; // 更新 isFixed 状态
 };
 
+// 组件挂载后执行
 onMounted(() => {
-  const { width } = useElementSize(layout);
+  const { width } = useElementSize(layout); // 获取布局元素的宽度
   watchEffect(() => {
-    if (width.value === 0) return;
-    collapsed.value = width.value < 768;
+    if (width.value === 0) return; // 如果宽度为 0，直接返回
+    collapsed.value = width.value < 768; // 根据宽度判断是否折叠菜单
   });
 });
 
+// 监听路由变化，更新选中的菜单项
 watchEffect(() => {
-  selected.value = items.find((item) => item.component == router.currentRoute.value.name);
+  selected.value = items.find((item) => item.component == router.currentRoute.value.name); // 查找当前路由对应的菜单项
   if (selected.value) selectedKeys.value = [selected.value?.key];
-  else selectedKeys.value = [];
+  // 更新选中键
+  else selectedKeys.value = []; // 如果没有选中项，则清空选中键
 });
 
+// 提供上下文参数，以供子组件使用
 provide("paramsRef", {
   layout,
   collapsed,
@@ -60,43 +72,49 @@ provide("paramsRef", {
 
 <template>
   <ALayout class="ant-layout" ref="layout">
-    <!-- 菜单遮罩 -->
+    <!-- 菜单遮罩层 -->
     <div
       :class="{ show: isFixed && !collapsed, mask: true }"
       @click="collapsed = true"
     ></div>
 
+    <!-- 侧边菜单组件 -->
     <SidebarMenu @breakpoint="handleBreakpoint" @push-router="pushRouter" />
 
     <ALayout>
+      <!-- 头部组件 -->
       <HeaderComponent />
 
+      <!-- 内容区域组件 -->
       <ContentArea @push-router="pushRouter" />
     </ALayout>
   </ALayout>
 </template>
 
 <style scoped>
-.ant-layout {
-  min-height: 80vh;
-  border-radius: 10px;
-  overflow: hidden;
-}
 :where(.css-dev-only-do-not-override-17yhhjv).ant-layout {
-  background-color: rgb(247 250 252);
+  background-color: rgb(247 250 252); /* 设置布局的背景色 */
 }
 
 .mask {
-  display: none;
+  display: none; /* 默认不显示遮罩层 */
+  position: fixed; /* 固定定位 */
+  top: 0;
+  left: 0;
+  z-index: 1; /* 确保遮罩层在最上层 */
+  background-color: rgba(0, 0, 0, 0.25); /* 半透明背景 */
+  width: 100vw; /* 全屏宽度 */
+  height: 100vh; /* 全屏高度 */
+}
+.show.mask {
+  display: block; /* 显示遮罩层 */
+}
+
+.fixed {
   position: fixed;
   top: 0;
   left: 0;
-  z-index: 1;
-  background-color: rgba(0, 0, 0, 0.25);
-  width: 100vw;
   height: 100vh;
-}
-.show.mask {
-  display: block;
+  z-index: 1000;
 }
 </style>

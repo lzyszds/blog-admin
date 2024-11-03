@@ -154,8 +154,8 @@ const multipleDel = () => {
             allowClear
             placeholder="请选择用户权限"
           >
-            <ASelect-option value="0">超级管理员</ASelect-option>
-            <ASelect-option value="1">普通用户</ASelect-option>
+            <ASelectOption value="0">超级管理员</ASelectOption>
+            <ASelectOption value="1">普通用户</ASelectOption>
           </ASelect>
         </section>
         <section style="display: flex; gap: 10px">
