@@ -75,7 +75,6 @@ usersTableData.setCallbackArr({
 
 //真正的数据Columns
 const columns = computed(() => {
-
   if (isRef(usersTableData.columns)) {
     return (usersTableData.columns as any).value.filter((item) => item.checked);
   } else {

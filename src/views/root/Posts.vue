@@ -15,6 +15,7 @@ import { multDelData } from "@/hook/useTableData";
 import { Key } from "ant-design-vue/es/_util/type";
 import TableHeaderOperation from "@/components/TableHeaderOperation.vue";
 import { TableProps } from "ant-design-vue";
+import { getArticleColumns } from "@/table/articleColumns";
 
 /* 获取表格滚动条高度 */
 const { scrollConfig } = useScrollY();
@@ -63,16 +64,22 @@ const pagination = computed(() => {
 /* 表格列表数据 提供的部分方法 */
 const usersTableData = getUsersTable();
 
-//真正的数据Columns
-const columns = computed(() => usersTableData.columns.filter((item) => item.checked));
-
 /* 设置表格列表数据的回调方法 */
 usersTableData.setCallbackArr({
-  getListCallbask: () => throttledRequest(searchCondition),
-  delCallback: ({ uid }) => articleDelete({ uid }),
+  getData: () => throttledRequest(searchCondition),
+  delData: ({ uid }) => articleDelete({ uid }),
   openModal: (params) => setUserModal(params),
+  columns: getArticleColumns,
 });
 
+//真正的数据Columns
+const columns = computed(() => {
+  if (isRef(usersTableData.columns)) {
+    return (usersTableData.columns as any).value.filter((item) => item.checked);
+  } else {
+    return usersTableData.columns.filter((item) => item.checked);
+  }
+});
 const handleTableChange: TableProps["onChange"] = (pagination) => {
   searchCondition.value.pages = pagination.current;
   throttledRequest(searchCondition);
