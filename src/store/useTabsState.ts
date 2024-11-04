@@ -70,7 +70,6 @@ export const useTabsState = defineStore(
      * @param isBasedKey 是否基于tabsKeyArr中的key删除
      */
     const delMultiKeyItem = (index: number[], tabId: number, isBasedKey: boolean = false) => {
-      debugger
       const tabsKeyItem = [...tabsKeyArr.value]
       index.forEach(i => {
         /* 基于key为索引来匹配 */
