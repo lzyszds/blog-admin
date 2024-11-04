@@ -3,7 +3,7 @@ import LzyIcon from '@/components/LzyIcon.vue';
 import { Column, Params } from "@/typings/Column";
 
 export const getUserColumns = (params: Params) => {
-  const columns = ref<Column[]>([
+  let columns: Column[] = [
     {
       title: "UID",
       dataIndex: "uid",
@@ -132,9 +132,9 @@ export const getUserColumns = (params: Params) => {
         ];
       },
     },
-  ]);
+  ]
 
-  columns.value = columns.value.map((item) => {
+  columns = columns.map((item) => {
     return { ...item, ellipsis: true, checked: true };
   });
 
