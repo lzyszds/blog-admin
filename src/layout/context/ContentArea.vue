@@ -118,7 +118,7 @@ button.icon-btn {
     height: 100%;
   }
 }
-.ant-layout-content{
+.ant-layout-content {
   background: var(--color-bg-light);
   color: var(--color-text);
 }

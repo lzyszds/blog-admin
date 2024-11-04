@@ -28,7 +28,7 @@ const formItemLayout = {
 // 表单Ref dom
 const formRef = ref<FormInstance>();
 // 表单数据
-const formState = ref<UserAdmin>(modalParams.params);
+const formState = ref<UserAdmin>({ ...modalParams.params });
 
 onMounted(() => {
   // 表单初始化设置
@@ -113,7 +113,7 @@ const onSubmit = async () => {
   /* 提交保存用户信息 并触发以下事件 */
   const nextCallback = () => {
     callback(formState).then(() => {
-      message.success("2.用户信息保存成功！");
+      message.success("用户信息保存成功！");
       refreshData(); // 刷新数据
       resetForm(); // 重置表单
       onClose(); //关闭modal
@@ -125,9 +125,12 @@ const onSubmit = async () => {
     if (!file.value) return message.error("请选择图片或自行上传头像");
     /* 将头像上传 */
     uploadHeadImg(file.value).then((res) => {
-      message.success("1.头像上传成功 即将保存用户信息！");
+      message.success("头像上传成功 即将保存用户信息！");
       formState.value.headImg = "/img/uploadHead/" + res.filename;
-      nextCallback();
+      setTimeout(() => {
+        // 延时一秒，让背景图片显示
+        nextCallback();
+      }, 1000);
     });
   } else {
     nextCallback();
@@ -262,6 +265,9 @@ const onSubmit = async () => {
       flex-direction: column;
       justify-content: center;
       align-items: center;
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
       font-family: "dindin";
       color: #888;
       p {

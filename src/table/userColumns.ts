@@ -1,34 +1,8 @@
-import { Avatar, Tag, Button, Popconfirm, message, } from "ant-design-vue";
-import LzyIcon from "@/components/LzyIcon.vue";
-import { defineStore } from "pinia";
+import { Avatar, Button, message, Popconfirm, Tag } from "ant-design-vue";
+import LzyIcon from '@/components/LzyIcon.vue';
+import { Column, Params } from "@/typings/Column";
 
-interface Params {
-  getListCallbask: () => void;
-  delCallback: any;
-  openModal: any;
-}
-
-interface Column {
-  title: string;
-  dataIndex: string;
-  key: string;
-  width?: string;
-  ellipsis?: boolean;
-  checked?: boolean;
-  customRender?: (params: any) => any;
-}
-
-
-export const getUsersTable = defineStore("getUsersTable", () => {
-  let params = ref<Params>({
-    getListCallbask: () => { },
-    delCallback: (_item: any) => { },
-    openModal: (_item: any) => { },
-  });
-  const setCallbackArr = (param: Params) => {
-    params.value = param;
-  };
-
+export const getUserColumns = (params: Params) => {
   const columns = ref<Column[]>([
     {
       title: "UID",
@@ -123,7 +97,7 @@ export const getUsersTable = defineStore("getUsersTable", () => {
               type: "primary",
               size: "small",
               style: { fontSize: "12px" },
-              onClick: () => params.value.openModal(record),
+              onClick: () => params.openModal(record),
             },
             { default: () => "编辑" } // 插槽内容
           ),
@@ -134,10 +108,10 @@ export const getUsersTable = defineStore("getUsersTable", () => {
               cancelText: "取消",
               okText: "确定",
               onConfirm: async () => {
-                const result: any = await params.value.delCallback(record);
-                if (result) {
-                  message.success(result);
-                  params.value.getListCallbask();
+                const result: any = await params.delData(record);
+                if (result.data) {
+                  message.success(result.data);
+                  params.getData();
                 }
               },
             },
@@ -164,5 +138,5 @@ export const getUsersTable = defineStore("getUsersTable", () => {
     return { ...item, ellipsis: true, checked: true };
   });
 
-  return { columns, setCallbackArr, };
-});
+  return columns;
+};

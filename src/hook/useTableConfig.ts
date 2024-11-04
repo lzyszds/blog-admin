@@ -15,7 +15,7 @@ export function useScrollY() {
       if (main && tool) {
         const toolHeight = tool.clientHeight
         const mainHeight = main.clientHeight
-        scrollConfig.value.y = mainHeight - toolHeight - 220 // 调整这里的值以符合你的需求
+        scrollConfig.value.y = mainHeight - toolHeight - 225 // 调整这里的值以符合你的需求
       }
     })
   }

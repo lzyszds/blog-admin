@@ -3,8 +3,8 @@ import request from "@/utils/request";
 
 
 /* 根据id获取用户信息 */
-export const getUserInfo = async (params: any) => {
-  return await request({
+export const getUserInfo = (params: any) => {
+  return request({
     url: `/users/getUserInfo`,
     method: "get",
     params,
@@ -12,19 +12,18 @@ export const getUserInfo = async (params: any) => {
 };
 
 /* 根据token获取用户信息 */
-export const getUserInfoToken = async () => {
-  return await request({
+export const getUserInfoToken = () => {
+  return request({
     url: `/users/getUserInfoToken`,
     method: "get",
   });
 };
 
 /* 获取用户列表 */
-export const getUsersList = async (params: any) => {
+export const getUsersList = (params: any) => {
   if (isRef(params)) params = unref(params);
   params.pages = params.pages
-  // let { pages, limit } = params;
-  return await request({
+  return request({
     url: `/users/getUserList`,
     method: "get",
     params,
@@ -32,11 +31,11 @@ export const getUsersList = async (params: any) => {
 };
 
 /* 添加用户 */
-export const addUser = async (params: any) => {
+export const addUser = (params: any) => {
   if (isRef(params)) params = unref(params);
   // 将参数转换为 snake_case 下划线形式
   params = convertKeysToSnakeCase(params)
-  return await request({
+  return request({
     url: "/users/addUser",
     method: "post",
     data: params,
@@ -44,11 +43,11 @@ export const addUser = async (params: any) => {
 };
 
 /* 修改用户 */
-export const editUser = async (params: any) => {
+export const editUser = (params: any) => {
   if (isRef(params)) params = unref(params);
   // 将参数转换为 snake_case 下划线形式
   params = convertKeysToSnakeCase(params)
-  return await request({
+  return request({
     url: "/users/updateUser",
     method: "post",
     data: params,
@@ -56,9 +55,9 @@ export const editUser = async (params: any) => {
 };
 
 /* 删除用户 */
-export const delUser = async (params: any) => {
+export const delUser = (params: any) => {
   if (isRef(params)) params = unref(params);
-  return await request({
+  return request({
     url: "/users/deleteUser",
     method: "post",
     data: params,
@@ -66,9 +65,9 @@ export const delUser = async (params: any) => {
 };
 
 /* 账号登陆 */
-export const login = async (params: any) => {
+export const login = (params: any) => {
   if (isRef(params)) params = unref(params);
-  return await request({
+  return request({
     url: "/users/login",
     method: "post",
     data: params,
@@ -76,15 +75,15 @@ export const login = async (params: any) => {
 };
 
 //获取所有可选头像
-export const getAllHeadImg = async () => {
-  return await request({
+export const getAllHeadImg = () => {
+  return request({
     url: "/users/getAllHeadImg",
     method: "get",
   });
 };
 
 //上传头像
-export const uploadHeadImg = async (file: any) => {
+export const uploadHeadImg = (file: any) => {
   if (isRef(file)) file = unref(file);
 
   // 检查 file 是否为有效的文件
@@ -95,7 +94,7 @@ export const uploadHeadImg = async (file: any) => {
   // 创建 FormData 对象
   const formData = new FormData();
   formData.append('file', file); // 'headImg' 为服务器端预期的字段名
-  return await request({
+  return request({
     url: "/users/uploadHeadImg",
     method: "post",
     headers: {

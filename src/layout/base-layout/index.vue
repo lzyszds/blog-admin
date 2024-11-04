@@ -84,7 +84,6 @@ provide("paramsRef", {
     <ALayout>
       <!-- 头部组件 -->
       <HeaderComponent />
-
       <!-- 内容区域组件 -->
       <ContentArea @push-router="pushRouter" />
     </ALayout>

@@ -1,0 +1,95 @@
+*[class^="ant-layout"] {
+  box-sizing: none;
+}
+
+:deep(.searchCard) {
+  display: flex;
+  gap: 20px;
+
+  section {
+    display: grid;
+    align-items: center;
+    grid-template-columns: 80px 1fr;
+    justify-content: space-between;
+    width: 240px;
+
+    span {
+      text-wrap: nowrap;
+      user-select: none;
+    }
+
+    button {
+      letter-spacing: 3px;
+
+      svg {
+        font-size: 16px;
+        margin-right: 5px;
+      }
+    }
+  }
+
+  .ant-select-selector {
+    min-width: 120px;
+  }
+}
+
+:deep(.ant-table-body) {
+  overflow-y: auto;
+}
+
+.actionBtn {
+  display: flex;
+  gap: 10px;
+
+  svg {
+    margin-right: 4px;
+  }
+}
+
+@keyframes custom-fade {
+  0% {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.custom-dropdown {
+  animation: custom-fade 0.3s ease-in-out;
+}
+
+@media (max-width: 1280px) {
+  :deep(.searchCard) {
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 655px) {
+  :deep(.searchCard) {
+    section {
+      width: 100%;
+
+      .ant-select {
+        width: 100% !important;
+      }
+    }
+  }
+
+  :deep(.actionBtn) {
+    button {
+      padding: 4px 15px !important;
+
+      span {
+        display: none;
+      }
+
+      svg {
+        margin-right: 0;
+      }
+    }
+  }
+}

@@ -7,17 +7,17 @@ import {
   getAllHeadImg,
   uploadHeadImg,
 } from "@/api/user";
-import LzyIcon from "@/components/LzyIcon.vue";
 import UserForm from "@/components/form/User.vue";
 import useResetRefState from "@/hook/useResetRefState";
-import { getUsersTable } from "@/store/useUserTable";
+import { getUsersTable } from "@/store/table/useUserTable";
 import { useRequest } from "@/hook/useRequest";
-import { useScrollY } from "@/hook/useTable";
+import { useScrollY } from "@/hook/useTableConfig";
+import { multDelData } from "@/hook/useTableData";
 import { Key } from "ant-design-vue/es/_util/type";
 import TableHeaderOperation from "@/components/TableHeaderOperation.vue";
-import { message, Modal, TableProps } from "ant-design-vue";
-import { ExclamationCircleOutlined } from "@ant-design/icons-vue";
-import { createVNode } from "vue";
+import { TableProps } from "ant-design-vue";
+import { getUserColumns } from "@/table/userColumns";
+
 /* 获取表格滚动条高度 */
 const { scrollConfig } = useScrollY();
 /* 搜索条件 */
@@ -65,14 +65,22 @@ const pagination = computed(() => {
 /* 表格列表数据 提供的部分方法 */
 const usersTableData = getUsersTable();
 
-//真正的数据Columns
-const columns = computed(() => usersTableData.columns.filter((item) => item.checked));
-
 /* 设置表格列表数据的回调方法 */
 usersTableData.setCallbackArr({
-  getListCallbask: () => throttledRequest(searchCondition),
-  delCallback: ({ uid }) => delUser({ uid }),
+  getData: () => throttledRequest(searchCondition),
+  delData: ({ uid }) => delUser({ uid }),
   openModal: (params) => setUserModal(params),
+  columns: getUserColumns,
+});
+
+//真正的数据Columns
+const columns = computed(() => {
+
+  if (isRef(usersTableData.columns)) {
+    return (usersTableData.columns as any).value.filter((item) => item.checked);
+  } else {
+    return usersTableData.columns.filter((item) => item.checked);
+  }
 });
 
 const handleTableChange: TableProps["onChange"] = (pagination) => {
@@ -84,7 +92,7 @@ const handleTableChange: TableProps["onChange"] = (pagination) => {
 getAllHeadImg().then(({ data }) => {
   modalParams.value.headimgs = data;
 });
-/* 添加/编辑用户弹窗 */
+/* 添加/编辑弹窗 */
 const setUserModal = async (params) => {
   const isEdit = !!params.uid;
 
@@ -105,29 +113,17 @@ watchEffect(async () => {
 });
 
 //多选删除列表事件
-
 const multipleDel = () => {
-  Modal.confirm({
-    title: "温馨提醒",
-    icon: createVNode(ExclamationCircleOutlined),
-    content: "确定要删除这些内容吗？",
-    okText: "确定",
-    cancelText: "取消",
-    onOk() {
-      const uids = selectedRowKeys.value;
-      delUser({ uid: uids.join(",") }).then(() => {
-        selectedRowKeys.value = [];
-        throttledRequest(searchCondition);
-        message.success("删除成功");
-      });
-    },
+  multDelData(selectedRowKeys.value, delUser, () => {
+    selectedRowKeys.value = [];
+    throttledRequest(searchCondition);
   });
 };
 </script>
 
 <template>
   <section style="display: flex; flex-direction: column; gap: 20px; height: 100%">
-    <ACard title="搜索工具" :bordered="false" ref="searchWrapperRef">
+    <ACard title="搜索工具" :bordered="false">
       <main class="searchCard">
         <section>
           <span>用户名：</span>
@@ -200,89 +196,7 @@ const multipleDel = () => {
 </template>
 
 <style scoped>
-*[class^="ant-layout"]{
-  box-sizing: none;
-}
-:deep(.searchCard) {
-  display: flex;
-  gap: 20px;
-  section {
-    display: grid;
-    align-items: center;
-    grid-template-columns: 80px 1fr;
-    justify-content: space-between;
-    width: 240px;
-    span {
-      text-wrap: nowrap;
-      user-select: none;
-    }
-    button {
-      letter-spacing: 3px;
-      svg {
-        font-size: 16px;
-        margin-right: 5px;
-      }
-    }
-  }
-  .ant-select-selector {
-    min-width: 120px;
-  }
-}
-
-:deep(.ant-table-body) {
-  overflow-y: auto;
-}
-
-.actionBtn {
-  display: flex;
-  gap: 10px;
-  svg {
-    margin-right: 4px;
-  }
-}
-
-@keyframes custom-fade {
-  0% {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.custom-dropdown {
-  animation: custom-fade 0.3s ease-in-out;
-}
-
-@media (max-width: 1280px) {
-  :deep(.searchCard) {
-    flex-wrap: wrap;
-  }
-}
-
-@media (max-width: 655px) {
-  :deep(.searchCard) {
-    section {
-      width: 100%;
-      .ant-select{
-         width: 100% !important;
-      }
-    }
-  }
-  :deep(.actionBtn){
-    button{
-      padding: 4px 15px !important;
-      span{
-        display: none;
-      }
-      svg{
-        margin-right: 0;
-      }
-    }
-  }
-}
+@import url("@/style/main.css");
 </style>
 <style>
 ::-webkit-scrollbar {
