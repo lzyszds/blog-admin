@@ -19,14 +19,14 @@ const emits = defineEmits(["refresh", "multipleDel"]);
       danger
       :disabled="!props.selectedRowKeys.length"
       @click="$emit('multipleDel')"
-      style="padding-left: 5px; padding-right: 5px"
+      class="multipleDel"
     >
       <LzyIcon name="iconoir:trash" size="16" />
       批量删除
     </AButton>
 
     <AButton @click="$emit('refresh')">
-      <LzyIcon name="iconoir:refresh-double" size="15" :class="{ spin: loading }" />
+      <LzyIcon name="iconoir:refresh-double" size="16" :class="{ spin: loading }" />
       刷新
     </AButton>
 
@@ -35,9 +35,17 @@ const emits = defineEmits(["refresh", "multipleDel"]);
 </template>
 
 <style scoped>
-.actionBtn button {
+.actionBtn :deep(button) {
   svg {
     margin-right: 5px;
+    vertical-align: text-bottom;
+  }
+  &.multipleDel {
+    padding: 0 5px;
+    
+    &[disabled] {
+      color: var(--color-border);
+    }
   }
 }
 

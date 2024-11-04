@@ -148,21 +148,16 @@ const multipleDel = () => {
 
         <section>
           <span>用户权限：</span>
-          <ASelect
-            v-model:value="searchCondition.power"
-            style="width: 100%"
-            allowClear
-            placeholder="请选择用户权限"
-          >
+          <ASelect v-model:value="searchCondition.power" style="width: 160px" allowClear>
             <ASelectOption value="0">超级管理员</ASelectOption>
             <ASelectOption value="1">普通用户</ASelectOption>
           </ASelect>
         </section>
         <section style="display: flex; gap: 10px">
-          <AButton @click="reset">
+          <AButton @click="reset" style="flex: 1">
             <LzyIcon name="hugeicons:exchange-01" /> 重置
           </AButton>
-          <AButton @click="throttledRequest(searchCondition)">
+          <AButton @click="throttledRequest(searchCondition)" style="flex: 1">
             <LzyIcon name="hugeicons:search-area" /> 搜索
           </AButton>
         </section>
@@ -171,6 +166,7 @@ const multipleDel = () => {
 
     <ACard
       title="角色列表"
+      :bordered="false"
       :body-style="{ flex: 1, overflow: 'hidden', paddingBottom: '0' }"
       style="height: calc(100% - 20px)"
     >
@@ -204,12 +200,18 @@ const multipleDel = () => {
 </template>
 
 <style scoped>
+*[class^="ant-layout"]{
+  box-sizing: none;
+}
 :deep(.searchCard) {
   display: flex;
   gap: 20px;
   section {
-    display: flex;
+    display: grid;
     align-items: center;
+    grid-template-columns: 80px 1fr;
+    justify-content: space-between;
+    width: 240px;
     span {
       text-wrap: nowrap;
       user-select: none;
@@ -220,9 +222,6 @@ const multipleDel = () => {
         font-size: 16px;
         margin-right: 5px;
       }
-    }
-    .ant-input {
-      max-width: 160px;
     }
   }
   .ant-select-selector {
@@ -262,9 +261,31 @@ const multipleDel = () => {
     flex-wrap: wrap;
   }
 }
+
+@media (max-width: 655px) {
+  :deep(.searchCard) {
+    section {
+      width: 100%;
+      .ant-select{
+         width: 100% !important;
+      }
+    }
+  }
+  :deep(.actionBtn){
+    button{
+      padding: 4px 15px !important;
+      span{
+        display: none;
+      }
+      svg{
+        margin-right: 0;
+      }
+    }
+  }
+}
 </style>
 <style>
 ::-webkit-scrollbar {
-  background-color: #fff !important;
+  background-color: var(--color-bg) !important;
 }
 </style>

@@ -1,6 +1,7 @@
 @import url('./font');
 @import url('./loading');
 @import url('./transition');
+@import url('./antDesign');
 
 :root {
   --themeColor: rgb(81, 97, 206);

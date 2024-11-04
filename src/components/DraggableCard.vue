@@ -9,7 +9,7 @@ const usersTableData = getUsersTable();
   <APopover placement="bottomRight" trigger="click">
     <AButton>
       <template #icon>
-        <LzyIcon name="iconoir:settings" size="16" />
+        <LzyIcon name="iconoir:settings" size="18" />
       </template>
       <span>列设置</span>
     </AButton>

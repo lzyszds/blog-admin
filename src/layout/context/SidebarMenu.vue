@@ -9,7 +9,6 @@ const emit = defineEmits(["breakpoint", "push-router"]);
   <ALayoutSider
     v-model:collapsed="collapsed"
     :trigger="null"
-    style="background-color: #fff"
     collapsible
     :collapsed-width="!isFixed ? 80 : 0"
     breakpoint="sm"
@@ -38,6 +37,7 @@ const emit = defineEmits(["breakpoint", "push-router"]);
 
 <style scoped>
 .ant-layout-sider {
+  background-color: var(--color-bg);
   z-index: 2;
   box-shadow: 2px 0 8px 0px rgb(29, 35, 41, 0.05);
   .logo {
@@ -48,6 +48,7 @@ const emit = defineEmits(["breakpoint", "push-router"]);
     font-family: "dindin";
     overflow: hidden;
     cursor: pointer;
+    background-color: transparent;
     h2 {
       text-wrap: nowrap;
     }

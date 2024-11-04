@@ -5,6 +5,7 @@ import closeOtherImage from "@/assets/icon/close-other.png";
 import closeAllImage from "@/assets/icon/close-all.png";
 import closeLeftImage from "@/assets/icon/close-left.png";
 import closeRightImage from "@/assets/icon/close-right.png";
+const themeMode = useStorage<string>("themeMode", "light");
 
 const { tabsState } = inject<any>("paramsRef");
 /* 右键触发菜单 */
@@ -88,10 +89,14 @@ const handleClick = (item, tabId) => {
           :disabled="props.disabledKeys.includes(tabId) && ['1', '5'].includes(item.key)"
           @click="handleClick(item, tabId)"
         >
-          <span
-            style="display: flex; justify-content: center; align-items: center; gap: 5px"
-          >
-            <img :src="item.icon" :width="item.size" :height="item.size" alt="" />
+          <span class="menu-item">
+            <img
+              :style="{ filter: themeMode == 'dark' ? 'invert(1)' : '' }"
+              :src="item.icon"
+              :width="item.size"
+              :height="item.size"
+              alt=""
+            />
             {{ item.label }}
           </span>
         </AMenu-item>
@@ -100,4 +105,12 @@ const handleClick = (item, tabId) => {
   </ADropdown>
 </template>
 
-<style scoped></style>
+<style scoped>
+.menu-item {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  color: var(--color-text);
+}
+</style>

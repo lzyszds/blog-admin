@@ -82,7 +82,7 @@ const refreshSrcoll = () => {
 <style scoped>
 .content-area {
   padding: 10px 15px;
-  background-color: #fff;
+  background-color: var(--color-bg);
   display: flex;
   justify-content: space-around;
 }
@@ -117,5 +117,9 @@ button.icon-btn {
   button {
     height: 100%;
   }
+}
+.ant-layout-content{
+  background: var(--color-bg-light);
+  color: var(--color-text);
 }
 </style>
