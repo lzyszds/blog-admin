@@ -3,20 +3,20 @@ import { User } from "./User"
 export interface Article {
   aid: string
   author: string
-  comments_count: string,
+  commentsCount: string,
   content: string,
   coverContent: string,
-  cover_img: string,
-  create_date: string,
+  coverImg: string,
+  createDate: string,
   main: string,
-  modified_date: string,
+  modifiedDate: string,
   title: string,
 }
 
 
 
 export interface TagDataType {
-  whether_use: string,
+  whetherUse: string,
   name: string,
   tid: number
 }
@@ -43,10 +43,10 @@ export interface InformationTypes {
 export interface ArticledataType {
   title: InformationTypes['title'],
   //文章开头第一段话
-  partial_content: string,
+  partialContent: string,
   content: InformationTypes['storage']['text'],
   main: InformationTypes['storage']['html'],
-  cover_img: string,
+  coverImg: string,
   modified: string,
   aid: string | null,
   tags: string[],
@@ -54,7 +54,7 @@ export interface ArticledataType {
 
 export interface ArticleMultipleDataType extends Article {
   tags: string[],
-  head_img: User['headImg'],
+  headImg: User['headImg'],
   signature: User['signature'],
   uname: User['uname'],
 }

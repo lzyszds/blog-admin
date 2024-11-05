@@ -1,5 +1,4 @@
-import { Avatar, Button, message, Popconfirm, Tag } from "ant-design-vue";
-import LzyIcon from '@/components/LzyIcon.vue';
+import { Avatar, Button, message, Popconfirm } from "ant-design-vue";
 import { Column, Params } from "@/typings/Column";
 
 export const getArticleColumns = (params: Params) => {

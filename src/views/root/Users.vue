@@ -7,7 +7,7 @@ import {
   getAllHeadImg,
   uploadHeadImg,
 } from "@/api/user";
-import UserForm from "@/components/form/User.vue";
+import UserForm from "@/components/form/UserForm.vue";
 import useResetRefState from "@/hook/useResetRefState";
 import { getUsersTable } from "@/store/useTableState";
 import { useRequest } from "@/hook/useRequest";

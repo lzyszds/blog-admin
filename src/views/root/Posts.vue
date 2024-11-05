@@ -6,7 +6,7 @@ import {
   articleEditor,
   articleDelete,
 } from "@/api/posts";
-import UserForm from "@/components/form/User.vue";
+import PostsForm from "@/components/form/PostsForm.vue";
 import useResetRefState from "@/hook/useResetRefState";
 import { getUsersTable } from "@/store/useTableState";
 import { useRequest } from "@/hook/useRequest";
@@ -15,7 +15,7 @@ import { multDelData } from "@/hook/useTableData";
 import { Key } from "ant-design-vue/es/_util/type";
 import TableHeaderOperation from "@/components/TableHeaderOperation.vue";
 import { TableProps } from "ant-design-vue";
-import { getArticleColumns } from "@/table/articleColumns";
+import { getArticleColumns } from "@/table/postsColumns";
 
 /* 获取表格滚动条高度 */
 const { scrollConfig } = useScrollY();
@@ -38,14 +38,13 @@ const onSelectChange = (keys: Key[]) => {
 /* 弹窗参数 */
 const modalParams = ref<any>({
   isOpen: false,
-  title: "添加用户",
+  title: "添加文章",
   params: {},
   headimgs: [],
-  // sureCallback: {
-  //   uploadHeadImg,
-  //   callback: addUser,
-  //   refreshData: () => throttledRequest(searchCondition),
-  // },
+  sureCallback: {
+    callback: articleAdd,
+    refreshData: () => throttledRequest(searchCondition),
+  },
 });
 
 /* 获取表格数据 并生成防抖函数  */
@@ -91,18 +90,18 @@ const setUserModal = async (params) => {
 
   modalParams.value.params = isEdit ? params : {};
   modalParams.value.isOpen = true;
-  modalParams.value.title = isEdit ? "修改用户" : "添加用户";
+  modalParams.value.title = isEdit ? "修改文章" : "添加文章";
   modalParams.value.sureCallback.callback = isEdit ? articleEditor : articleAdd;
 };
 
 // 动画控制 为了解决模态框关闭时 动画直接被if销毁
-const userFormHide = ref(false);
+const isFormHide = ref(false);
 watchEffect(async () => {
   const { isOpen } = modalParams.value;
   if (!isOpen) {
     await new Promise((resolve) => setTimeout(resolve, 300));
   }
-  userFormHide.value = isOpen;
+  isFormHide.value = isOpen;
 });
 
 //多选删除列表事件
@@ -119,27 +118,27 @@ const multipleDel = () => {
     <ACard title="搜索工具" :bordered="false">
       <main class="searchCard">
         <section>
-          <span>用户名：</span>
+          <span>文章名：</span>
           <AInput
             @pressEnter="throttledRequest(searchCondition)"
             v-model:value="searchCondition.name"
-            placeholder="请输入用户名称"
+            placeholder="请输入文章名称"
           />
         </section>
         <section>
-          <span>用户账号：</span>
+          <span>文章账号：</span>
           <AInput
             @pressEnter="throttledRequest(searchCondition)"
             v-model:value="searchCondition.username"
-            placeholder="请输入用户账号"
+            placeholder="请输入文章账号"
           />
         </section>
 
         <section>
-          <span>用户权限：</span>
+          <span>文章权限：</span>
           <ASelect v-model:value="searchCondition.power" style="width: 160px" allowClear>
             <ASelectOption value="0">超级管理员</ASelectOption>
-            <ASelectOption value="1">普通用户</ASelectOption>
+            <ASelectOption value="1">普通文章</ASelectOption>
           </ASelect>
         </section>
         <section style="display: flex; gap: 10px">
@@ -184,7 +183,7 @@ const multipleDel = () => {
         />
       </main>
     </ACard>
-    <UserForm :modalParams="modalParams" v-if="userFormHide" />
+    <PostsForm :modalParams="modalParams" v-if="isFormHide" />
   </section>
 </template>
 
