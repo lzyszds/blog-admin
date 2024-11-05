@@ -18,7 +18,7 @@ export interface Article {
 export interface TagDataType {
   whetherUse: string,
   name: string,
-  tid: number
+  typeId: number
 }
 
 

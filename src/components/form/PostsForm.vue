@@ -32,18 +32,6 @@ console.log(modalParams, "modalParams");
 /* 封面文件上传dom */
 const coverFile = templateRef<HTMLInputElement>("coverFile");
 
-/* 分类标签下拉框渲染 组件 */
-const VNodes = defineComponent({
-  props: {
-    vnodes: {
-      type: Object,
-      required: true,
-    },
-  },
-  render() {
-    return this.vnodes;
-  },
-});
 //标签弹窗控制flag
 const visible = ref<boolean>(false);
 //全部标签数据
@@ -58,7 +46,9 @@ const tagList = ref<TagDataType[]>();
 // 获取标签列表
 try {
   const result = await getArticleCategory();
-  tagList.value = result.data.data;
+  tagList.value = result.data.data.map((res) => {
+    return { value: res.typeId, label: res.name };
+  });
 } catch (e) {
   console.log(e);
 }
@@ -185,6 +175,34 @@ const addArticleType = async () => {
   tagList.value = tagData.data;
 };
 
+let index = 0;
+const items = ref(["jack", "lucy"]);
+const value = ref();
+const inputRef = ref();
+const name = ref();
+
+const addItem = (e) => {
+  e.preventDefault();
+  console.log("addItem");
+  items.value.push(name.value || `New item ${(index += 1)}`);
+  name.value = "";
+  setTimeout(() => {
+    inputRef.value?.focus();
+  }, 0);
+};
+
+/* 分类标签下拉框渲染 组件 */
+const VNodes = defineComponent({
+  props: {
+    vnodes: {
+      type: Object,
+      required: true,
+    },
+  },
+  render() {
+    return this.vnodes;
+  },
+});
 </script>
 
 <template>
@@ -213,10 +231,11 @@ const addArticleType = async () => {
             <AInput />
           </a-form-item>
           <a-form-item label="文章分类">
-            <a-select
+            <!-- <a-select
               v-model:value="tagData"
               placeholder="选择文章分类"
               :options="tagList"
+              mode="multiple"
             >
               <template #dropdownRender="{ menuNode: menu }">
                 <v-nodes :vnodes="menu" />
@@ -228,6 +247,29 @@ const addArticleType = async () => {
                       <LzyIcon size="17" name="iconoir:plus" />
                     </template>
                     <span style="font-size: 12px"> 添加分类</span>
+                  </a-button>
+                </a-space>
+              </template>
+            </a-select> -->
+            <a-select
+              v-model:value="value"
+              placeholder="custom dropdown render"
+              style="width: 300px"
+              v-if="tagList"
+              :options="tagList"
+            >
+              <template #dropdownRender="{ menuNode: menu }">
+                <v-nodes :vnodes="menu" />
+                <a-divider style="margin: 4px 0" />
+                <a-space style="padding: 4px 8px">
+                  <a-input
+                    ref="inputRef"
+                    v-model:value="name"
+                    placeholder="Please enter item"
+                  />
+                  <a-button type="text" @click="addItem">
+                    <template #icon> </template>
+                    Add item
                   </a-button>
                 </a-space>
               </template>
