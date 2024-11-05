@@ -1,4 +1,4 @@
-#markdownMain pre[class^="v-md-prism-"]  {
+#markdownMain pre[class^="v-md-prism-"] {
   position: relative;
   font-family: 'Red Hat Display';
   font-variant-numeric: tabular-nums;
@@ -411,7 +411,8 @@ code {
       width: var(--padding-left);
       left: 0;
       padding-top: 30px;
-      br{
+
+      br {
         line-height: 1.4;
       }
     }
@@ -523,6 +524,17 @@ code {
   }
 }
 
-.v-md-editor__main{
+.v-md-editor__main {
   border-radius: 12px;
+}
+
+.v-md-editor__toolbar-left {
+}
+
+.v-md-editor__toolbar-right-wrapper {
+  display: flex;
+  height: 100%;
+  .v-md-editor__toolbar-right {
+    flex-wrap: nowrap
+  }
 }

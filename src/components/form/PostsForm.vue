@@ -3,6 +3,7 @@ import { getArticleCategory, uploadArticleImg } from "@/api/posts";
 import { ArticledataType, TagDataType } from "@/typings/Posts";
 import { isEqual, optimizeImage, toProxys } from "@/utils/comment";
 import { message } from "ant-design-vue";
+import { orderTool, toolbar } from "@/plugins";
 
 type ModalParamsType = {
   modalParams: {
@@ -179,12 +180,11 @@ const addArticleType = async () => {
     }
     return tagDataTem.value.push(typeInput.value);
   }
-  // await addArticleCategory({ name: typeInput.value });
-  // const { data: tagData } = await getArticleCategory<Response<TagDataType>>();
   message.success("添加成功");
   // tipNotify("添加成功");
   tagList.value = tagData.data;
 };
+
 </script>
 
 <template>
@@ -240,7 +240,11 @@ const addArticleType = async () => {
           :bordered="false"
           :body-style="{ padding: '0' }"
         >
-          <v-md-editor v-model="information.content" />
+          <v-md-editor
+            v-model="information.content"
+            :left-toolbar="orderTool"
+            :toolbar="toolbar"
+          />
         </ACard>
       </main>
     </template>

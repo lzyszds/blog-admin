@@ -38,6 +38,7 @@ import markdownItAttrs from 'markdown-it-attrs'
 VueMarkdownEditor.use(vuepressTheme, {
   Prism,
   extend(md) {
+
     md.use(mark)
       .use(inlineComments)
       .use(bracketedSpans)
@@ -78,6 +79,7 @@ VueMarkdownEditor.use(vuepressTheme, {
       })
       return true;
     });
+
 
 
     md.core.ruler.push('music', function replace(state) {
@@ -195,6 +197,7 @@ const addTagMenu = [
   },
 
 ]
+export const orderTool = `emoji undo redo clear |h bold italic strikethrough quote addTag  mark |left center right ul ol table hr | link image code tip music| save tips`;
 
 
 export const toolbar = {
@@ -262,7 +265,7 @@ export const toolbar = {
   },
   tips: {
     title: '提示:可以给当前标记添加各种属性,类似与jQuery的attr 点击查看参考',
-    icon: 'fa fa-exclamation-circle',
+    icon: 'icon-quanju_fankui',
     action(editor) {
       editor.insert(function (selected) {
         const prefix = 'F12看看我就明白了,定义特殊属性时得加data-xxxx才能添加{.lzy_class #lzy_id ';
@@ -293,11 +296,17 @@ export const toolbar = {
       });
     },
   },
+
 }
 
 
 
 
+/* 切换编写html代码 */
+
+export const openHtmlCodeEditView = () => {
+
+}
 
 
 export const setupVMdEditor = (app) => {
