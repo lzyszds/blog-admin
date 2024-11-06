@@ -345,7 +345,7 @@ code {
   }
 
 
-  .token.property,
+  /* .token.property,
   .token.tag,
   .token.constant,
   .token.symbol,
@@ -364,7 +364,7 @@ code {
   .token.char,
   .token.builtin,
   .token.inserted {
-    color: #FFE14D;
+    color: #ffbc6c;
   }
 
   .token.atrule,
@@ -394,7 +394,7 @@ code {
 
   .token.entity {
     cursor: help;
-  }
+  } */
 
   div[class*=v-md-pre-wrapper-] {
     --padding-left: 35px;

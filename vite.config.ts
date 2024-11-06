@@ -11,6 +11,7 @@ import { visualizer } from 'rollup-plugin-visualizer'
 import viteCompression from 'vite-plugin-compression'
 import { ViteImageOptimizer } from 'vite-plugin-image-optimizer'
 import AutoImport from 'unplugin-auto-import/vite'
+import prismjs from 'vite-plugin-prismjs';
 
 const CWD = process.cwd()
 
@@ -53,6 +54,10 @@ export default ({ mode }: any) => {
         ext: '.gz',
       }),
       ViteImageOptimizer(),
+
+      prismjs({
+        languages: ['json', 'js', 'ts', 'css', 'scss', 'html', 'markdown', 'sql', 'typescript', 'vim', "git", "bash"],
+      }),
     ],
     build: {
       rollupOptions: {

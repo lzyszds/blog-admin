@@ -33,7 +33,9 @@ import createCopyCodePlugin from '@kangc/v-md-editor/lib/plugins/copy-code/index
 import createAlignPlugin from '@kangc/v-md-editor/lib/plugins/align';
 //可以给当前标记添加各种属性,类似与jQuery的attr 点击查看参考
 import markdownItAttrs from 'markdown-it-attrs'
-//
+
+// 自定义 Vue 语法高亮规则
+Prism.languages.vue = Prism.languages.html
 
 VueMarkdownEditor.use(vuepressTheme, {
   Prism,

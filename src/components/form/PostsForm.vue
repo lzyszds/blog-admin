@@ -57,9 +57,14 @@ const submitForm = async () => {
   const data = setData();
   // 检查内容是否相同
   modalParams.sureCallback.callback(data).then((res) => {
+    console.log("提交数据", res);
     message.success("保存成功！");
-    const save = document.querySelector(".v-md-icon-save") as HTMLLIElement;
-    save.click();
+    /* 推出模态框 */
+    modalParams.isOpen = false;
+    /* 刷新数据 */
+    modalParams.sureCallback.refreshData();
+    // const save = document.querySelector(".v-md-icon-save") as HTMLLIElement;
+    // save.click();
   });
 };
 
@@ -86,7 +91,7 @@ const customRequest = ({ file }) => {
   return new Promise(async (resolve) => {
     coverUpdate(file).then((res) => {
       setTimeout(() => {
-        information.value.coverImg = "/static/img/articleImages/" + res.data.filename;
+        information.value.coverImg = res.data.filename;
         resolve(res);
         message.info("封面上传成功！");
         coverUpLoad.value = false;
@@ -124,6 +129,8 @@ const saveToInformationStorage = (text, html) => {
  * @returns {ArticledataType} 文章数据
  */
 function setData(): ArticledataType {
+  console.log(information.value);
+
   const { aid, title, content, coverImg } = information.value;
   // 初始化文章数据
   const data = {
@@ -134,7 +141,7 @@ function setData(): ArticledataType {
     main: document.querySelector(".vuepress-markdown-body")?.innerHTML!, // 文章主体内容
     cover_img: coverImg, // 文章封面图片
     aid, // 文章ID（修改时为当前文章ID，创建时为null）
-    tags: tagDataTem.value, // 文章标签
+    tags: tagData.value, // 文章标签
   };
   // 判断数据是否与原始数据相同
   return isEqual(data, protoInformation, "aid");
@@ -236,7 +243,7 @@ const VNodes = defineComponent({
             </template>
           </a-upload>
           <a-divider>文章标题</a-divider>
-          <AInput placeholder="必填 | 请输入文章标题" />
+          <AInput v-model:value="information.title" placeholder="必填 | 请输入文章标题" />
           <a-divider>文章分类</a-divider>
           <a-select
             ref="selectRef"
@@ -264,7 +271,7 @@ const VNodes = defineComponent({
           <ATextarea
             v-model:value="information.partialContent"
             placeholder="选填 | 为空则将自动设置为文章开头第一段"
-            :auto-size="{ minRows: 2, maxRows: 5 }"
+            :auto-size="{ minRows: 4, maxRows: 4 }"
           />
         </ACard>
         <ACard
@@ -288,7 +295,7 @@ const VNodes = defineComponent({
     <template #extra>
       <ASpace>
         <a-button @click="modalParams.isOpen = false">取消保存</a-button>
-        <a-button type="primary" @click="">提交数据</a-button>
+        <a-button type="primary" @click="submitForm">提交数据</a-button>
       </ASpace>
     </template>
   </ADrawer>
