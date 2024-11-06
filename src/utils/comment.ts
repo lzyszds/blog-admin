@@ -165,7 +165,7 @@ export function optimizeImage(file, quality): Promise<{ base64: string, fileComp
     getBase64Binary(file, file.type).then((res: string) => {
       const canvas = document.createElement("canvas") as HTMLCanvasElement;
       const ctx = canvas.getContext("2d");
-      const img = new Image();
+      let img = new Image() as any;
       img.src = res;
       img.onload = function () {
         canvas.width = img.width;
@@ -174,8 +174,16 @@ export function optimizeImage(file, quality): Promise<{ base64: string, fileComp
         const base64 = canvas.toDataURL(file.type, quality);
         const fileCompress = base64toBlob(base64);
         resolve({ base64, fileCompress });
+        // 清理图片对象，释放内存
+        img.onload = img.onerror = null; // 移除事件监听器
+        img.src = ""; // 清空 src 属性，解除图片的引用
+        img = null; // 将 img 对象设为 null
       };
       img.onerror = function () {
+        // 清理图片对象
+        img.onload = img.onerror = null;
+        img.src = "";
+        img = null;
         reject(new Error('图片加载失败'));
       };
     });

@@ -33,7 +33,7 @@ export default function makeRequest<T = any>({
 
     const defaultConfig: AxiosConfig = {
       baseURL: '/hono/api',
-      timeout: 10000,
+      timeout: 5000,
       headers: {
         'access-control-allow-origin': '*',
         'Content-Type': 'application/json',

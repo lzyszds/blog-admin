@@ -29,8 +29,8 @@ const protoInformation = toProxys({ ...modalParams.params });
 
 console.log(modalParams, "modalParams");
 
-/* 封面文件上传dom */
-const coverFile = templateRef<HTMLInputElement>("coverFile");
+/* 封面文件上传状态 */
+const coverUpLoad = ref(false);
 
 //当前选中的标签数据
 const tagData: any = ref(modalParams.params?.tags || []);
@@ -69,21 +69,39 @@ const resetForm = () => {
   save.click();
   // articledata.value = setData();
 };
-const handleUploadImage = async (event, insertImage, files) => {
+
+//图片上传方法
+const coverUpdate = async (file) => {
   // 如果文件大小小于300kb，不进行压缩，按比例压缩
-  const scale = files[0].size < 300 * 1024 ? 1 : 0.5;
+  const scale = file.size < 300 * 1024 ? 1 : 0.5;
 
+  /* 压缩图片 */
+  const { fileCompress } = await optimizeImage(file, scale);
+  return await uploadArticleImg(fileCompress);
+};
+
+/* 上传封面重置请求 */
+const customRequest = ({ file }) => {
+  coverUpLoad.value = true;
+  return new Promise(async (resolve) => {
+    coverUpdate(file).then((res) => {
+      setTimeout(() => {
+        information.value.coverImg = "/static/img/articleImages/" + res.data.filename;
+        resolve(res);
+        message.info("封面上传成功！");
+        coverUpLoad.value = false;
+      }, 1000);
+    });
+  });
+};
+
+/* 文章内部图片上传事件 */
+const handleUploadImage = async (event, insertImage, files) => {
   try {
-    // 对图片进行压 缩
-    const { fileCompress } = await optimizeImage(files[0], scale);
-
-    // 上传图片
-    const res = await uploadArticleImg(fileCompress);
-    console.log(`lzy  res:`, res);
-
+    const res = await coverUpdate(files[0]);
     if (res.code === 200) {
       insertImage({
-        url: "/adminPublic" + res.data,
+        url: "/hono" + res.data.filename,
         desc: "点击放大",
       });
     }
@@ -94,7 +112,7 @@ const handleUploadImage = async (event, insertImage, files) => {
 };
 
 const saveToInformationStorage = (text, html) => {
-  // 确保information对象和storage属性已经定义
+  // 确保information对象和storage属性已经定义;
   // if (!information || !information.storage) {
   //   throw new Error("information.storage未定义");
   // }
@@ -183,9 +201,39 @@ const VNodes = defineComponent({
       <main class="edit-container">
         <ACard class="edit-infomation" :bordered="false">
           <a-divider>文章封面</a-divider>
-          <a-upload list-type="picture-card" :show-upload-list="false">
-            <LzyIcon size="18" name="hugeicons:image-01" style="vertical-align: middle" />
-            <div>上传图片</div>
+          <!--  :before-upload="coverUpdate" -->
+          <a-upload
+            list-type="picture-card"
+            name="upload-image"
+            :show-upload-list="false"
+            :customRequest="customRequest"
+            body-style="display: block;"
+          >
+            <img
+              v-if="information.coverImg"
+              :src="'/hono' + information.coverImg"
+              alt="coverImg"
+              style="width: 100%; height: 100%; object-fit: cover"
+            />
+
+            <template v-else>
+              <template v-if="!coverUpLoad">
+                <LzyIcon
+                  size="18"
+                  name="hugeicons:image-01"
+                  style="vertical-align: middle"
+                />
+                <div>上传图片</div>
+              </template>
+              <template v-else>
+                <LzyIcon
+                  size="18"
+                  name="line-md:uploading-loop"
+                  style="vertical-align: middle"
+                />
+                <span>上传中...</span>
+              </template>
+            </template>
           </a-upload>
           <a-divider>文章标题</a-divider>
           <AInput placeholder="必填 | 请输入文章标题" />
@@ -229,6 +277,9 @@ const VNodes = defineComponent({
             v-model="information.content"
             :left-toolbar="orderTool"
             :toolbar="toolbar"
+            :disabled-menus="[]"
+            @upload-image="handleUploadImage"
+            @save="saveToInformationStorage"
           />
         </ACard>
       </main>
@@ -262,6 +313,8 @@ const VNodes = defineComponent({
 
   :deep(.ant-upload) {
     width: 100% !important;
+    height: 150px !important;
+    overflow: hidden;
   }
 }
 .edit-content {
