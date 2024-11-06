@@ -197,8 +197,3 @@ const multipleDel = () => {
 <style scoped>
 @import url("@/style/main.css");
 </style>
-<style>
-::-webkit-scrollbar {
-  background-color: var(--color-bg) !important;
-}
-</style>

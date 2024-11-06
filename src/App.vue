@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { message } from 'ant-design-vue';
+
 const themeMode = useStorage<"light" | "dark">("themeMode", "light");
 
 const theme = computed(() => {
@@ -19,6 +21,13 @@ const theme = computed(() => {
       colorFillSecondary: isDark ? "rgb(255 255 255 / 0.12)" : "#00000010",
     },
   };
+});
+
+message.config({
+  duration: 2,
+  maxCount: 3,
+  rtl: true,
+  prefixCls: 'my-message',
 });
 </script>
 

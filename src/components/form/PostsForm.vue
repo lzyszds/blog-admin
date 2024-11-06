@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { getArticleCategory, uploadArticleImg } from "@/api/posts";
+import { addArticleCategory, getArticleCategory, uploadArticleImg } from "@/api/posts";
 import { ArticledataType, TagDataType } from "@/typings/Posts";
 import { isEqual, optimizeImage, toProxys } from "@/utils/comment";
 import { message } from "ant-design-vue";
@@ -32,10 +32,9 @@ console.log(modalParams, "modalParams");
 /* 封面文件上传dom */
 const coverFile = templateRef<HTMLInputElement>("coverFile");
 
-//标签弹窗控制flag
-const visible = ref<boolean>(false);
-//全部标签数据
+//当前选中的标签数据
 const tagData: any = ref(modalParams.params?.tags || []);
+
 //当前文章的标签数据 当前文章的标签数据 是否已经有标签
 // tagData.value = props.data?.w ? props.data?.wtype.split(",") : [];
 //临时存储数据
@@ -47,7 +46,7 @@ const tagList = ref<TagDataType[]>();
 try {
   const result = await getArticleCategory();
   tagList.value = result.data.data.map((res) => {
-    return { value: res.typeId, label: res.name };
+    return { value: res.name };
   });
 } catch (e) {
   console.log(e);
@@ -123,33 +122,12 @@ function setData(): ArticledataType {
   return isEqual(data, protoInformation, "aid");
 }
 
-// 标签激活函数
-const tagActive = (tag) => {
-  if (tagDataTem.value.includes(tag)) {
-    // 如果存在则删除
-    tagDataTem.value.splice(tagDataTem.value.indexOf(tag), 1);
-  } else {
-    if (tagDataTem.value.length >= 4) {
-      message.warning("最多只能选择4个标签");
-      return;
-    }
-    tagDataTem.value.push(tag);
+// 修改标签值事件
+const selectTag = (tags) => {
+  if (tags.length >= 4) {
+    tagData.value.pop();
+    return message.warning("最多只能选择4个标签");
   }
-};
-
-// 标签激活类名
-const tagActiveClass = (tag) => {
-  return tagDataTem.value.includes(tag) ? "tag-active" : "";
-};
-
-// 添加标签
-const addTag = (flag: boolean) => {
-  if (flag) {
-    tagData.value = tagDataTem.value;
-  } else {
-    tagDataTem.value = tagData.value;
-  }
-  visible.value = false;
 };
 
 // 输入类型
@@ -161,7 +139,8 @@ const addArticleType = async () => {
 
   //获取当前所有的文章分类
   const data = tagList.value!.map((res) => {
-    return res.name;
+    //@ts-ignore
+    return res.value;
   });
   //判断当前输入的类型是否已经存在 如果不存在 则添加
   if (data?.includes(typeInput.value as any)) {
@@ -170,25 +149,11 @@ const addArticleType = async () => {
     }
     return tagDataTem.value.push(typeInput.value);
   }
+  await addArticleCategory({ name: typeInput.value });
+  const { data: tagData } = await getArticleCategory();
   message.success("添加成功");
   // tipNotify("添加成功");
-  tagList.value = tagData.data;
-};
-
-let index = 0;
-const items = ref(["jack", "lucy"]);
-const value = ref();
-const inputRef = ref();
-const name = ref();
-
-const addItem = (e) => {
-  e.preventDefault();
-  console.log("addItem");
-  items.value.push(name.value || `New item ${(index += 1)}`);
-  name.value = "";
-  setTimeout(() => {
-    inputRef.value?.focus();
-  }, 0);
+  tagList.value = tagData.data.map((res) => ({ value: res.name }));
 };
 
 /* 分类标签下拉框渲染 组件 */
@@ -217,64 +182,42 @@ const VNodes = defineComponent({
     <template #default>
       <main class="edit-container">
         <ACard class="edit-infomation" :bordered="false">
-          <a-form-item label="文章封面">
-            <a-upload list-type="picture-card" :show-upload-list="false">
-              <LzyIcon
-                size="18"
-                name="hugeicons:image-01"
-                style="vertical-align: middle"
-              />
-              <div>上传图片</div>
-            </a-upload>
-          </a-form-item>
-          <a-form-item label="文章标题">
-            <AInput />
-          </a-form-item>
-          <a-form-item label="文章分类">
-            <!-- <a-select
-              v-model:value="tagData"
-              placeholder="选择文章分类"
-              :options="tagList"
-              mode="multiple"
-            >
-              <template #dropdownRender="{ menuNode: menu }">
-                <v-nodes :vnodes="menu" />
-                <a-divider style="margin: 4px 0" />
-                <a-space style="padding: 4px 8px">
-                  <a-input ref="inputRef" v-model:value="typeInput" />
-                  <a-button type="text" @click="addArticleType">
-                    <template #icon>
-                      <LzyIcon size="17" name="iconoir:plus" />
-                    </template>
-                    <span style="font-size: 12px"> 添加分类</span>
-                  </a-button>
-                </a-space>
-              </template>
-            </a-select> -->
-            <a-select
-              v-model:value="value"
-              placeholder="custom dropdown render"
-              style="width: 300px"
-              v-if="tagList"
-              :options="tagList"
-            >
-              <template #dropdownRender="{ menuNode: menu }">
-                <v-nodes :vnodes="menu" />
-                <a-divider style="margin: 4px 0" />
-                <a-space style="padding: 4px 8px">
-                  <a-input
-                    ref="inputRef"
-                    v-model:value="name"
-                    placeholder="Please enter item"
-                  />
-                  <a-button type="text" @click="addItem">
-                    <template #icon> </template>
-                    Add item
-                  </a-button>
-                </a-space>
-              </template>
-            </a-select>
-          </a-form-item>
+          <a-divider>文章封面</a-divider>
+          <a-upload list-type="picture-card" :show-upload-list="false">
+            <LzyIcon size="18" name="hugeicons:image-01" style="vertical-align: middle" />
+            <div>上传图片</div>
+          </a-upload>
+          <a-divider>文章标题</a-divider>
+          <AInput placeholder="必填 | 请输入文章标题" />
+          <a-divider>文章分类</a-divider>
+          <a-select
+            ref="selectRef"
+            v-model:value="tagData"
+            placeholder="必填 | 选择文章分类"
+            style="width: 100%"
+            v-if="tagList"
+            :options="tagList"
+            mode="tags"
+            @change="selectTag"
+          >
+            <template #dropdownRender="{ menuNode: menu }">
+              <v-nodes :vnodes="menu" />
+              <a-divider style="margin: 4px 0" />
+              <a-space style="padding: 4px 8px">
+                <a-input ref="inputRef" v-model:value="typeInput" />
+                <a-button type="text" @click="addArticleType">
+                  <template #icon><LzyIcon size="17" name="iconoir:plus" /></template>
+                  添加分类
+                </a-button>
+              </a-space>
+            </template>
+          </a-select>
+          <a-divider>文章介绍</a-divider>
+          <ATextarea
+            v-model:value="information.partialContent"
+            placeholder="选填 | 为空则将自动设置为文章开头第一段"
+            :auto-size="{ minRows: 2, maxRows: 5 }"
+          />
         </ACard>
         <ACard
           class="edit-content"
@@ -327,8 +270,22 @@ const VNodes = defineComponent({
 }
 
 :deep(.v-md-editor) {
-  height: calc(100vh - 65px - 96px);
+  height: calc(100vh - 65px - 48px);
   border-radius: 12px;
   box-shadow: none;
+  .v-md-editor-preview {
+    padding: 20px 20px 30px;
+  }
+
+  .vuepress-markdown-body {
+    font-size: 14px;
+
+    h3 {
+      font-size: 16px !important;
+    }
+    h2 {
+      font-size: 18px !important;
+    }
+  }
 }
 </style>
