@@ -35,6 +35,17 @@ const coverUpLoad = ref(false);
 //当前选中的标签数据
 const tagData: any = ref(modalParams.params?.tags || []);
 
+/* 是否为修改文章 */
+// const isEdit = !!modalParams.params.aid;
+// /* 文章表单缓存key */
+// const key = "cacheData" + (isEdit ? modalParams.params.aid! : "Add");
+// /* 文章表单中的缓存数据 */
+
+/* 全局配置缓存 */
+const globlConfig = useStorage("globlConfig", {
+  previewPosition: "flex",
+});
+
 //当前文章的标签数据 当前文章的标签数据 是否已经有标签
 // tagData.value = props.data?.w ? props.data?.wtype.split(",") : [];
 //临时存储数据
@@ -193,6 +204,47 @@ const VNodes = defineComponent({
     return this.vnodes;
   },
 });
+
+const infoCard = shallowRef();
+const { width: infoCard_w, height: infoCard_h } = useElementSize(infoCard);
+
+const changePlaces = (val) => {
+  globlConfig.value.previewPosition = val;
+  setPlace(val);
+};
+
+function setPlace(val) {
+  const preview = document.querySelector(".v-md-editor__preview-wrapper") as HTMLElement;
+  const container = document.querySelector(".edit-container") as HTMLElement;
+  container.style.flexDirection = "row";
+  /* 设置位置 如果val为flex 则设置为相对定位 */
+  if (val !== "flex") {
+    preview.style.position = "fixed";
+    preview.style.height = infoCard_h.value + "px";
+    preview.style.width = infoCard_w.value + "px";
+    preview.style.top = "90px";
+    if (val == "right") {
+      preview.style.right = "24px";
+      preview.style.left = "inherit";
+      container.style.flexDirection = "row-reverse";
+    }else{
+      preview.style.left = "24px";
+      preview.style.right = "inherit";
+    }
+  } else {
+    preview.style.position = "relative";
+    preview.style.height = "auto";
+    preview.style.width = "auto";
+    preview.style.top = "0";
+    preview.style.left = "0";
+  }
+}
+
+onMounted(() => {
+  setTimeout(() => {
+    setPlace(globlConfig.value.previewPosition);
+  }, 50);
+});
 </script>
 
 <template>
@@ -206,7 +258,7 @@ const VNodes = defineComponent({
   >
     <template #default>
       <main class="edit-container">
-        <ACard class="edit-infomation" :bordered="false">
+        <ACard ref="infoCard" class="edit-infomation" :bordered="false">
           <a-divider>文章封面</a-divider>
           <!--  :before-upload="coverUpdate" -->
           <a-upload
@@ -271,7 +323,7 @@ const VNodes = defineComponent({
           <ATextarea
             v-model:value="information.partialContent"
             placeholder="选填 | 为空则将自动设置为文章开头第一段"
-            :auto-size="{ minRows: 4, maxRows: 4 }"
+            :auto-size="{ minRows: 14, maxRows: 14 }"
           />
         </ACard>
         <ACard
@@ -294,7 +346,22 @@ const VNodes = defineComponent({
 
     <template #extra>
       <ASpace>
-        <a-button @click="modalParams.isOpen = false">取消保存</a-button>
+        <a-select
+          v-model:value="globlConfig.previewPosition"
+          style="width: 100px"
+          :options="[
+            { value: 'flex', label: '预览位置' },
+            { value: 'left', label: '预览居左' },
+            { value: 'right', label: '预览居右' },
+          ]"
+          @change="changePlaces"
+        >
+          <template #suffixIcon>
+            <LzyIcon style="color: var(--color-text)" size="16" name="iconoir:pin" />
+          </template>
+        </a-select>
+        <a-button @click="modalParams.isOpen = false">退出操作</a-button>
+        <a-button @click="">暂时保存</a-button>
         <a-button type="primary" @click="submitForm">提交数据</a-button>
       </ASpace>
     </template>
@@ -346,6 +413,14 @@ const VNodes = defineComponent({
     h2 {
       font-size: 18px !important;
     }
+  }
+
+  .v-md-editor__preview-wrapper {
+    width: 0;
+    height: 0;
+    height: calc(100vh - 65px - 48px);
+    background-color: #fff;
+    border-radius: 12px;
   }
 }
 </style>

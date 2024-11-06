@@ -345,7 +345,7 @@ code {
   }
 
 
-  /* .token.property,
+  .token.property,
   .token.tag,
   .token.constant,
   .token.symbol,
@@ -394,7 +394,7 @@ code {
 
   .token.entity {
     cursor: help;
-  } */
+  }
 
   div[class*=v-md-pre-wrapper-] {
     --padding-left: 35px;
@@ -419,6 +419,7 @@ code {
       padding-left: 10px;
     }
   }
+
 
 }
 
@@ -534,3 +535,68 @@ code {
     flex-wrap: nowrap
   }
 }
+
+
+/*
+ * Laserwave Theme originally by Jared Jones for Visual Studio Code
+ * https://github.com/Jaredk3nt/laserwave
+ *
+ * Ported for PrismJS by Simon Jespersen [https://github.com/simjes]
+ */
+
+ code[class*="language-"],
+ pre[class*="language-"] {
+   background: #27212e;
+   color: #ffffff;
+   font-family: Consolas, Monaco, "Andale Mono", "Ubuntu Mono", monospace; /* this is the default */
+   /* The following properties are standard, please leave them as they are */
+   font-size: 1em;
+   direction: ltr;
+   text-align: left;
+   white-space: pre;
+   word-spacing: normal;
+   word-break: normal;
+   line-height: 1.5;
+   -moz-tab-size: 2;
+   -o-tab-size: 2;
+   tab-size: 2;
+   /* The following properties are also standard */
+   -webkit-hyphens: none;
+   -moz-hyphens: none;
+   -ms-hyphens: none;
+   hyphens: none;
+ }
+ 
+ code[class*="language-"]::-moz-selection,
+ code[class*="language-"] ::-moz-selection,
+ pre[class*="language-"]::-moz-selection,
+ pre[class*="language-"] ::-moz-selection {
+   background: #eb64b927;
+   color: inherit;
+ }
+ 
+ code[class*="language-"]::selection,
+ code[class*="language-"] ::selection,
+ pre[class*="language-"]::selection,
+ pre[class*="language-"] ::selection {
+   background: #eb64b927;
+   color: inherit;
+ }
+ 
+ /* Properties specific to code blocks */
+ pre[class*="language-"] {
+   padding: 1em; /* this is standard */
+   margin: 0.5em 0; /* this is the default */
+   overflow: auto; /* this is standard */
+   border-radius: 0.5em;
+ }
+ 
+ /* Properties specific to inline code */
+ :not(pre) > code[class*="language-"] {
+   padding: 0.2em 0.3em;
+   border-radius: 0.5rem;
+   white-space: normal; /* this is standard */
+ }
+ 
+ 
+ 
