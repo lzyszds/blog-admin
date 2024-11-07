@@ -2,7 +2,7 @@
   <!-- Markdown编辑器主组件 -->
   <div class="markdown-editor" id="markdown-editor">
     <!-- 工具栏，包含切换预览和全屏功能 -->
-    <Toolbar @toggle-preview="togglePreview" @toggle-fullscreen="toggleFullscreen" />
+    <Toolbar :markdownEditorRef="markdownEditorRef" :useEditorOption="useEditorOption" />
 
     <!-- 编辑内容区域，根据是否全屏切换样式 -->
     <div class="editor-content" :class="{ 'is-fullscreen': isFullscreen }">
@@ -22,6 +22,7 @@
           @keyup.shift.down.exact="updateCurrentHistoryRange"
           @keyup.shift.left.exact="updateCurrentHistoryRange"
           @keyup.shift.right.exact="updateCurrentHistoryRange"
+          @input="updateMarkdownInput"
         ></textarea>
 
         <!-- Markdown实时预览组件 -->
@@ -35,7 +36,6 @@
 import { debounce } from "lodash-es";
 import Toolbar from "./Toolbar.vue";
 import AsyncMarkdownPreview from "./AsyncMarkdownPreview.vue";
-import { insertText } from "./utils/insert";
 import { handleKeyDown } from "./utils/keydown";
 import { useEditor } from "@/hook/useEditor";
 
@@ -50,6 +50,7 @@ const isFullscreen = ref(false);
 const previewOnly = ref(false);
 
 // 导入编辑器钩子并解构出相关方法
+const useEditorOption = useEditor(markdownInput);
 const {
   undo,
   redo,
@@ -57,7 +58,7 @@ const {
   markdownEditorRef,
   saveHistory,
   updateHistoryRange,
-} = useEditor(markdownInput);
+} = useEditorOption;
 
 // 切换预览模式的方法
 const togglePreview = () => {
@@ -69,6 +70,10 @@ const toggleFullscreen = () => {
   isFullscreen.value = !isFullscreen.value;
 };
 
+const updateMarkdownInput = (val) => {
+  markdownInput.value = val.target.value;
+};
+
 // 键盘快捷键的初始化和处理
 onMounted(() => {
   saveHistory();
@@ -76,6 +81,8 @@ onMounted(() => {
     handleKeyDown(event, markdownInput);
   });
 });
+
+provide("markdownInput", markdownInput);
 </script>
 
 <style scoped>
