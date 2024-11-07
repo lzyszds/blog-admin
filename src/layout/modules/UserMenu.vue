@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useUserInfoState } from "@/store/useUserInfoState";
+import { useUserInfoState } from "@/store/useUserInfoStore";
 /* 获取用户信息 */
 const userStore = useUserInfoState();
 </script>

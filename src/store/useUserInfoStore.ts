@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { getUserInfoToken } from '@/api/user'
 import { User } from '@/typings/User'
-import { useTabsState } from "@/store/useTabsState";
+import { useTabsState } from "@/store/useTabsStore";
 const tabsState = useTabsState()
 
 export const useUserInfoState = defineStore('useUserInfoState', () => {

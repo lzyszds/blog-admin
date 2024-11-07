@@ -9,7 +9,7 @@ import {
 } from "@/api/user";
 import UserForm from "@/components/form/UserForm.vue";
 import useResetRefState from "@/hook/useResetRefState";
-import { getUsersTable } from "@/store/useTableState";
+import { getUsersTable } from "@/store/useTableStore";
 import { useRequest } from "@/hook/useRequest";
 import { useScrollY } from "@/hook/useTableConfig";
 import { multDelData } from "@/hook/useTableData";

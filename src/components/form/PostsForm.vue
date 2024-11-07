@@ -4,7 +4,6 @@ import { ArticledataType, TagDataType } from "@/typings/Posts";
 import { isEqual, optimizeImage, toProxys } from "@/utils/comment";
 import { message } from "ant-design-vue";
 import MarkdownEditor from "../markdown/MarkdownEditor.vue";
-// import { orderTool, toolbar } from "@/plugins";
 
 type ModalParamsType = {
   modalParams: {
@@ -27,7 +26,7 @@ const { modalParams } = defineProps<ModalParamsType>();
 const information = ref<ArticledataType>({ ...modalParams.params });
 /*  文章编辑器原始数据 */
 const protoInformation = toProxys({ ...modalParams.params });
-
+ 
 console.log(modalParams, "modalParams");
 
 /* 封面文件上传状态 */
@@ -211,7 +210,7 @@ const { width: infoCard_w, height: infoCard_h } = useElementSize(infoCard);
 
 const changePlaces = (val) => {
   globlConfig.value.previewPosition = val;
-  setPlace(val);
+  // setPlace(val);
 };
 
 function setPlace(val) {
@@ -243,7 +242,7 @@ function setPlace(val) {
 
 onMounted(() => {
   setTimeout(() => {
-    setPlace(globlConfig.value.previewPosition);
+    // setPlace(globlConfig.value.previewPosition);
   }, 50);
 });
 </script>

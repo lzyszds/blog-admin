@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import BScroll from "@better-scroll/core";
-import { useTabsState } from "@/store/useTabsState";
+import { useTabsState } from "@/store/useTabsStore";
 const tabsState = useTabsState();
 
 const wrapperRef = templateRef("wrapperRef");

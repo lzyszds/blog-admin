@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { VueDraggable } from "vue-draggable-plus";
 
-import { getUsersTable } from "@/store/useTableState";
+import { getUsersTable } from "@/store/useTableStore";
 const usersTableData = getUsersTable();
 </script>
 

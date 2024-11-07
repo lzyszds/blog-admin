@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useTabsState } from "@/store/useTabsState"; // 导入用于管理标签页状态的 store
+import { useTabsState } from "@/store/useTabsStore"; // 导入用于管理标签页状态的 store
 import items from "@/layout/config"; // 导入布局配置项
 import SidebarMenu from "@/layout/context/SidebarMenu.vue"; // 导入侧边菜单组件
 import HeaderComponent from "@/layout/context/HeaderComponent.vue"; // 导入头部组件

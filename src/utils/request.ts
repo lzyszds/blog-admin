@@ -21,7 +21,7 @@ export default function makeRequest<T = any>({
   data,
   headers,
 }: AxiosRequestConfig): Promise<T | any> {
-  
+
   return new Promise(async (resolve, reject) => {
 
     /* 过滤参数 params 如果某个值为空则销毁这key */
@@ -33,7 +33,7 @@ export default function makeRequest<T = any>({
 
     const defaultConfig: AxiosConfig = {
       baseURL: '/hono/api',
-      timeout: 5000,
+      timeout: 30 * 1000,
       headers: {
         'access-control-allow-origin': '*',
         'Content-Type': 'application/json',

@@ -2,7 +2,7 @@
 import BetterScroll from "@/components/BetterScroll.vue";
 import LzyIcon from "@/components/LzyIcon.vue";
 import ToolsMenu from "@/layout/modules/ToolsMenu.vue";
-import { useTabsState } from "@/store/useTabsState";
+import { useTabsState } from "@/store/useTabsStore";
 const tabsState = useTabsState();
 
 const { layout, refreshKey } = inject<any>("paramsRef");

@@ -8,7 +8,7 @@ import {
 } from "@/api/posts";
 import PostsForm from "@/components/form/PostsForm.vue";
 import useResetRefState from "@/hook/useResetRefState";
-import { getUsersTable } from "@/store/useTableState";
+import { getUsersTable } from "@/store/useTableStore";
 import { useRequest } from "@/hook/useRequest";
 import { useScrollY } from "@/hook/useTableConfig";
 import { multDelData } from "@/hook/useTableData";
