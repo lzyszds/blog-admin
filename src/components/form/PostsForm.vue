@@ -3,7 +3,8 @@ import { addArticleCategory, getArticleCategory, uploadArticleImg } from "@/api/
 import { ArticledataType, TagDataType } from "@/typings/Posts";
 import { isEqual, optimizeImage, toProxys } from "@/utils/comment";
 import { message } from "ant-design-vue";
-import { orderTool, toolbar } from "@/plugins";
+import MarkdownEditor from "../markdown/MarkdownEditor.vue";
+// import { orderTool, toolbar } from "@/plugins";
 
 type ModalParamsType = {
   modalParams: {
@@ -227,7 +228,7 @@ function setPlace(val) {
       preview.style.right = "24px";
       preview.style.left = "inherit";
       container.style.flexDirection = "row-reverse";
-    }else{
+    } else {
       preview.style.left = "24px";
       preview.style.right = "inherit";
     }
@@ -332,14 +333,15 @@ onMounted(() => {
           :bordered="false"
           :body-style="{ padding: '0' }"
         >
-          <v-md-editor
+          <!-- <v-md-editor
             v-model="information.content"
             :left-toolbar="orderTool"
             :toolbar="toolbar"
             :disabled-menus="[]"
             @upload-image="handleUploadImage"
             @save="saveToInformationStorage"
-          />
+          /> -->
+          <MarkdownEditor v-model="information.content"></MarkdownEditor>
         </ACard>
       </main>
     </template>
@@ -396,7 +398,7 @@ onMounted(() => {
   height: 100%;
 }
 
-:deep(.v-md-editor) {
+:deep(.markdown-editor) {
   height: calc(100vh - 65px - 48px);
   border-radius: 12px;
   box-shadow: none;

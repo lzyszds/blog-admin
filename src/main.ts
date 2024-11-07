@@ -4,7 +4,7 @@ import App from './App.vue'
 
 import { setupRouter } from './router'
 import { setupStore } from './store'
-import { setupLoading, unLoad, setupVMdEditor } from '@/plugins'
+import { setupLoading, unLoad } from '@/plugins'
 
 async function setupApp() {
 
@@ -12,8 +12,6 @@ async function setupApp() {
   setupLoading();
   setupStore(app)
   await setupRouter(app)
-  // setupMarkDown(app)
-  setupVMdEditor(app)
   app.mount('#app')
 
   unLoad()

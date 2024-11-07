@@ -13,6 +13,7 @@ const initScroll = async () => {
   if (bs) {
     bs.destroy();
   }
+  if (!contentRef.value) return;
   const children = contentRef.value!.firstChild!.parentElement!.children as any;
   // 计算内容总宽度
   let totalWidth = 0;
