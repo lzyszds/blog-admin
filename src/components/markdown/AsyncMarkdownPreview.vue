@@ -3,9 +3,24 @@
 </template>
 
 <script setup>
-import { fromHighlighter } from "@shikijs/markdown-it/core";
 import MarkdownIt from "markdown-it";
-import { createHighlighter } from "shiki";
+import { createHighlighterCore } from "shiki/core";
+import { createOnigurumaEngine } from "shiki/engine/oniguruma";
+import { fromHighlighter } from "@shikijs/markdown-it/core";
+
+// 手动导入每个语言模块
+import htmlLang from "shiki/langs/html.mjs";
+import cssLang from "shiki/langs/css.mjs";
+import jsLang from "shiki/langs/javascript.mjs";
+import jsxLang from "shiki/langs/jsx.mjs";
+import tsLang from "shiki/langs/typescript.mjs";
+import tsxLang from "shiki/langs/tsx.mjs";
+import vueLang from "shiki/langs/vue.mjs";
+import jsonLang from "shiki/langs/json.mjs";
+import shLang from "shiki/langs/shellscript.mjs";
+import nginxLang from "shiki/langs/nginx.mjs";
+import xmlLang from "shiki/langs/xml.mjs";
+
 import { useEditor } from "@/hook/useEditor";
 
 /* 插件 */
@@ -21,6 +36,7 @@ import getWasm from "shiki/wasm";
 const props = defineProps({
   markdownInput: String,
 });
+const emit = defineEmits(["renderedHtml"]);
 
 const md = MarkdownIt({
   html: true,
@@ -28,18 +44,49 @@ const md = MarkdownIt({
   typographer: true,
 });
 
-const shiki = await createHighlighter({
-  langs: ["js", "vue"],
-  themes: ["one-dark-pro"],
+const langs = [
+  "html",
+  "css",
+  "js",
+  "jsx",
+  "ts",
+  "tsx",
+  "vue",
+  "json",
+  "sh",
+  "nginx",
+  "xml",
+];
+
+// 批量导入所有语言模块
+const langModules = [
+  htmlLang,
+  cssLang,
+  jsLang,
+  jsxLang,
+  tsLang,
+  tsxLang,
+  vueLang,
+  jsonLang,
+  shLang,
+  nginxLang,
+  xmlLang,
+];
+
+const highlighter = await createHighlighterCore({
+  themes: [import("shiki/themes/one-dark-pro.mjs")],
+  langs: langModules,
+  engine: createOnigurumaEngine(import("shiki/wasm")),
 });
 
-md.use(markdownItContainer, "spoiler", {
+/* 自定义容器插件 折叠面板 */
+md.use(markdownItContainer, "fold", {
   validate: function (params) {
-    return params.trim().match(/^spoiler\s+(.*)$/);
+    return params.trim().match(/^fold\s+(.*)$/);
   },
 
   render: function (tokens, idx) {
-    var m = tokens[idx].info.trim().match(/^spoiler\s+(.*)$/);
+    var m = tokens[idx].info.trim().match(/^fold\s+(.*)$/);
 
     if (tokens[idx].nesting === 1) {
       // opening tag
@@ -50,14 +97,33 @@ md.use(markdownItContainer, "spoiler", {
     }
   },
 });
+/* shiki代码块高亮插件 */
+md.use(
+  fromHighlighter(highlighter, {
+    theme: "one-dark-pro",
+  })
+);
+/* 自定义属性插件 attrs */
+md.use(mdAttrs, {
+  // optional, these are default options
+  leftDelimiter: "{",
+  rightDelimiter: "}",
+  allowedAttributes: [], // empty array = all attributes are allowed
+});
+md.use(mdMark);
+md.use(mdEmoji);
+md.use(mdBracketedSpans);
+md.use(mdInlineComments);
 
 const renderedHtml = ref("");
 watch(
   () => props.markdownInput,
   (newMarkdown) => {
-    const data = md.render(newMarkdown || "");
-
-    renderedHtml.value = data;
+    try {
+      const data = md.render(newMarkdown || "");
+      renderedHtml.value = data;
+      emit("renderedHtml", data);
+    } catch (error) {}
   },
   { immediate: true }
 );
@@ -178,11 +244,9 @@ watch(
     margin-bottom: 1rem;
     overflow-x: auto;
     code {
-      padding: 0.125rem 0.25rem;
       border-radius: 0.25rem;
-    }
-    span {
-      font-family: "Red Hat Display";
+      font-family: "Fira Code";
+      font-weight: 400;
     }
   }
   details {
@@ -202,6 +266,19 @@ watch(
     p {
       padding: 10px 15px;
       background-color: #fff;
+    }
+  }
+
+  blockquote {
+    margin: 1rem 0;
+    color: #999;
+    font-size: 1.5rem;
+    border-left: 0.2rem solid var(--themeColor);
+    background: aliceblue;
+    font-family: "dindin";
+    p {
+      padding: 0.5rem;
+      padding-left: 10px;
     }
   }
 }

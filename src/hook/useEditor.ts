@@ -4,7 +4,7 @@
  *  
  */
 export const useEditor = (markdownInput) => {
-  const markdownEditorRef = shallowRef<HTMLTextAreaElement | null>(null)
+  const markdownEditorRef = ref<HTMLTextAreaElement | null>(null)
   let timmer: number | null = null;
   const triggerInputBySetHistory = ref(false);
 

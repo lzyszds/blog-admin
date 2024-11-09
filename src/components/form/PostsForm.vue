@@ -26,7 +26,7 @@ const { modalParams } = defineProps<ModalParamsType>();
 const information = ref<ArticledataType>({ ...modalParams.params });
 /*  文章编辑器原始数据 */
 const protoInformation = toProxys({ ...modalParams.params });
- 
+
 console.log(modalParams, "modalParams");
 
 /* 封面文件上传状态 */
@@ -255,6 +255,7 @@ onMounted(() => {
     :body-style="{ paddingBottom: '80px' }"
     @close="modalParams.isOpen = false"
     destroyOnClose
+    :keyboard="false"
   >
     <template #default>
       <main class="edit-container">
@@ -330,16 +331,8 @@ onMounted(() => {
           class="edit-content"
           id="markdownMain"
           :bordered="false"
-          :body-style="{ padding: '0' }"
+          :body-style="{ padding: '0', height: '100%' }"
         >
-          <!-- <v-md-editor
-            v-model="information.content"
-            :left-toolbar="orderTool"
-            :toolbar="toolbar"
-            :disabled-menus="[]"
-            @upload-image="handleUploadImage"
-            @save="saveToInformationStorage"
-          /> -->
           <MarkdownEditor v-model="information.content"></MarkdownEditor>
         </ACard>
       </main>
@@ -382,6 +375,7 @@ onMounted(() => {
 }
 
 .edit-infomation {
+  height: calc(100vh - 65px - 48px);
   flex: 3;
   background-color: var(--color-bg);
   border-radius: 12px;
@@ -394,11 +388,9 @@ onMounted(() => {
 }
 .edit-content {
   flex: 7;
-  height: 100%;
 }
 
 :deep(.markdown-editor) {
-  height: calc(100vh - 65px - 48px);
   border-radius: 12px;
   box-shadow: none;
   .v-md-editor-preview {

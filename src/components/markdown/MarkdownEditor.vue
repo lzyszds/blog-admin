@@ -1,16 +1,21 @@
 <template>
   <!-- Markdown编辑器主组件 -->
-  <div class="markdown-editor" id="markdown-editor">
+  <div
+    class="markdown-editor"
+    id="markdown-editor"
+    :class="{ 'is-fullscreen': isFullscreen }"
+  >
     <!-- 工具栏，包含切换预览和全屏功能 -->
-    <Toolbar :markdownEditorRef="markdownEditorRef" :useEditorOption="useEditorOption" />
+    <Toolbar :useEditorOption="useEditorOption" />
 
     <!-- 编辑内容区域，根据是否全屏切换样式 -->
-    <div class="editor-content" :class="{ 'is-fullscreen': isFullscreen }">
+    <div class="editor-content">
       <!-- 编辑器窗格，根据是否只预览切换样式 -->
-      <div class="editor-panes" :class="{ 'preview-only': previewOnly }">
+      <div class="editor-panes">
         <!-- Markdown文本输入框，支持多种键盘快捷操作 -->
         <textarea
           v-model="markdownInput"
+          id="editor-textarea"
           ref="markdownEditorRef"
           class="editor-textarea"
           placeholder="Enter markdown text here..."
@@ -23,10 +28,17 @@
           @keyup.shift.left.exact="updateCurrentHistoryRange"
           @keyup.shift.right.exact="updateCurrentHistoryRange"
           @input="updateMarkdownInput"
+          @keydown="handleKeyDown($event, editorParams)"
         ></textarea>
 
         <!-- Markdown实时预览组件 -->
-        <AsyncMarkdownPreview :markdownInput="markdownInput" class="preview-pane" />
+        <AsyncMarkdownPreview
+          :markdownInput="markdownInput"
+          v-show="previewOnly"
+          class="preview-pane"
+          @renderedHtml="getRenderedHtml"
+        />
+        <div class="editor-textarea" v-show="showHtml" v-text="renderedHtml"></div>
       </div>
     </div>
   </div>
@@ -39,15 +51,23 @@ import AsyncMarkdownPreview from "./AsyncMarkdownPreview.vue";
 import { handleKeyDown } from "./utils/keydown";
 import { useEditor } from "@/hook/useEditor";
 
+const previewPaneRef = templateRef("previewPaneRef");
+
 // Markdown输入内容的模型定义
 const markdownInput = defineModel({
   type: String,
   default: "",
 });
+
 // 控制是否全屏的响应式变量
 const isFullscreen = ref(false);
 // 控制是否只显示预览的响应式变量
-const previewOnly = ref(false);
+const previewOnly = ref(true);
+
+/* 控制是否显示Html 代码预览 */
+const showHtml = ref(false);
+
+const renderedHtml = ref("");
 
 // 导入编辑器钩子并解构出相关方法
 const useEditorOption = useEditor(markdownInput);
@@ -61,28 +81,100 @@ const {
 } = useEditorOption;
 
 // 切换预览模式的方法
-const togglePreview = () => {
+const togglePreview = async () => {
   previewOnly.value = !previewOnly.value;
+  return previewOnly.value;
 };
 
 // 切换全屏模式的方法
-const toggleFullscreen = () => {
+const toggleFullscreen = async () => {
   isFullscreen.value = !isFullscreen.value;
+  return isFullscreen.value;
 };
 
+// 切换预览和Html代码预览的显示状态
+const toggleHtml = async () => {
+  showHtml.value = !showHtml.value;
+  return showHtml.value;
+};
+
+/* 监听文本输入，更新markdownInput的值 */
 const updateMarkdownInput = (val) => {
   markdownInput.value = val.target.value;
 };
 
+/* 获取渲染后的HTML内容  */
+const getRenderedHtml = (html) => {
+  // 获取渲染后的HTML内容
+  renderedHtml.value = html;
+};
+
+const registerHotkeys = ({ key, callback, preventDefault }) => {
+  useEventListener(markdownEditorRef, key, (...arg) => {
+    if (preventDefault) $event.preventDefault();
+    callback();
+  });
+};
+
+registerHotkeys({
+  key: "enter",
+  preventDefault: false,
+  action: (editor, e) => {
+    if (e.isComposing) return;
+    const cursorLineLeftText = this.getCursorLineLeftText();
+    let suffix;
+    let syntax;
+
+    if (ol.test(cursorLineLeftText)) {
+      suffix = "x. ";
+      syntax = olSyntax;
+
+      e.preventDefault();
+    } else if (ul.test(cursorLineLeftText)) {
+      suffix = "- ";
+      syntax = ulSyntax;
+
+      e.preventDefault();
+    } else {
+      return;
+    }
+
+    const indent = cursorLineLeftText.search(syntax);
+    const suffixIndex = indent + suffix.length;
+    let beforeText = cursorLineLeftText.slice(0, suffixIndex);
+    const content = cursorLineLeftText.slice(suffixIndex, cursorLineLeftText.length);
+
+    if (content) {
+      if (suffix === "x. ") {
+        beforeText = beforeText.replace(/(\d+)/, window.parseInt(beforeText) + 1);
+      }
+
+      this.replaceSelectionText(`\n${beforeText}`, "end");
+    } else {
+      // break
+      this.delLineLeft();
+      this.replaceSelectionText("\n", "end");
+    }
+  },
+});
+
 // 键盘快捷键的初始化和处理
 onMounted(() => {
   saveHistory();
-  useEventListener(markdownEditorRef, "keydown", (event) => {
-    handleKeyDown(event, markdownInput);
-  });
+  console.log(previewPaneRef.value);
 });
+const editorParams = {
+  ref: markdownEditorRef, // 绑定编辑器元素
+  value: markdownInput, // 绑定编辑器输入内容
+  option: useEditorOption, // 提供编辑器选项
+  togglePreview, // 切换预览
+  toggleFullscreen, // 切换全屏
+  toggleHtml, // 切换Html代码预览
+  updateHistoryRange, // 更新历史记录范围
+  updateCurrentHistoryRange, // 更新当前历史记录范围
+};
 
-provide("markdownInput", markdownInput);
+provide("editor", editorParams);
 </script>
 
 <style scoped>
@@ -95,22 +187,26 @@ provide("markdownInput", markdownInput);
   box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
   font-family: menlo, Ubuntu Mono, consolas, Courier New, Microsoft Yahei,
     Hiragino Sans GB, WenQuanYi Micro Hei, sans-serif;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+
+  /* 全屏模式下的编辑内容区域样式 */
+  &.is-fullscreen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 9999;
+    height: 100%;
+  }
 }
 
 /* 编辑内容区域的样式 */
 .editor-content {
   position: relative;
   height: calc(100% - 48px);
-}
-
-/* 全屏模式下的编辑内容区域样式 */
-.editor-content.is-fullscreen {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 9999;
 }
 
 /* 编辑器窗格的样式 */
@@ -123,7 +219,7 @@ provide("markdownInput", markdownInput);
 
 /* 只预览模式下的编辑器窗格样式 */
 .editor-panes.preview-only {
-  grid-template-columns: 1fr;
+  display: none;
 }
 
 /* Markdown文本输入框的样式 */
@@ -138,7 +234,6 @@ provide("markdownInput", markdownInput);
   line-height: 1.5;
   word-break: break-all;
   border: none;
-  border-right: 1px solid #eee;
   resize: none;
   height: 100%;
   overflow-y: auto;
@@ -153,5 +248,8 @@ provide("markdownInput", markdownInput);
 .preview-pane {
   padding: 1rem;
   overflow: auto;
+  height: calc(100% - 32px);
+  background-color: #fff;
+  border-left: 1px solid #eee;
 }
 </style>
