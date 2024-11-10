@@ -1,9 +1,13 @@
 <script setup lang="ts">
-defineProps(["title", "iconName", "iconSize"]);
+const props = defineProps(["title", "iconName", "iconSize", "active"]);
 </script>
 
 <template>
-  <button class="toolbar-button" :data-mdtitle="title">
+  <button
+    class="toolbar-button"
+    :class="{ active: props.active && props.active.value }"
+    :data-mdtitle="title"
+  >
     <LzyIcon v-if="iconName" :name="iconName" :size="iconSize" />
     <slot></slot>
   </button>
@@ -21,7 +25,10 @@ defineProps(["title", "iconName", "iconSize"]);
   border-radius: 0.25rem;
   transition: background-color 0.2s, color 0.2s;
   position: relative;
-
+  &.active {
+    color: var(--color-primary);
+    background-color: #e2e8f0
+  }
   &::before {
     content: attr(data-mdtitle);
     position: absolute;

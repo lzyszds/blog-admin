@@ -1,6 +1,6 @@
 :root {
   /* 基础颜色 */
-  --color-primary: #1890ff;
+  --color-primary:  var(--themeColor);
   --color-bg: #ffffff;
   --color-bg-light: #f5f5f5;
   --color-text: rgba(0, 0, 0, 0.85);

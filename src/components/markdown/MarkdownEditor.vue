@@ -3,7 +3,7 @@
   <div
     class="markdown-editor"
     id="markdown-editor"
-    :class="{ 'is-fullscreen': isFullscreen }"
+    :class="{ 'is-fullscreen': editorStore.isFullscreen }"
   >
     <!-- 工具栏，包含切换预览和全屏功能 -->
     <Toolbar :useEditorOption="useEditorOption" />
@@ -34,11 +34,15 @@
         <!-- Markdown实时预览组件 -->
         <AsyncMarkdownPreview
           :markdownInput="markdownInput"
-          v-show="previewOnly"
+          v-show="editorStore.previewOnly"
           class="preview-pane"
           @renderedHtml="getRenderedHtml"
         />
-        <div class="editor-textarea" v-show="showHtml" v-text="renderedHtml"></div>
+        <div
+          class="preview-pane"
+          v-show="editorStore.showHtml"
+          v-text="renderedHtml"
+        ></div>
       </div>
     </div>
   </div>
@@ -50,6 +54,7 @@ import Toolbar from "./Toolbar.vue";
 import AsyncMarkdownPreview from "./AsyncMarkdownPreview.vue";
 import { handleKeyDown } from "./utils/keydown";
 import { useEditor } from "@/hook/useEditor";
+import { useEditorStore } from "@/store/useEditorStore";
 
 const previewPaneRef = templateRef("previewPaneRef");
 
@@ -59,13 +64,7 @@ const markdownInput = defineModel({
   default: "",
 });
 
-// 控制是否全屏的响应式变量
-const isFullscreen = ref(false);
-// 控制是否只显示预览的响应式变量
-const previewOnly = ref(true);
-
-/* 控制是否显示Html 代码预览 */
-const showHtml = ref(false);
+const { saveForm } = defineProps(["saveForm"]);
 
 const renderedHtml = ref("");
 
@@ -75,28 +74,13 @@ const {
   undo,
   redo,
   updateCurrentHistoryRange,
-  markdownEditorRef,
   saveHistory,
   updateHistoryRange,
+  markdownEditorRef,
 } = useEditorOption;
 
-// 切换预览模式的方法
-const togglePreview = async () => {
-  previewOnly.value = !previewOnly.value;
-  return previewOnly.value;
-};
-
-// 切换全屏模式的方法
-const toggleFullscreen = async () => {
-  isFullscreen.value = !isFullscreen.value;
-  return isFullscreen.value;
-};
-
-// 切换预览和Html代码预览的显示状态
-const toggleHtml = async () => {
-  showHtml.value = !showHtml.value;
-  return showHtml.value;
-};
+//导入store中的部分数据
+const editorStore = useEditorStore();
 
 /* 监听文本输入，更新markdownInput的值 */
 const updateMarkdownInput = (val) => {
@@ -167,11 +151,9 @@ const editorParams = {
   ref: markdownEditorRef, // 绑定编辑器元素
   value: markdownInput, // 绑定编辑器输入内容
   option: useEditorOption, // 提供编辑器选项
-  togglePreview, // 切换预览
-  toggleFullscreen, // 切换全屏
-  toggleHtml, // 切换Html代码预览
   updateHistoryRange, // 更新历史记录范围
   updateCurrentHistoryRange, // 更新当前历史记录范围
+  saveForm, //保存草稿
 };
 
 provide("editor", editorParams);
@@ -180,14 +162,13 @@ provide("editor", editorParams);
 <style scoped>
 /* Markdown编辑器的整体样式 */
 #markdown-editor.markdown-editor {
-  overflow-y: auto;
-  overflow-x: hidden;
+  overflow: hidden;
   border: 1px solid #e2e8f0;
   border-radius: 0.5rem;
   box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
   font-family: menlo, Ubuntu Mono, consolas, Courier New, Microsoft Yahei,
     Hiragino Sans GB, WenQuanYi Micro Hei, sans-serif;
-  height: 100%;
+  height: calc(100vh - 65px - 50px);
   display: flex;
   flex-direction: column;
 
@@ -206,7 +187,8 @@ provide("editor", editorParams);
 /* 编辑内容区域的样式 */
 .editor-content {
   position: relative;
-  height: calc(100% - 48px);
+  overflow: auto;
+  flex: 1;
 }
 
 /* 编辑器窗格的样式 */

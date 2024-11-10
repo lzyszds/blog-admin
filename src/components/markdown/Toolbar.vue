@@ -1,6 +1,6 @@
 <template>
   <div class="toolbar">
-    <template v-for="item in toolbar">
+    <template v-for="item in leftBtnConfig">
       <template v-if="item.tip && !item.menus">
         <ToolbarButton :title="item.tip" :icon-name="item.icon" @click="item.action" />
       </template>
@@ -26,6 +26,18 @@
         <div class="divider"></div>
       </template>
     </template>
+
+    <section class="rightTools">
+      <!-- 右侧按钮 -->
+      <template v-for="item in rightBtnConfig">
+        <ToolbarButton
+          :active="item.active"
+          :title="item.tip"
+          :icon-name="item.icon"
+          @click="item.action"
+        />
+      </template>
+    </section>
   </div>
 </template>
 
@@ -34,7 +46,7 @@ import ToolbarButton from "./ToolbarButton.vue";
 import useImplement from "./utils/implement";
 const editor: any = inject("editor")!;
 
-const toolbar = useImplement(editor);
+const { leftBtnConfig, rightBtnConfig } = useImplement(editor);
 </script>
 
 <style scoped>
@@ -45,7 +57,6 @@ const toolbar = useImplement(editor);
   padding: 0.5rem;
   background-color: #ffffff;
   flex-wrap: wrap;
-  max-height: 128px;
 }
 
 .divider {
@@ -72,5 +83,9 @@ const toolbar = useImplement(editor);
       align-self: self-end;
     }
   }
+}
+.rightTools{
+  display: flex;
+  gap:5px;
 }
 </style>

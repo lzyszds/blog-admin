@@ -18,84 +18,84 @@ const insertDiy = (textarea, text) => {
 
 export const handleKeyDown = (e, editor) => {
 
-  const toolbar = useImplement(editor);
+  const { leftBtnConfig, rightBtnConfig } = useImplement(editor);
 
 
   /* 加粗 */
   if (e.ctrlKey && e.key === "b") {
-    const bold = toolbar.find(bar => bar.name === 'bold') as any;
+    const bold = leftBtnConfig.find(bar => bar.name === 'bold') as any;
     if (bold) bold.action()
   }
 
   /* 斜体 */
   if (e.ctrlKey && e.key === "i") {
-    const italic = toolbar.find(bar => bar.name === 'italic') as any;
+    const italic = leftBtnConfig.find(bar => bar.name === 'italic') as any;
     if (italic) italic.action()
   }
 
   /* 引用 */
   if (e.ctrlKey && e.key === "q") {
 
-    const quote = toolbar.find(bar => bar.name === 'quote') as any;
+    const quote = leftBtnConfig.find(bar => bar.name === 'quote') as any;
     if (quote) quote.action()
   }
 
   /* 删除线 */
   if (e.ctrlKey && e.key === "d") {
     e.preventDefault();
-    const del = toolbar.find(bar => bar.name === 'strikethrough') as any;
+    const del = leftBtnConfig.find(bar => bar.name === 'strikethrough') as any;
     if (del) del.action()
   }
 
   /* 无序列表 */
   if (e.ctrlKey && e.key === "u") {
     e.preventDefault();
-    const disorder = toolbar.find(bar => bar.name === 'disorder') as any;
+    const disorder = leftBtnConfig.find(bar => bar.name === 'disorder') as any;
     if (disorder) disorder.action()
   }
 
   /* 有序列表 */
   if (e.ctrlKey && e.key === "o") {
     e.preventDefault();
-    const ordered = toolbar.find(bar => bar.name === 'order') as any;
+    const ordered = leftBtnConfig.find(bar => bar.name === 'order') as any;
     if (ordered) ordered.action()
   }
 
   /* 表格 */
   if (e.ctrlKey && e.key === "t") {
     e.preventDefault();
-    const table = toolbar.find(bar => bar.name === 'table') as any;
+    const table = leftBtnConfig.find(bar => bar.name === 'table') as any;
     if (table) table.action()
   }
 
   /* 分割线 */
   if (e.ctrlKey && e.key === "h") {
     e.preventDefault();
-    const hr = toolbar.find(bar => bar.name === 'hr') as any;
+    const hr = leftBtnConfig.find(bar => bar.name === 'hr') as any;
     if (hr) hr.action()
   }
 
-  console.log(e.ctrlKey, e.shiftKey, e.key === "f");
+  // console.log(e.ctrlKey, e.shiftKey, e.key === "f");
 
 
   /* 折叠 */
   if (e.ctrlKey && e.shiftKey && e.key === "f") {
     e.preventDefault();
-    const fold = toolbar.find(bar => bar.name === 'fold') as any;
+    const fold = leftBtnConfig.find(bar => bar.name === 'fold') as any;
     if (fold) fold.action()
   }
 
   /* 链接 */
   if (e.ctrlKey && e.key === "l") {
     e.preventDefault();
-    const link = toolbar.find(bar => bar.name === 'link') as any;
+    const link = leftBtnConfig.find(bar => bar.name === 'link') as any;
     if (link) link.action()
   }
 
   /* 图片 */
   if (e.ctrlKey && e.key === "g") {
     e.preventDefault();
-    const image = toolbar.find(bar => bar.name === 'image') as any;
+    const image = leftBtnConfig.find(bar => bar.name === 'image') as any;
     if (image) image.menus[1].action()
   }
 
@@ -134,5 +134,13 @@ export const handleKeyDown = (e, editor) => {
     e.preventDefault();
     insertTextAtCursor(e.target, "  ");
   }
+
+  /* 保存草稿 */
+  if (e.ctrlKey && e.key === "s") {
+    e.preventDefault();
+    const save = rightBtnConfig.find(bar => bar.name === 'save') as any;
+    if (save) save.action()
+  }
+
 
 };

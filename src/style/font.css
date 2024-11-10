@@ -45,30 +45,30 @@
 
 @font-face {
   font-family: 'Fira Code';
-  src: url('../assets/font/FiraCode/FiraCode-Regular.ttf') format('truetype');
+  src: url('../assets/font/FiraCode/FiraCode-Regular.woff') format('truetype');
   font-weight: 400;
 }
 
 @font-face {
   font-family: 'Fira Code';
-  src: url('../assets/font/FiraCode/FiraCode-Medium.ttf') format('truetype');
+  src: url('../assets/font/FiraCode/FiraCode-Medium.woff') format('truetype');
   font-weight: 500;
 }
 
 @font-face {
   font-family: 'Fira Code';
-  src: url('../assets/font/FiraCode/FiraCode-SemiBold.ttf') format('truetype');
+  src: url('../assets/font/FiraCode/FiraCode-SemiBold.woff') format('truetype');
   font-weight: 600;
 }
 
 @font-face {
   font-family: 'Fira Code';
-  src: url('../assets/font/FiraCode/FiraCode-Bold.ttf') format('truetype');
+  src: url('../assets/font/FiraCode/FiraCode-Bold.woff') format('truetype');
   font-weight: 700;
 }
 
 @font-face {
   font-family: 'Fira Code';
-  src: url('../assets/font/FiraCode/FiraCode-Retina.ttf') format('truetype');
+  src: url('../assets/font/FiraCode/FiraCode-Retina.woff') format('truetype');
   font-weight: 800;
 }

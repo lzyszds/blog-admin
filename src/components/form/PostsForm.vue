@@ -2,8 +2,11 @@
 import { addArticleCategory, getArticleCategory, uploadArticleImg } from "@/api/posts";
 import { ArticledataType, TagDataType } from "@/typings/Posts";
 import { isEqual, optimizeImage, toProxys } from "@/utils/comment";
-import { message } from "ant-design-vue";
+import { message, Modal } from "ant-design-vue";
 import MarkdownEditor from "../markdown/MarkdownEditor.vue";
+import LzyIcon from "../LzyIcon.vue";
+import { ExclamationCircleOutlined } from "@ant-design/icons-vue";
+import { createVNode } from "vue";
 
 type ModalParamsType = {
   modalParams: {
@@ -22,6 +25,11 @@ type ModalParamsType = {
 /* 模态框参数 */
 const { modalParams } = defineProps<ModalParamsType>();
 
+/* 表单缓存数据 */
+const formState = useStorage("formState", {});
+
+const currentFormData = formState.value[modalParams.params.aid || "add"];
+
 /* 文章数据 */
 const information = ref<ArticledataType>({ ...modalParams.params });
 /*  文章编辑器原始数据 */
@@ -33,21 +41,13 @@ console.log(modalParams, "modalParams");
 const coverUpLoad = ref(false);
 
 //当前选中的标签数据
-const tagData: any = ref(modalParams.params?.tags || []);
-
-/* 是否为修改文章 */
-// const isEdit = !!modalParams.params.aid;
-// /* 文章表单缓存key */
-// const key = "cacheData" + (isEdit ? modalParams.params.aid! : "Add");
-// /* 文章表单中的缓存数据 */
+const tagData: any = ref(information.value?.tags || modalParams.params?.tags || []);
 
 /* 全局配置缓存 */
 const globlConfig = useStorage("globlConfig", {
   previewPosition: "flex",
 });
 
-//当前文章的标签数据 当前文章的标签数据 是否已经有标签
-// tagData.value = props.data?.w ? props.data?.wtype.split(",") : [];
 //临时存储数据
 const tagDataTem: any = ref(tagData.value);
 //标签列表
@@ -63,6 +63,24 @@ try {
   console.log(e);
 }
 
+//退出
+const exitForm = () => {
+  modalParams.isOpen = false;
+};
+
+// 保存编辑器内容
+const saveForm = () => {
+  const params = modalParams.params;
+
+  formState.value[params.aid || "add"] = {
+    title: information.value.title,
+    content: information.value.content,
+    coverImg: information.value.coverImg,
+    tags: tagData.value,
+    partialContent: information.value.partialContent,
+  };
+};
+
 // 确认提交
 const submitForm = async () => {
   const data = setData();
@@ -76,6 +94,9 @@ const submitForm = async () => {
     modalParams.sureCallback.refreshData();
     // const save = document.querySelector(".v-md-icon-save") as HTMLLIElement;
     // save.click();
+
+    /* 删除缓存 */
+    formState.value[modalParams.params.aid || "add"] = {};
   });
 };
 
@@ -244,6 +265,21 @@ onMounted(() => {
   setTimeout(() => {
     // setPlace(globlConfig.value.previewPosition);
   }, 50);
+
+  if (!currentFormData) return;
+  Modal.confirm({
+    content: "检测到上一次保存的数据，是否继续编辑？",
+    icon: createVNode(ExclamationCircleOutlined),
+    onOk() {
+      information.value = { ...currentFormData };
+    },
+    cancelText: "清除上一次记录",
+    okText: "继续编辑",
+    onCancel() {
+      Modal.destroyAll();
+      delete formState.value[modalParams.params.aid || "add"];
+    },
+  });
 });
 </script>
 
@@ -252,7 +288,7 @@ onMounted(() => {
     :title="modalParams.title"
     :width="'100%'"
     :open="modalParams.isOpen"
-    :body-style="{ paddingBottom: '80px' }"
+    :body-style="{ padding: '10px !important' }"
     @close="modalParams.isOpen = false"
     destroyOnClose
     :keyboard="false"
@@ -324,7 +360,7 @@ onMounted(() => {
           <ATextarea
             v-model:value="information.partialContent"
             placeholder="选填 | 为空则将自动设置为文章开头第一段"
-            :auto-size="{ minRows: 14, maxRows: 14 }"
+            :auto-size="{ minRows: 10, maxRows: 10 }"
           />
         </ACard>
         <ACard
@@ -333,14 +369,17 @@ onMounted(() => {
           :bordered="false"
           :body-style="{ padding: '0', height: '100%' }"
         >
-          <MarkdownEditor v-model="information.content"></MarkdownEditor>
+          <MarkdownEditor
+            v-model="information.content"
+            :saveForm="saveForm"
+          ></MarkdownEditor>
         </ACard>
       </main>
     </template>
 
     <template #extra>
-      <ASpace>
-        <a-select
+      <div class="drawer-extra">
+        <!-- <a-select
           v-model:value="globlConfig.previewPosition"
           style="width: 100px"
           :options="[
@@ -353,11 +392,20 @@ onMounted(() => {
           <template #suffixIcon>
             <LzyIcon style="color: var(--color-text)" size="16" name="iconoir:pin" />
           </template>
-        </a-select>
-        <a-button @click="modalParams.isOpen = false">退出操作</a-button>
-        <a-button @click="">暂时保存</a-button>
-        <a-button type="primary" @click="submitForm">提交数据</a-button>
-      </ASpace>
+        </a-select> -->
+        <a-button @click="exitForm">
+          <LzyIcon size="18" name="mdi:exit-to-app"></LzyIcon>
+          <span class="intact">退出操作</span>
+        </a-button>
+        <a-button @click="saveForm">
+          <LzyIcon size="18" name="mdi:content-save" />
+          <span class="intact">保存草稿</span>
+        </a-button>
+        <a-button type="primary" @click="submitForm">
+          <LzyIcon size="18" name="mdi:publish" />
+          <span class="intact">发布文章</span>
+        </a-button>
+      </div>
     </template>
   </ADrawer>
 </template>
@@ -379,6 +427,7 @@ onMounted(() => {
   flex: 3;
   background-color: var(--color-bg);
   border-radius: 12px;
+  overflow-y: auto;
 
   :deep(.ant-upload) {
     width: 100% !important;
@@ -414,6 +463,35 @@ onMounted(() => {
     height: calc(100vh - 65px - 48px);
     background-color: #fff;
     border-radius: 12px;
+  }
+}
+.drawer-extra {
+  display: flex;
+  gap: 10px;
+  :deep(span) {
+    margin-left: 5px;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .edit-container {
+    flex-direction: column;
+  }
+  .drawer-extra {
+    :deep(span) {
+      display: none;
+    }
+  }
+}
+
+@media screen and (max-width: 378px) {
+  .edit-container {
+    flex-direction: column;
+  }
+  .drawer-extra {
+    :deep(span) {
+      display: none;
+    }
   }
 }
 </style>
