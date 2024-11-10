@@ -180,10 +180,10 @@ function setData(): ArticledataType {
   // 初始化文章数据
   const data = {
     title, // 文章标题
-    partial_content: document.querySelector(".vuepress-markdown-body")?.firstElementChild!
+    partial_content: document.querySelector(".preview-pane")?.firstElementChild!
       .innerHTML!, // 文章开头第一段话
     content, // 文章内容
-    main: document.querySelector(".vuepress-markdown-body")?.innerHTML!, // 文章主体内容
+    main: document.querySelector(".preview-pane")?.innerHTML!, // 文章主体内容
     cover_img: coverImg, // 文章封面图片
     aid, // 文章ID（修改时为当前文章ID，创建时为null）
     tags: tagData.value, // 文章标签
@@ -459,7 +459,7 @@ onMounted(() => {
     padding: 20px 20px 30px;
   }
 
-  .vuepress-markdown-body {
+  .preview-pane {
     font-size: 14px;
 
     h3 {

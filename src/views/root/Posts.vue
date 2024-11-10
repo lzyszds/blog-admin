@@ -22,7 +22,7 @@ const { scrollConfig } = useScrollY();
 /* 搜索条件 */
 const { state: searchCondition, reset } = useResetRefState({
   pages: 1,
-  limit: 10,
+  limit: 8,
   name: "",
   username: "",
   power: "",
@@ -153,7 +153,7 @@ const multipleDel = () => {
     </ACard>
 
     <ACard
-      title="角色列表"
+      title="文章列表"
       :bordered="false"
       :body-style="{ flex: 1, overflow: 'hidden', paddingBottom: '0' }"
       style="height: calc(100% - 20px)"

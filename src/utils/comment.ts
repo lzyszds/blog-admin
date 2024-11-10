@@ -79,7 +79,7 @@ export function toProxys(obj: any): any {
  * @returns 比较结果对象，如果两个对象相等，则返回空对象，否则返回包含差异的键值对
  */
 export function isEqual(obj: object, other: object, keepNeededValue?: string[] | string, newResult: object = {}): any {
-  keepNeededValue = keepNeededValue || []
+  keepNeededValue = keepNeededValue || ''
 
   // 遍历第一个对象的每个键
   for (const key in obj) {

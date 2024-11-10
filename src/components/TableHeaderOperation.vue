@@ -12,7 +12,7 @@ const emits = defineEmits(["refresh", "multipleDel"]);
 <template>
   <div class="actionBtn">
     <AButton type="primary" @click="props.addModal">
-      <LzyIcon name="iconoir:user-plus" size="18" /> 新增
+      <LzyIcon name="iconoir:calendar-plus" size="18" /> 新增
     </AButton>
 
     <AButton
