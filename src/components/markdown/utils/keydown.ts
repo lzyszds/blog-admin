@@ -138,7 +138,7 @@ export const handleKeyDown = (e, editor) => {
   /* 保存草稿 */
   if (e.ctrlKey && e.key === "s") {
     e.preventDefault();
-    const save = rightBtnConfig.find(bar => bar.name === 'save') as any;
+    const save = leftBtnConfig.find(bar => bar.name === 'save') as any;
     if (save) save.action()
   }
 

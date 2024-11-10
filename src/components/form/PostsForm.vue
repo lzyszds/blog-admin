@@ -7,6 +7,7 @@ import MarkdownEditor from "../markdown/MarkdownEditor.vue";
 import LzyIcon from "../LzyIcon.vue";
 import { ExclamationCircleOutlined } from "@ant-design/icons-vue";
 import { createVNode } from "vue";
+import _ from "lodash";
 
 type ModalParamsType = {
   modalParams: {
@@ -71,7 +72,7 @@ const exitForm = () => {
 // 保存编辑器内容
 const saveForm = () => {
   const params = modalParams.params;
-
+  let isNext = false;
   formState.value[params.aid || "add"] = {
     title: information.value.title,
     content: information.value.content,
@@ -79,6 +80,18 @@ const saveForm = () => {
     tags: tagData.value,
     partialContent: information.value.partialContent,
   };
+
+  const values: any = Object.values(
+    isEqual(formState.value[params.aid || "add"], params)
+  );
+  for (let item of values) {
+    if (item.length != 0) {
+      isNext = true;
+      break;
+    }
+  }
+
+  if (!isNext) delete formState.value[params.aid || "add"];
 };
 
 // 确认提交
@@ -96,7 +109,7 @@ const submitForm = async () => {
     // save.click();
 
     /* 删除缓存 */
-    formState.value[modalParams.params.aid || "add"] = {};
+    delete formState.value[modalParams.params.aid || "add"];
   });
 };
 

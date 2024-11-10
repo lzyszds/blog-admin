@@ -20,6 +20,8 @@ import jsonLang from "shiki/langs/json.mjs";
 import shLang from "shiki/langs/shellscript.mjs";
 import nginxLang from "shiki/langs/nginx.mjs";
 import xmlLang from "shiki/langs/xml.mjs";
+import markDownLang from "shiki/langs/markdown.mjs";
+import yamlLang from "shiki/langs/yaml.mjs";
 
 import { useEditor } from "@/hook/useEditor";
 
@@ -56,6 +58,9 @@ const langs = [
   "sh",
   "nginx",
   "xml",
+  "markdown",
+  "md",
+  "yaml"
 ];
 
 // 批量导入所有语言模块
@@ -71,6 +76,8 @@ const langModules = [
   shLang,
   nginxLang,
   xmlLang,
+  markDownLang,
+  yamlLang,
 ];
 
 const highlighter = await createHighlighterCore({
@@ -123,7 +130,9 @@ watch(
       const data = md.render(newMarkdown || "");
       renderedHtml.value = data;
       emit("renderedHtml", data);
-    } catch (error) {}
+    } catch (error) {
+      console.error(error);
+    }
   },
   { immediate: true }
 );
