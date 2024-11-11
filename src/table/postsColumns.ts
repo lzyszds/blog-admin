@@ -33,8 +33,8 @@ export const getArticleColumns = (params: Params) => {
     },
     {
       title: "评论量",
-      dataIndex: "commentsCount",
-      key: "commentsCount",
+      dataIndex: "commentCount",
+      key: "commentCount",
       width: "80px",
     },
 
