@@ -93,14 +93,14 @@ export default ({ mode }: any) => {
     server: {
       open: false,
       port: 1026,
-      proxy: {
-        '/hono': {
-          target: env.VITE_APP_API_BASE_URL, // 接口的域名
-          secure: false, // 如果是https接口，需要配置这个参数
-          changeOrigin: true, // 如果接口跨域，需要进行这个参数配置
-          rewrite: path => path.replace(/^\/hono/, ''),
-        },
-      },
+      // proxy: {
+      //   '/hono': {
+      //     target: env.VITE_BASE_URL, // 接口的域名
+      //     secure: false, // 如果是https接口，需要配置这个参数
+      //     changeOrigin: true, // 如果接口跨域，需要进行这个参数配置
+      //     rewrite: path => path.replace(/^\/hono/, ''),
+      //   },
+      // },
     },
   })
 }

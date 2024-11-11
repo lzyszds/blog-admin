@@ -16,7 +16,7 @@ export const getArticleColumns = (params: Params) => {
       width: "80px",
       // 可用于显示图片或设置渲染方法
       customRender: ({ text }) => {
-        return h(Avatar, { src: "/hono" + text, shape: "square" });
+        return h(Avatar, { src: import.meta.env.VITE_BASE_URL + text, shape: "square" });
       },
     },
     {

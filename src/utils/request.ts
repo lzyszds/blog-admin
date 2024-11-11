@@ -4,7 +4,7 @@ import axios, { AxiosRequestConfig, AxiosResponse, AxiosError } from 'axios';
 import { merge } from 'lodash';
 
 
-interface AxiosConfig {
+interface AxiosConfig extends AxiosRequestConfig {
   baseURL?: string;
   timeout?: number;
   headers?: {
@@ -20,7 +20,7 @@ export default function makeRequest<T = any>({
   params,
   data,
   headers,
-}: AxiosRequestConfig): Promise<T | any> {
+}: AxiosConfig): Promise<T | any> {
 
   return new Promise(async (resolve, reject) => {
 
@@ -32,18 +32,18 @@ export default function makeRequest<T = any>({
     }
 
     const defaultConfig: AxiosConfig = {
-      baseURL: '/hono/api',
+      baseURL: import.meta.env.VITE_BASE_URL + '/api',
       timeout: 30 * 1000,
       headers: {
-        'access-control-allow-origin': '*',
         'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin-Type': '*',
         'Authorization': localStorage.getItem('lzy_token') || '',
       },
+      withCredentials: true // 重要：允许发送 cookies 和 HTTP 认证
     };
     // 使用深拷贝合并默认配置
     const config: AxiosConfig = merge({}, defaultConfig, { headers });
-
+    console.log(config);
+    
     // 创建 axios 实例
     const instance = axios.create(config);
 

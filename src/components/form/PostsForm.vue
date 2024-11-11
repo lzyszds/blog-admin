@@ -9,6 +9,8 @@ import { ExclamationCircleOutlined } from "@ant-design/icons-vue";
 import { createVNode } from "vue";
 import _ from "lodash";
 
+const BASE_URL = import.meta.env.VITE_BASE_URL;
+
 type ModalParamsType = {
   modalParams: {
     isOpen: boolean;
@@ -320,7 +322,7 @@ onMounted(() => {
           >
             <img
               v-if="information.coverImg"
-              :src="'/hono' + information.coverImg"
+              :src="BASE_URL + information.coverImg"
               alt="coverImg"
               style="width: 100%; height: 100%; object-fit: cover"
             />
