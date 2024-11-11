@@ -18,7 +18,7 @@ const CWD = process.cwd()
 // https://vitejs.dev/config/
 export default ({ mode }: any) => {
   const env = loadEnv(mode, CWD)
-  // console.log(mode, env, CWD)
+  console.log(mode, env, CWD)
   return defineConfig({
     plugins: [
       vue(),
@@ -48,7 +48,7 @@ export default ({ mode }: any) => {
       }),
       viteCompression({
         verbose: true,
-        disable: false,
+        disable: true,
         threshold: 10240,
         algorithm: 'gzip',
         ext: '.gz',

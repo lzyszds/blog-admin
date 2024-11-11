@@ -3,7 +3,7 @@ import Token from 'markdown-it/lib/token'
 function mdImagePlugin(md, options) {
   const { baseUrl } = options
 
-  const defaultRender = md.renderer.rules.image || function (tokens, idx, options, env, self) {
+  const defaultRender = md.renderer.rules.image || function (tokens, idx, options, _env, self) {
     return self.renderToken(tokens, idx, options)
   }
 

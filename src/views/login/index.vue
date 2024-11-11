@@ -2,6 +2,8 @@
 import { login } from "@/api/user";
 import { useRouter } from "vue-router";
 import { useRequest } from "@/hook/useRequest";
+
+const baseURL = import.meta.env.VITE_BASE_URL;
 const isTransition = ref(false);
 const router = useRouter();
 //进入页面先判断是否登陆着,localStorage.getItem('token')是登陆时候存的token
@@ -96,7 +98,7 @@ onMounted(() => {
           </AForm>
         </div>
         <div class="illustartion">
-          <img :src="'/hono/static/img/loginCover.png'" alt="logo" />
+          <img :src="baseURL + '/static/img/loginCover.png'" alt="logo" />
         </div>
       </div>
     </Transition>
@@ -125,7 +127,7 @@ onMounted(() => {
     width: 45vw;
     height: 45vw;
     border-radius: 50%;
-    background: url("/hono/static/img/moon.png") no-repeat center;
+    background: url("/moon.png") no-repeat center;
     background-size: 120%;
     border: 5px solid #000;
     z-index: -1;

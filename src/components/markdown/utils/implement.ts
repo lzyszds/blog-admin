@@ -1,5 +1,5 @@
 import { useEditorStore } from "@/store/useEditorStore";
-import insertTextAtCursor from "insert-text-at-cursor";
+// import insertTextAtCursor from "insert-text-at-cursor";
 
 interface Option {
   text?: string,

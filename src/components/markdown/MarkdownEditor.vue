@@ -55,7 +55,7 @@ const registerHotkeys = ({ key, callback, preventDefault }) => {
 registerHotkeys({
   key: "enter",
   preventDefault: false,
-  callback: (editor, e) => {
+  callback: (_editor, _e) => {
     // if (e.isComposing) return;
     // const cursorLineLeftText = this.getCursorLineLeftText();
     // let suffix;
