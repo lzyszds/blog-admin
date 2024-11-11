@@ -1,5 +1,7 @@
 import { createApp } from 'vue'
+import "@fancyapps/ui/dist/fancybox/fancybox.css";
 import '@/style/style.css'
+
 import App from './App.vue'
 
 import { setupRouter } from './router'
@@ -12,7 +14,10 @@ async function setupApp() {
   setupLoading();
   setupStore(app)
   await setupRouter(app)
+
+  // vue3全局变量挂载
   app.mount('#app')
+
 
   unLoad()
 }

@@ -13,6 +13,7 @@
     "@better-scroll/core": "^2.5.1",
     "@codemirror/commands": "^6.7.1",
     "@codemirror/state": "^6.4.1",
+    "@fancyapps/ui": "^5.0.36",
     "@shikijs/markdown-it": "^1.22.2",
     "@vueuse/core": "^10.11.1",
     "animate.css": "^4.1.1",

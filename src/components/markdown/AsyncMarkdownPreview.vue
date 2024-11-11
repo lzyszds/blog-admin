@@ -1,5 +1,7 @@
 <template>
-  <div v-html="renderedHtml"></div>
+  <div>
+    <div ref="preview" v-html="renderedHtml"></div>
+  </div>
 </template>
 
 <script setup>
@@ -7,6 +9,7 @@ import MarkdownIt from "markdown-it";
 import { createHighlighterCore } from "shiki/core";
 import { createOnigurumaEngine } from "shiki/engine/oniguruma";
 import { fromHighlighter } from "@shikijs/markdown-it/core";
+import { Fancybox, Carousel, Panzoom } from "@fancyapps/ui"; //图片放大
 
 // 手动导入每个语言模块
 import htmlLang from "shiki/langs/html.mjs";
@@ -26,20 +29,22 @@ import yamlLang from "shiki/langs/yaml.mjs";
 import { useEditor } from "@/hook/useEditor";
 
 /* 插件 */
-import mdMark from "markdown-it-mark";
-import mdAttrs from "markdown-it-attrs";
-import mdEmoji from "markdown-it-emoji";
-import markdownItContainer from "markdown-it-container";
-import mdBracketedSpans from "markdown-it-bracketed-spans";
-import mdInlineComments from "markdown-it-inline-comments";
+import mdMark from "markdown-it-mark"; // 高亮标记
+import mdAttrs from "markdown-it-attrs"; // 添加自定义属性
+import mdEmoji from "markdown-it-emoji"; // emoji
+import markdownItContainer from "markdown-it-container"; // 折叠面板
+import mdBracketedSpans from "markdown-it-bracketed-spans"; // 括号跨度
+import mdInlineComments from "markdown-it-inline-comments"; // 行内注释
+import mdImagePlugin from "./plugin/image";
 
 import getWasm from "shiki/wasm";
 
 const props = defineProps({
   markdownInput: String,
 });
-const emit = defineEmits(["renderedHtml"]);
 
+const emit = defineEmits(["renderedHtml"]);
+const preview = templateRef("preview"); // 用于渲染markdown的容器
 const md = MarkdownIt({
   html: true,
   linkify: true,
@@ -121,6 +126,20 @@ md.use(mdMark);
 md.use(mdEmoji);
 md.use(mdBracketedSpans);
 md.use(mdInlineComments);
+md.use(mdImagePlugin, {
+  baseUrl: import.meta.env.VITE_BASE_URL,
+});
+
+/* 图片放大插件 */
+const fancyboxBind = () => {
+  Fancybox.bind(preview.value, {
+    Carousel: {
+      Panzoom: {
+        zoomLevels: 5,
+      },
+    },
+  });
+};
 
 const renderedHtml = ref("");
 watch(
@@ -130,12 +149,17 @@ watch(
       const data = md.render(newMarkdown || "");
       renderedHtml.value = data;
       emit("renderedHtml", data);
+      fancyboxBind();
     } catch (error) {
       console.error(error);
     }
   },
   { immediate: true }
 );
+
+onMounted(() => {
+  fancyboxBind();
+});
 </script>
 <style>
 .preview-pane {
@@ -146,7 +170,7 @@ watch(
     list-style-position: inside; /* 确保标记符号在列表项内部 */
   }
   ul li {
-    padding-left: .2rem;
+    padding-left: 0.2rem;
   }
 
   h1,
@@ -286,6 +310,55 @@ watch(
     p {
       padding: 0.5rem;
       padding-left: 10px;
+    }
+  }
+
+  .img-wrapper {
+    position: relative;
+    --height: 20px;
+    background-color: #f0f2f5;
+    padding: 5px 1px;
+    border-radius: 10px;
+    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.3);
+    cursor: zoom-in;
+    border: 1px solid #aaa;
+    margin: 5px 0 10px;
+    width: 100%;
+
+    &:hover {
+      .img-pseudo::before {
+        content: "🔎点击放大图片";
+      }
+
+      img {
+        filter: brightness(0.7);
+      }
+    }
+
+    img {
+      margin: var(--height) 5px 0;
+      border-radius: 10px;
+      transition: 0.5s;
+      width: calc(100% - 10px);
+    }
+
+    .img-pseudo {
+      background-color: var(--themeColor);
+      height: var(--height);
+      width: calc(100%);
+      border-radius: 10px 10px 0 0;
+      text-align: center;
+      position: absolute;
+      top: 0;
+      left: 0;
+      color: #fff;
+      font-size: 12px;
+
+      &::before {
+        content: attr(data-clipboard-text);
+        width: 100%;
+        height: 100%;
+      }
     }
   }
 }
