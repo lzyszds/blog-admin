@@ -148,12 +148,16 @@ const customRequest = ({ file }) => {
 };
 
 /* 文章内部图片上传事件 */
-const handleUploadImage = async (event, insertImage, files) => {
+const handleUploadImage = async ([insertImage, files]) => {
+  console.log(insertImage, files);
+
   try {
     const res = await coverUpdate(files[0]);
+    console.log(res);
+    
     if (res.code === 200) {
       insertImage({
-        url: "/hono" + res.data.filename,
+        url: res.data.filename,
         desc: "点击放大",
       });
     }
@@ -387,6 +391,7 @@ onMounted(() => {
           <MarkdownEditor
             v-model="information.content"
             :saveForm="saveForm"
+            @update-image="handleUploadImage"
           ></MarkdownEditor>
         </ACard>
       </main>

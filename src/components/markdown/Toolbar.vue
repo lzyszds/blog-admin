@@ -7,10 +7,12 @@
       <template v-else-if="item.menus && item.name != 'rightFixed'">
         <a-popover trigger="click" overlayClassName="diySelect">
           <template #content>
-            <p v-for="menu in item.menus" @click="menu.action || ''">
-              <LzyIcon :size="menu.iconSize ?? 20" v-if="menu.icon" :name="menu.icon" />
-              {{ menu.name }}
-            </p>
+            <template v-for="menu in item.menus">
+              <p @click="uploadContent(menu)">
+                <LzyIcon :size="menu.iconSize ?? 20" v-if="menu.icon" :name="menu.icon" />
+                {{ menu.name }}
+              </p>
+            </template>
           </template>
           <ToolbarButton
             :icon-name="item.icon"
@@ -47,6 +49,24 @@ import useImplement from "./utils/implement";
 const editor: any = inject("editor")!;
 
 const { leftBtnConfig, rightBtnConfig } = useImplement(editor);
+
+const emit = defineEmits(["updateImage"]);
+
+const uploadContent = async (menu) => {
+  if (menu.isUpload) {
+    try {
+      const { isSupported, file, open } = useFileSystemAccess();
+      if (!isSupported) {
+        alert("当前浏览器不支持此功能");
+        return;
+      }
+      await open();
+      emit("updateImage", menu.action, [file.value]);
+    } catch {}
+  } else {
+    menu.action();
+  }
+};
 </script>
 
 <style scoped>
@@ -84,8 +104,8 @@ const { leftBtnConfig, rightBtnConfig } = useImplement(editor);
     }
   }
 }
-.rightTools{
+.rightTools {
   display: flex;
-  gap:5px;
+  gap: 5px;
 }
 </style>

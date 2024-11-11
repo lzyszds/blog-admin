@@ -32,9 +32,9 @@ import { useEditor } from "@/hook/useEditor";
 import mdMark from "markdown-it-mark"; // 高亮标记
 import mdAttrs from "markdown-it-attrs"; // 添加自定义属性
 import mdEmoji from "markdown-it-emoji"; // emoji
-import markdownItContainer from "markdown-it-container"; // 折叠面板
 import mdBracketedSpans from "markdown-it-bracketed-spans"; // 括号跨度
 import mdInlineComments from "markdown-it-inline-comments"; // 行内注释
+import mdTipsCollectPlugin from "./plugin/tipsCollect";
 import mdImagePlugin from "./plugin/image";
 
 import getWasm from "shiki/wasm";
@@ -49,6 +49,7 @@ const md = MarkdownIt({
   html: true,
   linkify: true,
   typographer: true,
+  breaks: true,
 });
 
 const langs = [
@@ -92,23 +93,7 @@ const highlighter = await createHighlighterCore({
 });
 
 /* 自定义容器插件 折叠面板 */
-md.use(markdownItContainer, "fold", {
-  validate: function (params) {
-    return params.trim().match(/^fold\s+(.*)$/);
-  },
 
-  render: function (tokens, idx) {
-    var m = tokens[idx].info.trim().match(/^fold\s+(.*)$/);
-
-    if (tokens[idx].nesting === 1) {
-      // opening tag
-      return "<details><summary>" + md.utils.escapeHtml(m[1]) + "</summary>\n";
-    } else {
-      // closing tag
-      return "</details>\n";
-    }
-  },
-});
 /* shiki代码块高亮插件 */
 md.use(
   fromHighlighter(highlighter, {
@@ -129,8 +114,8 @@ md.use(mdInlineComments);
 md.use(mdImagePlugin, {
   baseUrl: import.meta.env.VITE_BASE_URL,
 });
-
-/* 图片放大插件 */
+mdTipsCollectPlugin(md);
+/* 图片放大插件绑定 */
 const fancyboxBind = () => {
   Fancybox.bind(preview.value, {
     Carousel: {
@@ -297,6 +282,72 @@ onMounted(() => {
     p {
       padding: 10px 15px;
       background-color: #fff;
+    }
+  }
+
+  .markdown-plugin-tip {
+    border-radius: 10px;
+    font-family: "dindin";
+    padding: 10px;
+    border-radius: 5px;
+    border-left: 5px solid var(--themeColor);
+    margin-top: 10px;
+    background-color: #e6e6e6;
+
+    .markdown-tip-title {
+      color: var(--color-primary);
+      font-size: 20px;
+      font-weight: 600;
+    }
+    &.tip {
+      border-color: #4a9ff5;
+      .markdown-tip-title {
+        color: #4a9ff5;
+      }
+    }
+    &.warning {
+      border-color: #ffd500;
+      .markdown-tip-title {
+        color: #be9e01;
+      }
+    }
+    &.danger {
+      border-color: #ff5050;
+      .markdown-tip-title {
+        color: #ff5050;
+      }
+    }
+    &.danger {
+      border-color: #ff5050;
+      .markdown-tip-title {
+        color: #ff5050;
+      }
+    }
+    &.success {
+      border-color: #00cb6ce6;
+      .markdown-tip-title {
+        color: #00cb6ce6;
+      }
+    }
+    &.note{
+      border-color: #00cb6ce6;
+      .markdown-tip-title {
+        color: #00cb6ce6;
+      }
+    }
+
+    &.attention{
+      border-color: #ffb400;
+      .markdown-tip-title {
+        color: #ffb400;
+      }
+    }
+
+    &.caution{
+      border-color: #ff5050;
+      .markdown-tip-title {
+        color: #ff5050;
+      }
     }
   }
 
