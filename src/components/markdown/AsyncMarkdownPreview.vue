@@ -60,7 +60,7 @@ const langs = [
   "xml",
   "markdown",
   "md",
-  "yaml"
+  "yaml",
 ];
 
 // 批量导入所有语言模块
@@ -141,14 +141,12 @@ watch(
 .preview-pane {
   ul,
   ol {
-    margin-bottom: 1rem;
     margin: 0;
     padding: 0;
+    list-style-position: inside; /* 确保标记符号在列表项内部 */
   }
-
-  li {
-    margin-bottom: 1rem;
-    margin-left: 1rem;
+  ul li {
+    padding-left: .2rem;
   }
 
   h1,

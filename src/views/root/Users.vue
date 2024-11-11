@@ -9,7 +9,7 @@ import {
 } from "@/api/user";
 import UserForm from "@/components/form/UserForm.vue";
 import useResetRefState from "@/hook/useResetRefState";
-import { getUsersTable } from "@/store/useTableStore";
+import { getTableStore } from "@/store/useTableStore";
 import { useRequest } from "@/hook/useRequest";
 import { useScrollY } from "@/hook/useTableConfig";
 import { multDelData } from "@/hook/useTableData";
@@ -63,10 +63,10 @@ const pagination = computed(() => {
 });
 
 /* 表格列表数据 提供的部分方法 */
-const usersTableData = getUsersTable();
+const getTable = getTableStore();
 
 /* 设置表格列表数据的回调方法 */
-usersTableData.setCallbackArr({
+getTable.setCallbackArr({
   getData: () => throttledRequest(searchCondition),
   delData: ({ uid }) => delUser({ uid }),
   openModal: (params) => setUserModal(params),
@@ -75,10 +75,10 @@ usersTableData.setCallbackArr({
 
 //真正的数据Columns
 const columns = computed(() => {
-  if (isRef(usersTableData.columns)) {
-    return (usersTableData.columns as any).value.filter((item) => item.checked);
+  if (isRef(getTable.columns)) {
+    return (getTable.columns as any).value.filter((item) => item.checked);
   } else {
-    return usersTableData.columns.filter((item) => item.checked);
+    return getTable.columns.filter((item) => item.checked);
   }
 });
 

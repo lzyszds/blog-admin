@@ -1,14 +1,8 @@
 <script setup lang="ts">
-import {
-  articleList,
-  articleDetail,
-  articleAdd,
-  articleEditor,
-  articleDelete,
-} from "@/api/posts";
+import { articleList, articleAdd, articleEditor, articleDelete } from "@/api/posts";
 import PostsForm from "@/components/form/PostsForm.vue";
 import useResetRefState from "@/hook/useResetRefState";
-import { getUsersTable } from "@/store/useTableStore";
+import { getTableStore } from "@/store/useTableStore";
 import { useRequest } from "@/hook/useRequest";
 import { useScrollY } from "@/hook/useTableConfig";
 import { multDelData } from "@/hook/useTableData";
@@ -61,7 +55,7 @@ const pagination = computed(() => {
 });
 
 /* 表格列表数据 提供的部分方法 */
-const usersTableData = getUsersTable();
+const usersTableData = getTableStore();
 
 /* 设置表格列表数据的回调方法 */
 usersTableData.setCallbackArr({
@@ -165,6 +159,7 @@ const multipleDel = () => {
           :loading="loading"
           @refresh="throttledRequest(searchCondition)"
           @multipleDel="multipleDel"
+          :usersTableData="usersTableData"
         />
       </template>
 

@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { VueDraggable } from "vue-draggable-plus";
 
-import { getUsersTable } from "@/store/useTableStore";
-const usersTableData = getUsersTable();
+import { getTableStore } from "@/store/useTableStore";
+const getTable = getTableStore();
+
 </script>
 
 <template>
@@ -14,16 +15,8 @@ const usersTableData = getUsersTable();
       <span>列设置</span>
     </AButton>
     <template #content>
-      <VueDraggable
-        v-model="usersTableData.columns"
-        :animation="150"
-        filter=".none_draggable"
-      >
-        <div
-          v-for="item in usersTableData.columns"
-          :key="item.key"
-          class="draggable-item"
-        >
+      <VueDraggable v-model="getTable.columns" :animation="150" filter=".none_draggable">
+        <div v-for="item in getTable.columns" :key="item.key" class="draggable-item">
           <LzyIcon name="iconoir:dialpad" size="18" style="vertical-align: sub" />
           <ACheckbox v-model:checked="item.checked" class="none_draggable flex-1">
             {{ item.title }}
