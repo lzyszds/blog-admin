@@ -36,6 +36,7 @@ import mdBracketedSpans from "markdown-it-bracketed-spans"; // 括号跨度
 import mdInlineComments from "markdown-it-inline-comments"; // 行内注释
 import mdTipsCollectPlugin from "./plugin/tipsCollect";
 import mdImagePlugin from "./plugin/image";
+import setDirectoryId from "./plugin/directoryId";
 
 import getWasm from "shiki/wasm";
 
@@ -114,6 +115,7 @@ md.use(mdInlineComments);
 md.use(mdImagePlugin, {
   baseUrl: import.meta.env.VITE_BASE_URL,
 });
+setDirectoryId(md);
 mdTipsCollectPlugin(md);
 /* 图片放大插件绑定 */
 const fancyboxBind = () => {
@@ -164,12 +166,12 @@ onMounted(() => {
   h4 {
     animation-duration: 0.5s;
     animation-delay: 0.5s;
+    color: #000000db;
   }
 
   h1 {
     padding-bottom: 0.3em;
     font-size: 1.3em;
-    color: #000;
     font-weight: 600;
     font-family: "dindin";
   }
@@ -177,7 +179,6 @@ onMounted(() => {
   h2 {
     padding-bottom: 8px;
     border-bottom: 1px dashed #ddd;
-    color: #000;
     font-size: 20px;
     font-weight: 600;
     font-family: "dindin";
@@ -190,7 +191,6 @@ onMounted(() => {
   }
 
   h3 {
-    color: #222;
     font-size: 18px;
     font-weight: 600;
 
@@ -259,10 +259,28 @@ onMounted(() => {
     border-radius: 0.25rem;
     margin-bottom: 1rem;
     overflow-x: auto;
+    line-height: 23px;
+
     code {
       border-radius: 0.25rem;
       font-family: "Fira Code";
       font-weight: 400;
+      /* 初始化计数器 */
+      counter-reset: line-number;
+
+      .line::before {
+        counter-increment: line-number;
+        /* 计数器自增 */
+        content: counter(line-number);
+        /* 显示行号 */
+        display: inline-block;
+        /* 行号的宽度，可以调整 */
+        text-align: left;
+        margin-right: 10px;
+        width: 30px;
+        /* 行号和代码的间距 */
+        color: #495162;
+      }
     }
   }
   details {
@@ -329,21 +347,21 @@ onMounted(() => {
         color: #00cb6ce6;
       }
     }
-    &.note{
+    &.note {
       border-color: #00cb6ce6;
       .markdown-tip-title {
         color: #00cb6ce6;
       }
     }
 
-    &.attention{
+    &.attention {
       border-color: #ffb400;
       .markdown-tip-title {
         color: #ffb400;
       }
     }
 
-    &.caution{
+    &.caution {
       border-color: #ff5050;
       .markdown-tip-title {
         color: #ff5050;
