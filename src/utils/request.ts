@@ -42,7 +42,6 @@ export default function makeRequest<T = any>({
     };
     // 使用深拷贝合并默认配置
     const config: AxiosConfig = merge({}, defaultConfig, { headers });
-    console.log(config);
     
     // 创建 axios 实例
     const instance = axios.create(config);

@@ -17,7 +17,7 @@ export const getUserColumns = (params: Params) => {
       width: "80px",
       // 可用于显示图片或设置渲染方法
       customRender: ({ text }) => {
-        return h(Avatar, { src: import.meta.env.VITE_BASE_URL + "/static" + text, shape: "square" });
+        return h(Avatar, { src: import.meta.env.VITE_BASE_URL + text, shape: "square" });
       },
     },
     {
@@ -41,20 +41,29 @@ export const getUserColumns = (params: Params) => {
         return h(
           Tag,
           {
-            color: text !== 0 ? "var(--themeColor)" : "#cd201f",
-            icon: h(LzyIcon, {
-              name: text !== 0 ? "iconoir:user-square" : "iconoir:user-crown",
-              size: 16,
-            }),
+            color: text !== 0 ? "var(--themeColor)" : "#f56565",
             style: {
               display: "flex",
               alignItems: "center",
+              justifyContent: "center",
               gap: "4px",
               width: "65px",
             },
             html: "inline-block",
           },
-          () => text !== 0 ? "user" : "admin" // 使用函数形式
+          () => text !== 0 ? "普通用户" : "管理员" // 使用函数形式
+        );
+      },
+    },
+    {
+      title: "状态",
+      dataIndex: "whetherUse",
+      key: "whetherUse",
+      width: "100px",
+      customRender: ({ text }) => {
+        return h(
+          Tag,
+          () => text == 1 ? "启用" : "禁用" // 使用函数形式
         );
       },
     },

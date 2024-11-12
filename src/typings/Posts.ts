@@ -3,7 +3,7 @@ import { User } from "./User"
 export interface Article {
   aid: string
   author: string
-  commentsCount: string,
+  commentCount: string,
   content: string,
   coverContent: string,
   coverImg: string,
