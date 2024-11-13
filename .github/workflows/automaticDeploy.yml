@@ -7,14 +7,14 @@ on:
 
 jobs:
     build:
-        # runs-on 指定job任务运行所需要的虚拟机环境(必填字段)
+        # runs-on 指定job任务运行所需要的虚拟机环境
         runs-on: ubuntu-latest
         steps:
             # 获取源码
             - name: 迁出代码
-              # 使用action库  actions/checkout获取源码
-              uses: actions/checkout@master
+              uses: actions/checkout@v3  # 使用v3版本，推荐使用稳定版本
 
+            # 设置Bun
             - name: 设置Bun
               uses: oven-sh/setup-bun@v1
               with:
@@ -28,20 +28,14 @@ jobs:
             - name: 打包应用
               run: bun run build
               
-               
-            # 上传阿里云
+            # 上传到阿里云
             - name: 发布到阿里云
               uses: easingthemes/ssh-deploy@v2.1.1
               env:
-                  # 私钥
-                  SSH_PRIVATE_KEY: ${{ secrets.SERVER_SSH_KEY }}
-                  # scp参数
-                  ARGS: '-avzr --delete'
-                  # 源目录
-                  SOURCE: 'dist/'
-                  # 服务器ip：换成你的服务器IP
-                  REMOTE_HOST: ${{ secrets.SERVER_HOST }}
-                  # 用户
-                  REMOTE_USER: 'root'
-                  # 目标地址
-                  TARGET: '/www/wwwroot/101.201.171.168_1026'
+                  SSH_PRIVATE_KEY: ${{ secrets.SERVER_SSH_KEY }}  # SSH 密钥
+                  ARGS: '-avzr --delete --exclude=.user.ini'  # Rsync 参数
+                  SOURCE: 'dist/'  # 源目录
+                  REMOTE_HOST: ${{ secrets.SERVER_HOST }}  # 服务器地址
+                  REMOTE_USER: 'root'  # 用户名
+                  TARGET: '/www/wwwroot/101.201.171.168_1026'  # 目标路径，注意这里应该是一个有效的路径
+
