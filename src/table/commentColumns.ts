@@ -1,5 +1,5 @@
-import { Avatar, Button, message, Popconfirm, TableProps, Tag } from "ant-design-vue";
-import { Column, Params } from "@/typings/Column";
+import { Avatar, Button, message, Popconfirm, TableProps } from "ant-design-vue";
+import { Params } from "@/typings/Column";
 export const getcommentColumns = (params: Params) => {
   let columns: TableProps['columns'] = [
     {
