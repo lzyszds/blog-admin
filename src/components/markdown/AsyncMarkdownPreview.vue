@@ -31,7 +31,7 @@ import { useEditor } from "@/hook/useEditor";
 /* 插件 */
 import mdMark from "markdown-it-mark"; // 高亮标记
 import mdAttrs from "markdown-it-attrs"; // 添加自定义属性
-import mdEmoji from "markdown-it-emoji"; // emoji
+import { full as mdEmoji } from 'markdown-it-emoji' // emoji
 import mdBracketedSpans from "markdown-it-bracketed-spans"; // 括号跨度
 import mdInlineComments from "markdown-it-inline-comments"; // 行内注释
 import mdTipsCollectPlugin from "./plugin/tipsCollect";
