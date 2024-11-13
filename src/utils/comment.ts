@@ -195,3 +195,28 @@ export function optimizeImage(file, quality): Promise<{ base64: string, fileComp
     }
   });
 }
+
+
+/**
+ * `setTimeAgoLocalMessages` 是一个包含本地化时间格式的对象，用于根据时间的过去或未来状态
+ * 动态生成中文的“时间前”或“时间后”表达。
+ * 
+ * 该对象包含一个 `messages` 属性，定义了不同时间单位的本地化消息格式。
+ * 可以用在显示“刚刚”、“几分钟前”、“几小时前”等时间提示的场景。
+ */
+export const setTimeAgoLocalMessages = {
+  messages: {
+    justNow: '刚刚',
+    past: n => (n.match(/\d/) ? `${n}前` : n),
+    future: n => (n.match(/\d/) ? `在${n}` : n),
+    month: (n, past) => (n === 1 ? (past ? '上个月' : '下个月') : `${n}月`),
+    year: (n, past) => (n === 1 ? (past ? '去年' : '明年') : `${n}年`),
+    day: (n, past) => (n === 1 ? (past ? '昨天' : '明天') : `${n}天`),
+    week: (n, past) => (n === 1 ? (past ? '上周' : '下周') : `${n}周`),
+    hour: n => `${n}小时`,
+    minute: n => `${n}分钟`,
+    second: n => `${n}秒`,
+    invalid: '',
+  }
+}
+
