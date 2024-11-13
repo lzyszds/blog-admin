@@ -163,30 +163,35 @@ export function getBase64Binary(data, type) {
  */
 export function optimizeImage(file, quality): Promise<{ base64: string, fileCompress: Blob }> {
   return new Promise((resolve, reject) => {
-    getBase64Binary(file, file.type).then((res: string) => {
-      const canvas = document.createElement("canvas") as HTMLCanvasElement;
-      const ctx = canvas.getContext("2d");
-      let img = new Image() as any;
-      img.src = res;
-      img.onload = function () {
-        canvas.width = img.width;
-        canvas.height = img.height;
-        ctx!.drawImage(img, 0, 0, img.width, img.height);
-        const base64 = canvas.toDataURL(file.type, quality);
-        const fileCompress = base64toBlob(base64);
-        resolve({ base64, fileCompress });
-        // 清理图片对象，释放内存
-        img.onload = img.onerror = null; // 移除事件监听器
-        img.src = ""; // 清空 src 属性，解除图片的引用
-        img = null; // 将 img 对象设为 null
-      };
-      img.onerror = function () {
-        // 清理图片对象
-        img.onload = img.onerror = null;
-        img.src = "";
-        img = null;
-        reject(new Error('图片加载失败'));
-      };
-    });
+
+    if (quality == 1) {
+      return resolve({ base64: "", fileCompress: file })
+    } else {
+      getBase64Binary(file, file.type).then((res: string) => {
+        const canvas = document.createElement("canvas") as HTMLCanvasElement;
+        const ctx = canvas.getContext("2d");
+        let img = new Image() as any;
+        img.src = res;
+        img.onload = function () {
+          canvas.width = img.width;
+          canvas.height = img.height;
+          ctx!.drawImage(img, 0, 0, img.width, img.height);
+          const base64 = canvas.toDataURL(file.type, quality);
+          const fileCompress = base64toBlob(base64);
+          resolve({ base64, fileCompress });
+          // 清理图片对象，释放内存
+          img.onload = img.onerror = null; // 移除事件监听器
+          img.src = ""; // 清空 src 属性，解除图片的引用
+          img = null; // 将 img 对象设为 null
+        };
+        img.onerror = function () {
+          // 清理图片对象
+          img.onload = img.onerror = null;
+          img.src = "";
+          img = null;
+          reject(new Error('图片加载失败'));
+        };
+      });
+    }
   });
 }

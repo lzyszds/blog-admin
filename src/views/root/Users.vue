@@ -23,7 +23,7 @@ const { scrollConfig } = useScrollY();
 /* 搜索条件 */
 const { state: searchCondition, reset } = useResetRefState({
   pages: 1,
-  limit: 10,
+  limit: 8,
   name: "",
   username: "",
   power: "",
