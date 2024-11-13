@@ -20,6 +20,10 @@ jobs:
               with:
                 bun-version: latest
 
+            # 安装应用依赖
+            - name: 安装应用依赖
+              run: bun install
+
             # 打包应用
             - name: 打包应用
               run: bun build
