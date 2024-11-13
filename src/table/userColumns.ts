@@ -94,6 +94,7 @@ export const getUserColumns = (params: Params) => {
             hour: n => `${n}小时`,
             minute: n => `${n}分钟`,
             second: n => `${n}秒`,
+            invalid: '',
           },
           // 其他选项:
           showSecond: true,
