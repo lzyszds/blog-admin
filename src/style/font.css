@@ -1,21 +1,6 @@
-/* @font-face {
-  font-family: 'almama';
-  src: url('./almama2.0.ttf');
-} */
+@import url('../assets/font/HarmonyOS/regular.css');
+@import url('../assets/font/HarmonyOS/medium.css');
 
-@font-face {
-  font-family: OPPO-Sans;
-  font-weight: 400;
-  font-display: swap;
-  src: url(//code.oppo.com/content/dam/oppo/common/fonts/font2/new-font/OPPOSansOS2-5000-Regular.woff2) format('woff2');
-}
-
-@font-face {
-  font-family: OPPO-Sans;
-  font-weight: 500;
-  font-display: swap;
-  src: url(//code.oppo.com/content/dam/oppo/common/fonts/font2/new-font/OPPOSansOS2-5000-Medium.woff2) format('woff2');
-}
 
 @font-face {
   font-family: 'dindin';
