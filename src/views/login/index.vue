@@ -3,7 +3,7 @@ import { login } from "@/api/user";
 import { useRouter } from "vue-router";
 import { useRequest } from "@/hook/useRequest";
 
-const baseURL = import.meta.env.VITE_BASE_URL;
+// const baseURL = import.meta.env.VITE_BASE_URL;
 const isTransition = ref(false);
 const router = useRouter();
 //进入页面先判断是否登陆着,localStorage.getItem('token')是登陆时候存的token

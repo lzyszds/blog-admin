@@ -1,4 +1,3 @@
-import { message } from "ant-design-vue";
 import { ref } from "vue";
 
 interface RequestAfterCall {
