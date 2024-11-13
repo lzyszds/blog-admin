@@ -93,3 +93,17 @@
 .ant-menu-item:active {
   background-color: var(--color-bg) !important;
 }
+
+.ant-table-body {
+  td {
+    font-size: .85rem;
+  }
+}
+
+.ant-table-thead {
+
+  th {
+    font-family: "HarmonyOS_Medium";
+    font-weight: 500 !important;
+  }
+}

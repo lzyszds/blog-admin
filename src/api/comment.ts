@@ -7,7 +7,7 @@ export const getCommentList = (params) => {
   return request({
     url: "/comment/getAllComment",
     method: "get",
-    data: params,
+    params
   });
 }
 
@@ -23,13 +23,12 @@ export const editComment = (params) => {
 }
 
 // 删除评论
-export const deleteComment = (id) => {
+export const deleteComment = (params) => {
+  if (isRef(params)) params = unref(params);
   return request({
     url: "/comment/deleteComment",
     method: "post",
-    data: {
-      ids: id,
-    },
+    data: params,
   });
 }
 

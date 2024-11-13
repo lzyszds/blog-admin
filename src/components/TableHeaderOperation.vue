@@ -2,7 +2,7 @@
 import DraggableCard from "@/components/DraggableCard.vue";
 interface Props {
   selectedRowKeys: any[];
-  addModal: Function;
+  addModal?: Function;
   loading: boolean;
 }
 const props = defineProps<Props>();
@@ -11,7 +11,7 @@ const emits = defineEmits(["refresh", "multipleDel"]);
 
 <template>
   <div class="actionBtn">
-    <AButton type="primary" @click="props.addModal">
+    <AButton type="primary" @click="props.addModal" v-if="props.addModal">
       <LzyIcon name="iconoir:calendar-plus" size="18" /> 新增
     </AButton>
 

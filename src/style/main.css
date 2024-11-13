@@ -5,14 +5,16 @@
 :deep(.searchCard) {
   display: flex;
   gap: 20px;
+  flex-wrap: wrap;
 
   section {
     display: grid;
     align-items: center;
-    grid-template-columns: 80px 1fr;
+    grid-template-columns: 65px 1fr;
     justify-content: space-between;
     width: 240px;
-
+    gap: 10px;
+    
     span {
       text-wrap: nowrap;
       user-select: none;
@@ -58,9 +60,6 @@
   }
 }
 
-.custom-dropdown {
-  animation: custom-fade 0.3s ease-in-out;
-}
 
 @media (max-width: 1280px) {
   :deep(.searchCard) {
