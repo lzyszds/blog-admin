@@ -36,7 +36,7 @@ import mdBracketedSpans from "markdown-it-bracketed-spans"; // 括号跨度
 import mdInlineComments from "markdown-it-inline-comments"; // 行内注释
 import mdTipsCollectPlugin from "./plugin/tipsCollect";
 import mdImagePlugin from "./plugin/image";
-import setDirectoryId from "./plugin/directoryId";
+import setDirectoryId from "./plugin/directoryid";
 
 import getWasm from "shiki/wasm";
 
