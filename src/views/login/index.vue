@@ -61,7 +61,7 @@ onMounted(() => {
             autocomplete="off"
             @finish="throttledRequest"
           >
-            <p class="title">欢迎登陆</p>
+            <p class="title">如约而至</p>
 
             <AFormItem name="username" :rules="rules.username">
               <AInput v-model:value="ruleForm.username">
@@ -98,7 +98,7 @@ onMounted(() => {
           </AForm>
         </div>
         <div class="illustartion">
-          <img :src="baseURL + '/static/img/loginCover.png'" alt="logo" />
+          <img src="/loginCover.png" alt="logo" />
         </div>
       </div>
     </Transition>
@@ -142,7 +142,7 @@ onMounted(() => {
     box-shadow: 0 1px 8px 10px rgba(0, 0, 0, 0.2);
     transition: 0.6s;
     display: grid;
-    grid-template-columns: 0.5fr 1fr;
+    grid-template-columns: 0.8fr 1fr;
     grid-template-rows: 1fr;
     justify-content: center;
     align-items: center;
@@ -161,9 +161,11 @@ onMounted(() => {
       text-align: center;
 
       img {
-        width: 600px;
+        width: 40vw;
+        min-width: 300px;
+        max-width: 600px;
         position: absolute;
-        right: 10%;
+        right: 5%;
         bottom: -20%;
         user-select: none;
         pointer-events: none;
@@ -215,13 +217,15 @@ onMounted(() => {
         margin-top: 10px;
 
         p.title {
-          font-size: 40px;
+          font-size: 60px;
           font-weight: 600;
-          color: var(--themeColor);
+          color: #000;
+          text-shadow: 2px 2px 1px #fff;
           flex: 3;
           font-family: "dindin";
           pointer-events: none;
           user-select: none;
+          filter: drop-shadow(3px 2px 1px var(--themeColor));
         }
 
         :deep(.ant-form-item-control-input) {
@@ -253,5 +257,40 @@ onMounted(() => {
 
 .router-leave-to {
   transform: scale(0.7);
+}
+
+@media screen and (max-width: 700px) {
+  #app {
+    .login {
+      .card {
+        grid-template-columns: 1fr;
+        .title {
+          margin: 15px;
+          text-align: center;
+        }
+        .item {
+          padding: 0;
+          align-items: baseline;
+          button{
+            width: 100%;
+          }
+        }
+
+        :deep(.ant-form-item-control-input) {
+          width: 100%;
+        }
+        :deep(.ant-form-item-control) {
+          max-width: 100%;
+        }
+
+        .illustartion {
+          img {
+            left: 50%;
+            transform: translateX(-50%);
+          }
+        }
+      }
+    }
+  }
 }
 </style>
