@@ -12,11 +12,11 @@ const emit = defineEmits(["updateSystemData"]);
 
 const addAiKey = () => {
   data.value.push({
-    config_desc: "",
-    config_id: 0,
-    config_key: "",
-    config_value: "",
-    config_type: "string",
+    configDesc: "",
+    configId: 0,
+    configKey: "",
+    configValue: "",
+    configType: "string",
   });
 };
 
