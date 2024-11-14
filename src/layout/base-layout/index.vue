@@ -30,9 +30,7 @@ const pushRouter = (item) => {
   tabsState.setKeyArr(item); // 更新标签页状态
 
   /* 实现脱离动画 */
-  setTimeout(() => {
-    if (item.component) router.push({ name: item.component }); // 路由跳转到对应的组件
-  }, 300); // 延迟 300 毫秒进行跳转，显示动画效果
+  if (item.component) router.push({ name: item.component }); // 路由跳转到对应的组件
 };
 
 // 处理响应式布局断点

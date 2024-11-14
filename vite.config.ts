@@ -11,14 +11,13 @@ import { visualizer } from 'rollup-plugin-visualizer'
 import viteCompression from 'vite-plugin-compression'
 import { ViteImageOptimizer } from 'vite-plugin-image-optimizer'
 import AutoImport from 'unplugin-auto-import/vite'
-import prismjs from 'vite-plugin-prismjs';
 
 const CWD = process.cwd()
 
 // https://vitejs.dev/config/
 export default ({ mode }: any) => {
   const env = loadEnv(mode, CWD)
-  // console.log(mode, env, CWD)
+  console.log(mode, env, CWD)
   return defineConfig({
     plugins: [
       vue(),
@@ -48,16 +47,12 @@ export default ({ mode }: any) => {
       }),
       viteCompression({
         verbose: true,
-        disable: false,
+        disable: true,
         threshold: 10240,
         algorithm: 'gzip',
         ext: '.gz',
       }),
       ViteImageOptimizer(),
-
-      prismjs({
-        languages: ['json', 'js', 'ts', 'css', 'scss', 'html', 'markdown', 'sql', 'typescript', 'vim', "git", "bash"],
-      }),
     ],
     build: {
       rollupOptions: {
@@ -93,14 +88,14 @@ export default ({ mode }: any) => {
     server: {
       open: false,
       port: 1026,
-      proxy: {
-        '/hono': {
-          target: env.VITE_APP_API_BASE_URL, // 接口的域名
-          secure: false, // 如果是https接口，需要配置这个参数
-          changeOrigin: true, // 如果接口跨域，需要进行这个参数配置
-          rewrite: path => path.replace(/^\/hono/, ''),
-        },
-      },
+      // proxy: {
+      //   '/hono': {
+      //     target: env.VITE_BASE_URL, // 接口的域名
+      //     secure: false, // 如果是https接口，需要配置这个参数
+      //     changeOrigin: true, // 如果接口跨域，需要进行这个参数配置
+      //     rewrite: path => path.replace(/^\/hono/, ''),
+      //   },
+      // },
     },
   })
 }

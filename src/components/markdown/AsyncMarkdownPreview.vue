@@ -1,5 +1,7 @@
 <template>
-  <div v-html="renderedHtml"></div>
+  <div>
+    <div ref="preview" v-html="renderedHtml"></div>
+  </div>
 </template>
 
 <script setup>
@@ -7,6 +9,7 @@ import MarkdownIt from "markdown-it";
 import { createHighlighterCore } from "shiki/core";
 import { createOnigurumaEngine } from "shiki/engine/oniguruma";
 import { fromHighlighter } from "@shikijs/markdown-it/core";
+import { Fancybox, Carousel, Panzoom } from "@fancyapps/ui"; //图片放大
 
 // 手动导入每个语言模块
 import htmlLang from "shiki/langs/html.mjs";
@@ -26,24 +29,28 @@ import yamlLang from "shiki/langs/yaml.mjs";
 import { useEditor } from "@/hook/useEditor";
 
 /* 插件 */
-import mdMark from "markdown-it-mark";
-import mdAttrs from "markdown-it-attrs";
-import mdEmoji from "markdown-it-emoji";
-import markdownItContainer from "markdown-it-container";
-import mdBracketedSpans from "markdown-it-bracketed-spans";
-import mdInlineComments from "markdown-it-inline-comments";
+import mdMark from "markdown-it-mark"; // 高亮标记
+import mdAttrs from "markdown-it-attrs"; // 添加自定义属性
+import { full as mdEmoji } from 'markdown-it-emoji' // emoji
+import mdBracketedSpans from "markdown-it-bracketed-spans"; // 括号跨度
+import mdInlineComments from "markdown-it-inline-comments"; // 行内注释
+import mdTipsCollectPlugin from "./plugin/tipsCollect";
+import mdImagePlugin from "./plugin/image";
+import setDirectoryId from "./plugin/directoryid";
 
 import getWasm from "shiki/wasm";
 
 const props = defineProps({
   markdownInput: String,
 });
-const emit = defineEmits(["renderedHtml"]);
 
+const emit = defineEmits(["renderedHtml"]);
+const preview = templateRef("preview"); // 用于渲染markdown的容器
 const md = MarkdownIt({
   html: true,
   linkify: true,
   typographer: true,
+  breaks: true,
 });
 
 const langs = [
@@ -87,23 +94,7 @@ const highlighter = await createHighlighterCore({
 });
 
 /* 自定义容器插件 折叠面板 */
-md.use(markdownItContainer, "fold", {
-  validate: function (params) {
-    return params.trim().match(/^fold\s+(.*)$/);
-  },
 
-  render: function (tokens, idx) {
-    var m = tokens[idx].info.trim().match(/^fold\s+(.*)$/);
-
-    if (tokens[idx].nesting === 1) {
-      // opening tag
-      return "<details><summary>" + md.utils.escapeHtml(m[1]) + "</summary>\n";
-    } else {
-      // closing tag
-      return "</details>\n";
-    }
-  },
-});
 /* shiki代码块高亮插件 */
 md.use(
   fromHighlighter(highlighter, {
@@ -121,6 +112,21 @@ md.use(mdMark);
 md.use(mdEmoji);
 md.use(mdBracketedSpans);
 md.use(mdInlineComments);
+md.use(mdImagePlugin, {
+  baseUrl: import.meta.env.VITE_BASE_URL,
+});
+setDirectoryId(md);
+mdTipsCollectPlugin(md);
+/* 图片放大插件绑定 */
+const fancyboxBind = () => {
+  Fancybox.bind(preview.value, {
+    Carousel: {
+      Panzoom: {
+        zoomLevels: 5,
+      },
+    },
+  });
+};
 
 const renderedHtml = ref("");
 watch(
@@ -130,12 +136,17 @@ watch(
       const data = md.render(newMarkdown || "");
       renderedHtml.value = data;
       emit("renderedHtml", data);
+      fancyboxBind();
     } catch (error) {
       console.error(error);
     }
   },
   { immediate: true }
 );
+
+onMounted(() => {
+  fancyboxBind();
+});
 </script>
 <style>
 .preview-pane {
@@ -146,7 +157,7 @@ watch(
     list-style-position: inside; /* 确保标记符号在列表项内部 */
   }
   ul li {
-    padding-left: .2rem;
+    padding-left: 0.2rem;
   }
 
   h1,
@@ -155,12 +166,12 @@ watch(
   h4 {
     animation-duration: 0.5s;
     animation-delay: 0.5s;
+    color: #000000db;
   }
 
   h1 {
     padding-bottom: 0.3em;
     font-size: 1.3em;
-    color: #000;
     font-weight: 600;
     font-family: "dindin";
   }
@@ -168,7 +179,6 @@ watch(
   h2 {
     padding-bottom: 8px;
     border-bottom: 1px dashed #ddd;
-    color: #000;
     font-size: 20px;
     font-weight: 600;
     font-family: "dindin";
@@ -181,7 +191,6 @@ watch(
   }
 
   h3 {
-    color: #222;
     font-size: 18px;
     font-weight: 600;
 
@@ -250,10 +259,28 @@ watch(
     border-radius: 0.25rem;
     margin-bottom: 1rem;
     overflow-x: auto;
+    line-height: 23px;
+
     code {
       border-radius: 0.25rem;
       font-family: "Fira Code";
       font-weight: 400;
+      /* 初始化计数器 */
+      counter-reset: line-number;
+
+      .line::before {
+        counter-increment: line-number;
+        /* 计数器自增 */
+        content: counter(line-number);
+        /* 显示行号 */
+        display: inline-block;
+        /* 行号的宽度，可以调整 */
+        text-align: left;
+        margin-right: 10px;
+        width: 30px;
+        /* 行号和代码的间距 */
+        color: #495162;
+      }
     }
   }
   details {
@@ -276,6 +303,72 @@ watch(
     }
   }
 
+  .markdown-plugin-tip {
+    border-radius: 10px;
+    font-family: "dindin";
+    padding: 10px;
+    border-radius: 5px;
+    border-left: 5px solid var(--themeColor);
+    margin-top: 10px;
+    background-color: #e6e6e6;
+
+    .markdown-tip-title {
+      color: var(--color-primary);
+      font-size: 20px;
+      font-weight: 600;
+    }
+    &.tip {
+      border-color: #4a9ff5;
+      .markdown-tip-title {
+        color: #4a9ff5;
+      }
+    }
+    &.warning {
+      border-color: #ffd500;
+      .markdown-tip-title {
+        color: #be9e01;
+      }
+    }
+    &.danger {
+      border-color: #ff5050;
+      .markdown-tip-title {
+        color: #ff5050;
+      }
+    }
+    &.danger {
+      border-color: #ff5050;
+      .markdown-tip-title {
+        color: #ff5050;
+      }
+    }
+    &.success {
+      border-color: #00cb6ce6;
+      .markdown-tip-title {
+        color: #00cb6ce6;
+      }
+    }
+    &.note {
+      border-color: #00cb6ce6;
+      .markdown-tip-title {
+        color: #00cb6ce6;
+      }
+    }
+
+    &.attention {
+      border-color: #ffb400;
+      .markdown-tip-title {
+        color: #ffb400;
+      }
+    }
+
+    &.caution {
+      border-color: #ff5050;
+      .markdown-tip-title {
+        color: #ff5050;
+      }
+    }
+  }
+
   blockquote {
     margin: 1rem 0;
     color: #999;
@@ -286,6 +379,55 @@ watch(
     p {
       padding: 0.5rem;
       padding-left: 10px;
+    }
+  }
+
+  .img-wrapper {
+    position: relative;
+    --height: 20px;
+    background-color: #f0f2f5;
+    padding: 5px 1px;
+    border-radius: 10px;
+    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.3);
+    cursor: zoom-in;
+    border: 1px solid #aaa;
+    margin: 5px 0 10px;
+    width: 100%;
+
+    &:hover {
+      .img-pseudo::before {
+        content: "🔎点击放大图片";
+      }
+
+      img {
+        filter: brightness(0.7);
+      }
+    }
+
+    img {
+      margin: var(--height) 5px 0;
+      border-radius: 10px;
+      transition: 0.5s;
+      width: calc(100% - 10px);
+    }
+
+    .img-pseudo {
+      background-color: var(--themeColor);
+      height: var(--height);
+      width: calc(100%);
+      border-radius: 10px 10px 0 0;
+      text-align: center;
+      position: absolute;
+      top: 0;
+      left: 0;
+      color: #fff;
+      font-size: 12px;
+
+      &::before {
+        content: attr(data-clipboard-text);
+        width: 100%;
+        height: 100%;
+      }
     }
   }
 }

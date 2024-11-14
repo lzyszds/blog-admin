@@ -1,9 +1,12 @@
-import { Avatar, Button, message, Popconfirm, Tag } from "ant-design-vue";
-import LzyIcon from '@/components/LzyIcon.vue';
-import { Column, Params } from "@/typings/Column";
-
+import { Avatar, Button, message, Popconfirm, TableProps, Tag } from "ant-design-vue";
+import { Params } from "@/typings/Column";
+import { setTimeAgoLocalMessages } from "@/utils/comment";
 export const getUserColumns = (params: Params) => {
-  let columns: Column[] = [
+
+  console.log(params);
+
+
+  let columns: TableProps['columns'] = [
     {
       title: "UID",
       dataIndex: "uid",
@@ -17,7 +20,7 @@ export const getUserColumns = (params: Params) => {
       width: "80px",
       // 可用于显示图片或设置渲染方法
       customRender: ({ text }) => {
-        return h(Avatar, { src: "/hono/static" + text, shape: "square" });
+        return h(Avatar, { src: import.meta.env.VITE_BASE_URL + text, shape: "square" });
       },
     },
     {
@@ -37,24 +40,61 @@ export const getUserColumns = (params: Params) => {
       dataIndex: "power",
       key: "power",
       width: "100px",
+      filters: [
+        {
+          text: '普通用户',
+          value: '1',
+        },
+        {
+          text: '管理员',
+          value: '0',
+        },
+      ],
+      filterMode: 'tree',
+      filterSearch: true,
+      onFilter: (value, record) => record.power.toString().startsWith(value),
+
       customRender: ({ text }) => {
         return h(
           Tag,
           {
-            color: text !== 0 ? "var(--themeColor)" : "#cd201f",
-            icon: h(LzyIcon, {
-              name: text !== 0 ? "iconoir:user-square" : "iconoir:user-crown",
-              size: 16,
-            }),
+            color: text !== 0 ? "var(--themeColor)" : "#f56565",
             style: {
               display: "flex",
               alignItems: "center",
+              justifyContent: "center",
               gap: "4px",
               width: "65px",
             },
             html: "inline-block",
           },
-          () => text !== 0 ? "user" : "admin" // 使用函数形式
+          () => text !== 0 ? "普通用户" : "管理员" // 使用函数形式
+        );
+      },
+    },
+    {
+      title: "状态",
+      dataIndex: "whetherUse",
+      key: "whetherUse",
+      width: "100px",
+      filters: [
+        {
+          text: '启用',
+          value: '1',
+        },
+        {
+          text: '禁用',
+          value: '0',
+        },
+      ],
+      filterMode: 'tree',
+      filterSearch: true,
+      onFilter: (value, record) => record.whetherUse.toString().startsWith(value),
+
+      customRender: ({ text }) => {
+        return h(
+          Tag,
+          () => text == 1 ? "启用" : "禁用" // 使用函数形式
         );
       },
     },
@@ -74,8 +114,7 @@ export const getUserColumns = (params: Params) => {
       width: "100px",
       customRender: ({ text }) => {
         if (!text) return "暂无";
-        return useTimeAgo(text).value;
-        // return useDateFormat(text, 'YYYY-MM-DD').value
+        return useTimeAgo(text, setTimeAgoLocalMessages).value;
       },
     },
     {

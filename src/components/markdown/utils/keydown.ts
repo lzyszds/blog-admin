@@ -18,7 +18,7 @@ const insertDiy = (textarea, text) => {
 
 export const handleKeyDown = (e, editor) => {
 
-  const { leftBtnConfig, rightBtnConfig } = useImplement(editor);
+  const { leftBtnConfig } = useImplement(editor);
 
 
   /* 加粗 */

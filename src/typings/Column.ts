@@ -11,6 +11,6 @@ export interface Column {
 export interface Params {
   getData: any;
   delData: any;
-  openModal: any;
+  openModal?: any;
   columns: any;
 }

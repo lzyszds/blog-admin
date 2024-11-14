@@ -9,6 +9,8 @@ import { ExclamationCircleOutlined } from "@ant-design/icons-vue";
 import { createVNode } from "vue";
 import _ from "lodash";
 
+const BASE_URL = import.meta.env.VITE_BASE_URL;
+
 type ModalParamsType = {
   modalParams: {
     isOpen: boolean;
@@ -45,9 +47,9 @@ const coverUpLoad = ref(false);
 const tagData: any = ref(information.value?.tags || modalParams.params?.tags || []);
 
 /* 全局配置缓存 */
-const globlConfig = useStorage("globlConfig", {
-  previewPosition: "flex",
-});
+// const globlConfig = useStorage("globlConfig", {
+//   previewPosition: "flex",
+// });
 
 //临时存储数据
 const tagDataTem: any = ref(tagData.value);
@@ -113,12 +115,6 @@ const submitForm = async () => {
   });
 };
 
-//暂存按钮
-const resetForm = () => {
-  const save = document.querySelector(".v-md-icon-save") as HTMLLIElement;
-  save.click();
-  // articledata.value = setData();
-};
 
 //图片上传方法
 const coverUpdate = async (file) => {
@@ -146,12 +142,16 @@ const customRequest = ({ file }) => {
 };
 
 /* 文章内部图片上传事件 */
-const handleUploadImage = async (event, insertImage, files) => {
+const handleUploadImage = async ([insertImage, files]) => {
+  console.log(insertImage, files);
+
   try {
     const res = await coverUpdate(files[0]);
+    console.log(res);
+    
     if (res.code === 200) {
       insertImage({
-        url: "/hono" + res.data.filename,
+        url: res.data.filename,
         desc: "点击放大",
       });
     }
@@ -161,13 +161,7 @@ const handleUploadImage = async (event, insertImage, files) => {
   }
 };
 
-const saveToInformationStorage = (text, html) => {
-  // 确保information对象和storage属性已经定义;
-  // if (!information || !information.storage) {
-  //   throw new Error("information.storage未定义");
-  // }
-  // information.storage = { text, html };
-};
+
 
 /**
  * 设置数据
@@ -240,39 +234,39 @@ const VNodes = defineComponent({
 });
 
 const infoCard = shallowRef();
-const { width: infoCard_w, height: infoCard_h } = useElementSize(infoCard);
+// const { width: infoCard_w, height: infoCard_h } = useElementSize(infoCard);
 
-const changePlaces = (val) => {
-  globlConfig.value.previewPosition = val;
-  // setPlace(val);
-};
+// const changePlaces = (val) => {
+//   globlConfig.value.previewPosition = val;
+//   // setPlace(val);
+// };
 
-function setPlace(val) {
-  const preview = document.querySelector(".v-md-editor__preview-wrapper") as HTMLElement;
-  const container = document.querySelector(".edit-container") as HTMLElement;
-  container.style.flexDirection = "row";
-  /* 设置位置 如果val为flex 则设置为相对定位 */
-  if (val !== "flex") {
-    preview.style.position = "fixed";
-    preview.style.height = infoCard_h.value + "px";
-    preview.style.width = infoCard_w.value + "px";
-    preview.style.top = "90px";
-    if (val == "right") {
-      preview.style.right = "24px";
-      preview.style.left = "inherit";
-      container.style.flexDirection = "row-reverse";
-    } else {
-      preview.style.left = "24px";
-      preview.style.right = "inherit";
-    }
-  } else {
-    preview.style.position = "relative";
-    preview.style.height = "auto";
-    preview.style.width = "auto";
-    preview.style.top = "0";
-    preview.style.left = "0";
-  }
-}
+// function setPlace(val) {
+//   const preview = document.querySelector(".v-md-editor__preview-wrapper") as HTMLElement;
+//   const container = document.querySelector(".edit-container") as HTMLElement;
+//   container.style.flexDirection = "row";
+//   /* 设置位置 如果val为flex 则设置为相对定位 */
+//   if (val !== "flex") {
+//     preview.style.position = "fixed";
+//     preview.style.height = infoCard_h.value + "px";
+//     preview.style.width = infoCard_w.value + "px";
+//     preview.style.top = "90px";
+//     if (val == "right") {
+//       preview.style.right = "24px";
+//       preview.style.left = "inherit";
+//       container.style.flexDirection = "row-reverse";
+//     } else {
+//       preview.style.left = "24px";
+//       preview.style.right = "inherit";
+//     }
+//   } else {
+//     preview.style.position = "relative";
+//     preview.style.height = "auto";
+//     preview.style.width = "auto";
+//     preview.style.top = "0";
+//     preview.style.left = "0";
+//   }
+// }
 
 onMounted(() => {
   setTimeout(() => {
@@ -320,7 +314,7 @@ onMounted(() => {
           >
             <img
               v-if="information.coverImg"
-              :src="'/hono' + information.coverImg"
+              :src="BASE_URL + information.coverImg"
               alt="coverImg"
               style="width: 100%; height: 100%; object-fit: cover"
             />
@@ -385,6 +379,7 @@ onMounted(() => {
           <MarkdownEditor
             v-model="information.content"
             :saveForm="saveForm"
+            @update-image="handleUploadImage"
           ></MarkdownEditor>
         </ACard>
       </main>

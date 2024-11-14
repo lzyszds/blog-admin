@@ -1,12 +1,19 @@
 import { useEditorStore } from "@/store/useEditorStore";
-import insertTextAtCursor from "insert-text-at-cursor";
+// import insertTextAtCursor from "insert-text-at-cursor";
+
+interface Option {
+  text?: string,
+  url?: string,
+  desc?: string
+}
 
 interface result {
-  name: string,
-  icon?: string,
-  iconSize?: string,
-  tip?: string,
-  action?: (text?: string) => void
+  name: string
+  icon?: string
+  iconSize?: string
+  tip?: string
+  isUpload?: boolean
+  action?: (option?: Option) => void
 }
 
 interface CustomToolbar extends result {
@@ -32,7 +39,6 @@ interface Editor {
   ref: Ref<HTMLTextAreaElement>
   value: Ref<string>
   option: any,
-  updateHistoryRange: any, // 更新历史记录范围
   updateCurrentHistoryRange: any, // 更新当前历史记录范围
   saveForm: () => {}  // 保存草稿
 }
@@ -226,13 +232,59 @@ export default (editor: Editor): BtnConfig => {
         tip: "提示",
         menus: [
           {
-            name: "Info", icon: "mdi:information-outline", action: (text) => {
-              insetTagText("::: info ", "\n\n" + text + "\n:::", text)
+            name: "tip",
+            icon: "mdi:lightbulb-on-outline",
+            action: () => {
+              insetTagText("::: tip ", "\n\n具体内容\n:::", "提示")
             }
           },
           {
-            name: "Tip", icon: "mdi:lightbulb-on-outline", action: (text) => {
-              insetTagText("::: tip ", "\n\n" + text + "\n:::", text)
+            name: "info",
+            icon: "mdi:information-outline",
+            action: () => {
+              insetTagText("::: info ", "\n\n具体内容\n:::", "信息")
+            }
+          },
+          {
+            name: "warning",
+            icon: "mdi:lightbulb-on-outline",
+            action: () => {
+              insetTagText("::: warning ", "\n\n具体内容\n:::", "警告")
+            }
+          },
+          {
+            name: "danger",
+            icon: "mdi:lightbulb-on-outline",
+            action: () => {
+              insetTagText("::: danger ", "\n\n具体内容\n:::", "危险")
+            }
+          },
+          {
+            name: "success",
+            icon: "mdi:lightbulb-on-outline",
+            action: () => {
+              insetTagText("::: success ", "\n\n具体内容\n:::", "成功")
+            }
+          },
+          {
+            name: "note",
+            icon: "mdi:lightbulb-on-outline",
+            action: () => {
+              insetTagText("::: note ", "\n\n具体内容\n:::", "注释")
+            }
+          },
+          {
+            name: "attention",
+            icon: "mdi:lightbulb-on-outline",
+            action: () => {
+              insetTagText("::: attention ", "\n\n具体内容\n:::", "注意")
+            }
+          },
+          {
+            name: "caution",
+            icon: "mdi:lightbulb-on-outline",
+            action: () => {
+              insetTagText("::: caution ", "\n\n具体内容\n:::", "小心")
             }
           },
         ],
@@ -251,14 +303,21 @@ export default (editor: Editor): BtnConfig => {
         icon: "lets-icons:img-box",
         iconSize: "18",
         tip: "图片 (Ctrl+G)",
-        menus: [
-          { name: "上传图片", action: () => { } },
-          {
-            name: "添加图片链接", action: () => {
-              insetTagText("![", `](http://)`, "图片描述")
-            }
-          },
-        ],
+        menus: [{
+          name: "上传图片",
+          isUpload: true,
+          action: (option) => {
+            const { url, desc } = option!
+            insetTagText("![", `](${url})`, desc ?? '图片描述')
+          }
+        },
+        {
+          name: "添加图片链接",
+          isUpload: false,
+          action: () => {
+            insetTagText("![", `](http://)`, "图片描述")
+          }
+        }],
       },
       {
         name: "file",

@@ -1,4 +1,3 @@
-import { message } from "ant-design-vue";
 import { ref } from "vue";
 
 interface RequestAfterCall {
@@ -59,7 +58,7 @@ export function useRequest(
         if (attempts <= retryCount) {
           return executeRequest();
         }
-        message.error(err.message + " 请稍后重试");
+        // message.error(err.message + " 请稍后重试");
         console.error(err, apiFunction);
         /* 请求失败，调用失败回调函数 */
         requestAfterCall.fail?.(err); // 使用可选链调用

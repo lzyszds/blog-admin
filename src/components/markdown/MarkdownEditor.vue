@@ -1,3 +1,112 @@
+<script setup lang="ts">
+import Toolbar from "./Toolbar.vue";
+import AsyncMarkdownPreview from "./AsyncMarkdownPreview.vue";
+import { handleKeyDown } from "./utils/keydown";
+import { useEditor } from "@/hook/useEditor";
+import { useEditorStore } from "@/store/useEditorStore";
+
+const previewPaneRef = templateRef("previewPaneRef");
+
+// Markdown输入内容的模型定义
+const markdownInput = defineModel({
+  type: String,
+  default: "",
+});
+
+/* 父组件传递过来的保存表单的方法 */
+const { saveForm } = defineProps(["saveForm"]);
+
+/* 暴露事件给父组件的上传图片事件 */
+const emit = defineEmits(["updateImage"]);
+
+const renderedHtml = ref("");
+
+// 导入编辑器钩子并解构出相关方法
+const useEditorOption = useEditor(markdownInput);
+const {
+  undo,
+  redo,
+  updateCurrentHistoryRange,
+  saveHistory,
+  markdownEditorRef,
+} = useEditorOption;
+
+//导入store中的部分数据
+const editorStore = useEditorStore();
+
+/* 监听文本输入，更新markdownInput的值 */
+const updateMarkdownInput = (val) => {
+  markdownInput.value = val.target.value;
+};
+
+/* 获取渲染后的HTML内容  */
+const getRenderedHtml = (html) => {
+  // 获取渲染后的HTML内容
+  renderedHtml.value = html;
+};
+
+const registerHotkeys = ({ key, callback, preventDefault }) => {
+  useEventListener(markdownEditorRef, key, ($event) => {
+    if (preventDefault) $event.preventDefault();
+    callback();
+  });
+};
+/* 回车键处理 */
+registerHotkeys({
+  key: "enter",
+  preventDefault: false,
+  callback: (_editor, _e) => {
+    // if (e.isComposing) return;
+    // const cursorLineLeftText = this.getCursorLineLeftText();
+    // let suffix;
+    // let syntax;
+    // if (ol.test(cursorLineLeftText)) {
+    //   suffix = "x. ";
+    //   syntax = olSyntax;
+    //   e.preventDefault();
+    // } else if (ul.test(cursorLineLeftText)) {
+    //   suffix = "- ";
+    //   syntax = ulSyntax;
+    //   e.preventDefault();
+    // } else {
+    //   return;
+    // }
+    // const indent = cursorLineLeftText.search(syntax);
+    // const suffixIndex = indent + suffix.length;
+    // let beforeText = cursorLineLeftText.slice(0, suffixIndex);
+    // const content = cursorLineLeftText.slice(suffixIndex, cursorLineLeftText.length);
+    // if (content) {
+    //   if (suffix === "x. ") {
+    //     beforeText = beforeText.replace(/(\d+)/, window.parseInt(beforeText) + 1);
+    //   }
+    //   this.replaceSelectionText(`\n${beforeText}`, "end");
+    // } else {
+    //   // break
+    //   this.delLineLeft();
+    //   this.replaceSelectionText("\n", "end");
+    // }
+  },
+});
+const updateImage = (...arg) => {
+  emit("updateImage", arg);
+};
+
+// 键盘快捷键的初始化和处理
+onMounted(() => {
+  saveHistory();
+  console.log(previewPaneRef.value);
+});
+const editorParams = {
+  ref: markdownEditorRef, // 绑定编辑器元素
+  value: markdownInput, // 绑定编辑器输入内容
+  option: useEditorOption, // 提供编辑器选项
+  updateCurrentHistoryRange, // 更新当前历史记录范围
+  saveForm, //保存草稿
+};
+
+provide("editor", editorParams);
+</script>
+
 <template>
   <!-- Markdown编辑器主组件 -->
   <div
@@ -6,7 +115,7 @@
     :class="{ 'is-fullscreen': editorStore.isFullscreen }"
   >
     <!-- 工具栏，包含切换预览和全屏功能 -->
-    <Toolbar :useEditorOption="useEditorOption" />
+    <Toolbar :useEditorOption="useEditorOption" @updateImage="updateImage" />
 
     <!-- 编辑内容区域，根据是否全屏切换样式 -->
     <div class="editor-content">
@@ -47,117 +156,6 @@
     </div>
   </div>
 </template>
-
-<script setup>
-import { debounce } from "lodash-es";
-import Toolbar from "./Toolbar.vue";
-import AsyncMarkdownPreview from "./AsyncMarkdownPreview.vue";
-import { handleKeyDown } from "./utils/keydown";
-import { useEditor } from "@/hook/useEditor";
-import { useEditorStore } from "@/store/useEditorStore";
-
-const previewPaneRef = templateRef("previewPaneRef");
-
-// Markdown输入内容的模型定义
-const markdownInput = defineModel({
-  type: String,
-  default: "",
-});
-
-const { saveForm } = defineProps(["saveForm"]);
-
-const renderedHtml = ref("");
-
-// 导入编辑器钩子并解构出相关方法
-const useEditorOption = useEditor(markdownInput);
-const {
-  undo,
-  redo,
-  updateCurrentHistoryRange,
-  saveHistory,
-  updateHistoryRange,
-  markdownEditorRef,
-} = useEditorOption;
-
-//导入store中的部分数据
-const editorStore = useEditorStore();
-
-/* 监听文本输入，更新markdownInput的值 */
-const updateMarkdownInput = (val) => {
-  markdownInput.value = val.target.value;
-};
-
-/* 获取渲染后的HTML内容  */
-const getRenderedHtml = (html) => {
-  // 获取渲染后的HTML内容
-  renderedHtml.value = html;
-};
-
-const registerHotkeys = ({ key, callback, preventDefault }) => {
-  useEventListener(markdownEditorRef, key, (...arg) => {
-    if (preventDefault) $event.preventDefault();
-    callback();
-  });
-};
-
-registerHotkeys({
-  key: "enter",
-  preventDefault: false,
-  action: (editor, e) => {
-    if (e.isComposing) return;
-    const cursorLineLeftText = this.getCursorLineLeftText();
-    let suffix;
-    let syntax;
-
-    if (ol.test(cursorLineLeftText)) {
-      suffix = "x. ";
-      syntax = olSyntax;
-
-      e.preventDefault();
-    } else if (ul.test(cursorLineLeftText)) {
-      suffix = "- ";
-      syntax = ulSyntax;
-
-      e.preventDefault();
-    } else {
-      return;
-    }
-
-    const indent = cursorLineLeftText.search(syntax);
-    const suffixIndex = indent + suffix.length;
-    let beforeText = cursorLineLeftText.slice(0, suffixIndex);
-    const content = cursorLineLeftText.slice(suffixIndex, cursorLineLeftText.length);
-
-    if (content) {
-      if (suffix === "x. ") {
-        beforeText = beforeText.replace(/(\d+)/, window.parseInt(beforeText) + 1);
-      }
-
-      this.replaceSelectionText(`\n${beforeText}`, "end");
-    } else {
-      // break
-      this.delLineLeft();
-      this.replaceSelectionText("\n", "end");
-    }
-  },
-});
-
-// 键盘快捷键的初始化和处理
-onMounted(() => {
-  saveHistory();
-  console.log(previewPaneRef.value);
-});
-const editorParams = {
-  ref: markdownEditorRef, // 绑定编辑器元素
-  value: markdownInput, // 绑定编辑器输入内容
-  option: useEditorOption, // 提供编辑器选项
-  updateHistoryRange, // 更新历史记录范围
-  updateCurrentHistoryRange, // 更新当前历史记录范围
-  saveForm, //保存草稿
-};
-
-provide("editor", editorParams);
-</script>
 
 <style scoped>
 /* Markdown编辑器的整体样式 */

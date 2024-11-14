@@ -7,7 +7,7 @@ export interface User {
   createDate?: string;
   lastLoginDate?: string | null;
   headImg?: string;
-  whetherUse?: number;
+  whetherUse?: number | boolean;
   signature?: string;
   createIp?: string;
   lastLoginIp?: string | null;

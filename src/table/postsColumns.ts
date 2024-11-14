@@ -1,8 +1,9 @@
-import { Avatar, Button, message, Popconfirm } from "ant-design-vue";
-import { Column, Params } from "@/typings/Column";
+import { Avatar, Button, message, Popconfirm, TableProps, Tag } from "ant-design-vue";
+import { Params } from "@/typings/Column";
+import { setTimeAgoLocalMessages } from "@/utils/comment";
 
 export const getArticleColumns = (params: Params) => {
-  const columns = ref<Column[]>([
+  let columns: TableProps['columns'] = [
     {
       title: "ID",
       dataIndex: "aid",
@@ -16,7 +17,7 @@ export const getArticleColumns = (params: Params) => {
       width: "80px",
       // 可用于显示图片或设置渲染方法
       customRender: ({ text }) => {
-        return h(Avatar, { src: "/hono" + text, shape: "square" });
+        return h(Avatar, { src: import.meta.env.VITE_BASE_URL + text, shape: "square" });
       },
     },
     {
@@ -54,11 +55,35 @@ export const getArticleColumns = (params: Params) => {
       width: "100px",
       customRender: ({ text }) => {
         if (!text) return "暂无";
-        return useTimeAgo(text).value;
-        // return useDateFormat(text, 'YYYY-MM-DD').value
+        return useTimeAgo(text, setTimeAgoLocalMessages).value;
       },
     },
+    {
+      title: "状态",
+      dataIndex: "whetherUse",
+      key: "whetherUse",
+      width: "70px",
+      filters: [
+        {
+          text: '启用',
+          value: '1',
+        },
+        {
+          text: '禁用',
+          value: '0',
+        },
+      ],
+      filterMode: 'tree',
+      filterSearch: true,
+      onFilter: (value, record) => record.whetherUse.toString().startsWith(value),
 
+      customRender: ({ text }) => {
+        return h(
+          Tag,
+          () => text == 1 ? "启用" : "禁用" // 使用函数形式
+        );
+      },
+    },
     {
       title: "操作",
       dataIndex: "action",
@@ -107,9 +132,9 @@ export const getArticleColumns = (params: Params) => {
         ];
       },
     },
-  ]);
+  ]
 
-  columns.value = columns.value.map((item) => {
+  columns = columns.map((item) => {
     return { ...item, ellipsis: true, checked: true };
   });
 

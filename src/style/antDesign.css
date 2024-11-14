@@ -1,6 +1,7 @@
 :root {
   /* 基础颜色 */
-  --color-primary:  var(--themeColor);
+  --color-primary: var(--themeColor);
+  --color-primary-Rgb: var(--themeColorRgb);
   --color-bg: #ffffff;
   --color-bg-light: #f5f5f5;
   --color-text: rgba(0, 0, 0, 0.85);
@@ -91,4 +92,18 @@
 /* 解决导航栏选中背景颜色闪烁的问题 */
 .ant-menu-item:active {
   background-color: var(--color-bg) !important;
+}
+
+.ant-table-body {
+  td {
+    font-size: .85rem;
+  }
+}
+
+.ant-table-thead {
+
+  th {
+    font-family: "HarmonyOS_Medium";
+    font-weight: 500 !important;
+  }
 }

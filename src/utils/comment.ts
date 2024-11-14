@@ -163,30 +163,60 @@ export function getBase64Binary(data, type) {
  */
 export function optimizeImage(file, quality): Promise<{ base64: string, fileCompress: Blob }> {
   return new Promise((resolve, reject) => {
-    getBase64Binary(file, file.type).then((res: string) => {
-      const canvas = document.createElement("canvas") as HTMLCanvasElement;
-      const ctx = canvas.getContext("2d");
-      let img = new Image() as any;
-      img.src = res;
-      img.onload = function () {
-        canvas.width = img.width;
-        canvas.height = img.height;
-        ctx!.drawImage(img, 0, 0, img.width, img.height);
-        const base64 = canvas.toDataURL(file.type, quality);
-        const fileCompress = base64toBlob(base64);
-        resolve({ base64, fileCompress });
-        // 清理图片对象，释放内存
-        img.onload = img.onerror = null; // 移除事件监听器
-        img.src = ""; // 清空 src 属性，解除图片的引用
-        img = null; // 将 img 对象设为 null
-      };
-      img.onerror = function () {
-        // 清理图片对象
-        img.onload = img.onerror = null;
-        img.src = "";
-        img = null;
-        reject(new Error('图片加载失败'));
-      };
-    });
+
+    if (quality == 1) {
+      return resolve({ base64: "", fileCompress: file })
+    } else {
+      getBase64Binary(file, file.type).then((res: string) => {
+        const canvas = document.createElement("canvas") as HTMLCanvasElement;
+        const ctx = canvas.getContext("2d");
+        let img = new Image() as any;
+        img.src = res;
+        img.onload = function () {
+          canvas.width = img.width;
+          canvas.height = img.height;
+          ctx!.drawImage(img, 0, 0, img.width, img.height);
+          const base64 = canvas.toDataURL(file.type, quality);
+          const fileCompress = base64toBlob(base64);
+          resolve({ base64, fileCompress });
+          // 清理图片对象，释放内存
+          img.onload = img.onerror = null; // 移除事件监听器
+          img.src = ""; // 清空 src 属性，解除图片的引用
+          img = null; // 将 img 对象设为 null
+        };
+        img.onerror = function () {
+          // 清理图片对象
+          img.onload = img.onerror = null;
+          img.src = "";
+          img = null;
+          reject(new Error('图片加载失败'));
+        };
+      });
+    }
   });
 }
+
+
+/**
+ * `setTimeAgoLocalMessages` 是一个包含本地化时间格式的对象，用于根据时间的过去或未来状态
+ * 动态生成中文的“时间前”或“时间后”表达。
+ * 
+ * 该对象包含一个 `messages` 属性，定义了不同时间单位的本地化消息格式。
+ * 可以用在显示“刚刚”、“几分钟前”、“几小时前”等时间提示的场景。
+ */
+export const setTimeAgoLocalMessages = {
+  messages: {
+    justNow: '刚刚',
+    past: n => (n.match(/\d/) ? `${n}前` : n),
+    future: n => (n.match(/\d/) ? `在${n}` : n),
+    month: (n, past) => (n === 1 ? (past ? '上个月' : '下个月') : `${n}月`),
+    year: (n, past) => (n === 1 ? (past ? '去年' : '明年') : `${n}年`),
+    day: (n, past) => (n === 1 ? (past ? '昨天' : '明天') : `${n}天`),
+    week: (n, past) => (n === 1 ? (past ? '上周' : '下周') : `${n}周`),
+    hour: n => `${n}小时`,
+    minute: n => `${n}分钟`,
+    second: n => `${n}秒`,
+    invalid: '',
+  }
+}
+

@@ -3,7 +3,8 @@ import type { FormInstance, Rule } from "ant-design-vue/es/form";
 import { UserAdmin } from "@/typings/User";
 import LzyIcon from "../LzyIcon.vue";
 import { message } from "ant-design-vue";
-import { getBase64, randomPassword } from "@/utils/comment";
+import { getBase64, optimizeImage, randomPassword } from "@/utils/comment";
+const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 type ModalParamsType = {
   modalParams: {
@@ -30,6 +31,11 @@ const formRef = ref<FormInstance>();
 // 表单数据
 const formState = ref<UserAdmin>({ ...modalParams.params });
 
+formState.value.whetherUse = !formState.value.whetherUse;
+
+//是否为修改表单
+const isEdit = !!formState.value.uid;
+
 onMounted(() => {
   // 表单初始化设置
   if (!modalParams.params) {
@@ -54,7 +60,7 @@ const rules: Record<string, Rule[]> = {
     { min: 3, max: 16, message: "长度在 3 到 16 个字符", trigger: "blur" },
   ],
   password: [
-    { required: true, message: "请输入密码", trigger: "blur" },
+    { required: !isEdit, message: "请输入密码", trigger: "blur" },
     { min: 6, max: 16, message: "长度在 6 到 16 个字符", trigger: "blur" },
   ],
 };
@@ -112,6 +118,15 @@ const onSubmit = async () => {
 
   /* 提交保存用户信息 并触发以下事件 */
   const nextCallback = () => {
+    //处理禁用开关的值 0为禁用 1为启用
+    formState.value.whetherUse = formState.value.whetherUse ? 0 : 1;
+    console.log(formState.value.createDate);
+
+    if (formState.value.createDate) {
+      //处理创建时间，从后端传来的时间，没办法直接传回去
+      const date = new Date(formState.value.createDate!);
+      formState.value.createDate = date.toISOString().slice(0, 19).replace("T", " ");
+    }
     callback(formState).then(() => {
       message.success("用户信息保存成功！");
       refreshData(); // 刷新数据
@@ -123,10 +138,14 @@ const onSubmit = async () => {
   //@ts-ignore
   if (formState.value.headImg === "none") {
     if (!file.value) return message.error("请选择图片或自行上传头像");
+    // 如果文件大小小于300kb，不进行压缩，按比例压缩
+    const scale = file.value.size < 300 * 1024 ? 1 : 0.5;
+    /* 压缩图片 */
+    const { fileCompress } = await optimizeImage(file.value, scale);
     /* 将头像上传 */
-    uploadHeadImg(file.value).then((res) => {
+    uploadHeadImg(fileCompress).then((res) => {
       message.success("头像上传成功 即将保存用户信息！");
-      formState.value.headImg = "/img/uploadHead/" + res.filename;
+      formState.value.headImg = "/static/img/uploadHead/" + res.filename;
       setTimeout(() => {
         // 延时一秒，让背景图片显示
         nextCallback();
@@ -162,7 +181,7 @@ const onSubmit = async () => {
           <a-radio-button
             v-for="item in modalParams.headimgs"
             :value="item"
-            :style="{ backgroundImage: `url(/hono/static${item})` }"
+            :style="{ backgroundImage: `url(${BASE_URL + item})` }"
           >
             <Transition name="fade">
               <LzyIcon
