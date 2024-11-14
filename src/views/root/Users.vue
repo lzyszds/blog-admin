@@ -23,7 +23,7 @@ const { scrollConfig } = useScrollY();
 /* 搜索条件 */
 const { state: searchCondition, reset } = useResetRefState({
   pages: 1,
-  limit: 8,
+  limit: 10,
   name: "",
   username: "",
   power: "",
@@ -57,8 +57,15 @@ throttledRequest(searchCondition);
 const pagination = computed(() => {
   return {
     total: tableData.value && tableData.value.total,
-    pages: searchCondition.value.pages,
-    limit: searchCondition.value.limit,
+    current: searchCondition.value.pages,
+    pageSize: searchCondition.value.limit,
+    showSizeChanger: true,
+    pageSizeOptions: ["5", "8", "10", "15", "20"],
+    onShowSizeChange: (current, pageSize) => {
+      searchCondition.value.pages = current;
+      searchCondition.value.limit = pageSize;
+      throttledRequest(searchCondition);
+    },
   };
 });
 
