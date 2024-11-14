@@ -69,6 +69,7 @@ const refreshSrcoll = () => {
       padding: '14px',
       overflow: 'hidden auto',
       minHeight: '500px',
+      height: '100%'
     }"
   >
     <RouterView v-slot="{ Component }">

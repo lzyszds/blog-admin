@@ -3,9 +3,9 @@
 </script>
 
 <template>
-    <div>
-
-    </div>
+    <ACard>
+      计划任务
+    </ACard>
 </template>
 
 <style scoped>

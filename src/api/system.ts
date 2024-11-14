@@ -2,7 +2,7 @@ import request from "@/utils/request";
 
 
 // 获取系统配置
-export const getSystemConfig = ()=> {
+export const getSystemConfig = () => {
      return request({
           url: "/system/getSystemConfig?type=admin",
           method: "get",
@@ -10,8 +10,17 @@ export const getSystemConfig = ()=> {
 }
 
 
+//新增系统配置
+export const addSystemConfig = (data: object) => {
+     return request({
+          url: "/system/addSystemConfig",
+          method: "post",
+          data
+     });
+}
+
 // 更新系统配置
-export const updateSystemConfig = (data: object)=> {
+export const updateSystemConfig = (data: object) => {
      return request({
           url: "/system/updateSystemConfig",
           method: "post",
@@ -21,7 +30,7 @@ export const updateSystemConfig = (data: object)=> {
 
 
 // 获取系统图片懒加载的图片
-export const getSystemLoadImages = ()=> {
+export const getSystemLoadImages = () => {
      return request({
           url: "/system/getSystemLoadImages",
           method: "get",
@@ -29,7 +38,7 @@ export const getSystemLoadImages = ()=> {
 }
 
 // 获取底部信息
-export const getFooterInfo = ()=> {
+export const getFooterInfo = () => {
      return request({
           url: "/system/getFooterInfo",
           method: "get",
@@ -37,7 +46,7 @@ export const getFooterInfo = ()=> {
 }
 
 // 新增底部信息
-export const addFooterInfo = (data: object)=> {
+export const addFooterInfo = (data: object) => {
      return request({
           url: "/system/addFooterInfo",
           method: "post",
@@ -45,7 +54,7 @@ export const addFooterInfo = (data: object)=> {
      })
 }
 // 更新底部信息
-export const updateFooterInfo = (data: object)=> {
+export const updateFooterInfo = (data: object) => {
      return request({
           url: "/system/updateFooterInfo",
           method: "post",
