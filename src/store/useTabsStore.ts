@@ -1,5 +1,5 @@
-import items, { Items } from '@/layout/config'
-import { defineStore } from 'pinia'
+import items, {Items} from '@/layout/config'
+import {defineStore} from 'pinia'
 
 interface TabskeyArr extends Items {
   noClose: boolean
@@ -24,7 +24,7 @@ export const useTabsState = defineStore(
 
     /*  tabs页签 */
     const tabsKeyArr = ref<TabskeyArr[]>([
-      Object.assign({}, items[0], { noClose: true })
+      Object.assign({}, items[0], {noClose: true})
     ])
 
     const setKeyArr = (item: any) => {
@@ -58,7 +58,7 @@ export const useTabsState = defineStore(
       if (activeKey.value == index) {
         /* 删除当前激活的标签，则激活前一个标签 */
         activeKey.value = tabsKeyArr.value.length - 1
-        router.push({ name: getKeyArr(activeKey.value).component })
+        router.push({name: getKeyArr(activeKey.value).component})
       }
 
     }
@@ -70,29 +70,31 @@ export const useTabsState = defineStore(
      * @param isBasedKey 是否基于tabsKeyArr中的key删除
      */
     const delMultiKeyItem = (index: number[], tabId: number, isBasedKey: boolean = false) => {
+      /** 找出当前index[]里的key
+       const keyArr = index.map((i) => tabsKeyArr.value[i].key)
+       */
       const tabsKeyItem = [...tabsKeyArr.value]
-      index.forEach(i => {
+      index.forEach((i, _index) => {
         /* 基于key为索引来匹配 */
         if (isBasedKey) {
           let findIndex = tabsKeyArr.value.findIndex((item) => item.key == i)
           if (findIndex > 0) tabsKeyArr.value.splice(findIndex, 1)
         } else {
-          tabsKeyItem.splice(tabsKeyItem.findIndex((_item, _index) => _index == i), 1)
-          if (i == index.length - 1) tabsKeyArr.value = tabsKeyItem
+          tabsKeyItem.splice(i, 1)
+          if (_index == index.length - 1) tabsKeyArr.value = tabsKeyItem
         }
       })
       /* 激活标签 */
       activeKey.value = tabsKeyArr.value.findIndex((item) => item.key == tabId)
-      
+
       /*  判断是否为首页 首页比较特殊 */
       if (getKeyArr(activeKey.value).component == 'dashboard') {
         router.push('/')
       } else {
         /* 跳转当前选中的标签路由中 */
-        router.push({ name: getKeyArr(activeKey.value).component })
+        router.push({name: getKeyArr(activeKey.value).component})
       }
     }
-
 
 
     /* 根据路由获取当前页面的key */
