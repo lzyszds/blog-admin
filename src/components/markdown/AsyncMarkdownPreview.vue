@@ -6,10 +6,10 @@
 
 <script setup>
 import MarkdownIt from "markdown-it";
-import { createHighlighterCore } from "shiki/core";
-import { createOnigurumaEngine } from "shiki/engine/oniguruma";
-import { fromHighlighter } from "@shikijs/markdown-it/core";
-import { Fancybox, Carousel, Panzoom } from "@fancyapps/ui"; //图片放大
+import {createHighlighterCore} from "shiki/core";
+import {createOnigurumaEngine} from "shiki/engine/oniguruma";
+import {fromHighlighter} from "@shikijs/markdown-it/core";
+import {Fancybox, Carousel, Panzoom} from "@fancyapps/ui"; //图片放大
 
 // 手动导入每个语言模块
 import htmlLang from "shiki/langs/html.mjs";
@@ -26,12 +26,12 @@ import xmlLang from "shiki/langs/xml.mjs";
 import markDownLang from "shiki/langs/markdown.mjs";
 import yamlLang from "shiki/langs/yaml.mjs";
 
-import { useEditor } from "@/hook/useEditor";
+import {useEditor} from "@/hook/useEditor";
 
 /* 插件 */
 import mdMark from "markdown-it-mark"; // 高亮标记
 import mdAttrs from "markdown-it-attrs"; // 添加自定义属性
-import { full as mdEmoji } from 'markdown-it-emoji' // emoji
+import {full as mdEmoji} from 'markdown-it-emoji' // emoji
 import mdBracketedSpans from "markdown-it-bracketed-spans"; // 括号跨度
 import mdInlineComments from "markdown-it-inline-comments"; // 行内注释
 import mdTipsCollectPlugin from "./plugin/tipsCollect";
@@ -97,9 +97,9 @@ const highlighter = await createHighlighterCore({
 
 /* shiki代码块高亮插件 */
 md.use(
-  fromHighlighter(highlighter, {
-    theme: "one-dark-pro",
-  })
+    fromHighlighter(highlighter, {
+      theme: "one-dark-pro",
+    })
 );
 /* 自定义属性插件 attrs */
 md.use(mdAttrs, {
@@ -130,18 +130,18 @@ const fancyboxBind = () => {
 
 const renderedHtml = ref("");
 watch(
-  () => props.markdownInput,
-  (newMarkdown) => {
-    try {
-      const data = md.render(newMarkdown || "");
-      renderedHtml.value = data;
-      emit("renderedHtml", data);
-      fancyboxBind();
-    } catch (error) {
-      console.error(error);
-    }
-  },
-  { immediate: true }
+    () => props.markdownInput,
+    (newMarkdown) => {
+      try {
+        const data = md.render(newMarkdown || "");
+        renderedHtml.value = data;
+        emit("renderedHtml", data);
+        fancyboxBind();
+      } catch (error) {
+        console.error(error);
+      }
+    },
+    {immediate: true}
 );
 
 onMounted(() => {
@@ -156,6 +156,7 @@ onMounted(() => {
     padding: 0;
     list-style-position: inside; /* 确保标记符号在列表项内部 */
   }
+
   ul li {
     padding-left: 0.2rem;
   }
@@ -231,27 +232,51 @@ onMounted(() => {
   }
 
   table {
-    border-collapse: collapse;
-    width: max-content;
-    border-radius: 5px;
-    margin: 0 auto;
-    font-size: 15px;
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    background-color: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   }
 
-  th {
-    color: #fff;
-    padding: 0 8px;
+  table thead {
+    background-color: #5161ce;
+    color: white;
+  }
+
+  table th,
+  table td {
+    padding: 12px 15px;
     text-align: left;
-    background-color: var(--themeColor);
   }
 
-  td {
-    padding: 0 8px;
-    text-align: left;
+  table th {
+    font-weight: bold;
+    text-transform: uppercase;
+    font-size: 14px;
+    letter-spacing: 0.5px;
   }
 
-  tr:nth-child(even) {
-    background-color: none;
+  table tbody tr:nth-child(even) {
+    background-color: #f8f8f8;
+  }
+
+  table tbody tr:hover {
+    background-color: rgba(81, 97, 206, 0.1);
+    transition: background-color 0.3s ease;
+  }
+
+  @media (max-width: 600px) {
+    .table th,
+    .table td {
+      padding: 8px 10px;
+    }
+
+    .table th {
+      font-size: 12px;
+    }
   }
 
   pre {
@@ -283,12 +308,14 @@ onMounted(() => {
       }
     }
   }
+
   details {
     border-radius: 5px;
     overflow: hidden;
     background: #f5f5f5;
     color: #333;
     border: 1px solid #ccc;
+
     summary {
       padding: 10px 15px;
       cursor: pointer;
@@ -297,6 +324,7 @@ onMounted(() => {
       background: #e6e6e6;
       margin: 0;
     }
+
     p {
       padding: 10px 15px;
       background-color: #fff;
@@ -317,38 +345,50 @@ onMounted(() => {
       font-size: 20px;
       font-weight: 600;
     }
+
     &.tip {
       border-color: #4a9ff5;
+
       .markdown-tip-title {
         color: #4a9ff5;
       }
     }
+
     &.warning {
       border-color: #ffd500;
+
       .markdown-tip-title {
         color: #be9e01;
       }
     }
+
     &.danger {
       border-color: #ff5050;
+
       .markdown-tip-title {
         color: #ff5050;
       }
     }
+
     &.danger {
       border-color: #ff5050;
+
       .markdown-tip-title {
         color: #ff5050;
       }
     }
+
     &.success {
       border-color: #00cb6ce6;
+
       .markdown-tip-title {
         color: #00cb6ce6;
       }
     }
+
     &.note {
       border-color: #00cb6ce6;
+
       .markdown-tip-title {
         color: #00cb6ce6;
       }
@@ -356,6 +396,7 @@ onMounted(() => {
 
     &.attention {
       border-color: #ffb400;
+
       .markdown-tip-title {
         color: #ffb400;
       }
@@ -363,6 +404,7 @@ onMounted(() => {
 
     &.caution {
       border-color: #ff5050;
+
       .markdown-tip-title {
         color: #ff5050;
       }
@@ -376,6 +418,7 @@ onMounted(() => {
     border-left: 0.2rem solid var(--themeColor);
     background: aliceblue;
     font-family: "dindin";
+
     p {
       padding: 0.5rem;
       padding-left: 10px;
