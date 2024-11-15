@@ -1,7 +1,7 @@
-@import url('./font');
-@import url('./loading');
-@import url('./transition');
-@import url('./antDesign');
+@import url('./font.css');
+@import url('./loading.css');
+@import url('./transition.css');
+@import url('./antDesign.css');
 
 :root {
   --themeColor: rgb(81, 97, 206);
@@ -24,7 +24,7 @@
   --purple: rgb(123, 31, 162);
   --violet: rgb(103, 58, 183);
   --pink: rgb(244, 143, 177);
-  --font: "Source Han Sans"
+  --font: "PingFang SC,HarmonyOS_Regular,Helvetica Neue,Microsoft YaHei,sans-serif"
 }
 
 ::selection {
@@ -148,7 +148,7 @@ textarea:-webkit-autofill,
 select:-webkit-autofill {
   -webkit-text-fill-color: #000 !important;
   /* //这个地方的颜色是字体颜色，可以根据实际情况修改 */
-  -webkit-box-shadow: 0 0 0px 1000px transparent inset !important;
+  -webkit-box-shadow: 0 0 0 1000px transparent inset !important;
   /* //设置input输入框的背景颜色为透明色 */
   background-color: transparent;
   /* //设置input输入框的背景颜色为透明色 */

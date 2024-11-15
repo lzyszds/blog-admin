@@ -1,6 +1,5 @@
 import { createApp } from 'vue'
 import "@fancyapps/ui/dist/fancybox/fancybox.css";
-import '@/style/style.css'
 
 import App from './App.vue'
 
