@@ -1,8 +1,14 @@
 <script setup lang="ts">
-import { addSystemConfig, getSystemConfig, updateSystemConfig } from "@/api/system";
-import WebSetSetLoadGif from "@/components/webSet/SetLoadGif.vue";
+import {
+  addSystemConfig,
+  getSystemConfig,
+  updateSystemConfig,
+} from "@/api/system";
+import SetLoadGif from "@/components/webSet/SetLoadGif.vue";
 import { WebSystemType } from "@/typings/WebSetType";
 import { message } from "ant-design-vue";
+import SetSystem from "@/components/webSet/SetSystem.vue";
+
 const activeKey = useStorage("activeKey", "1");
 
 const { data } = await getSystemConfig();
@@ -18,9 +24,8 @@ const updateSystemData = async (arr) => {
         } else {
           return addSystemConfig(arg);
         }
-      })
+      }),
     );
-    // console.log(result);
     return message.success(resultPromise[0].data);
   } catch (err) {
     console.log("🚀 ~ updateSystemData ~ err:", err);
@@ -33,11 +38,13 @@ const updateSystemData = async (arr) => {
     <ATabs v-model:activeKey="activeKey" :tab-position="'top'" centered>
       <ATab-pane key="1" tab="图片懒加载设置">
         <section class="webSetItem">
-          <WebSetSetLoadGif :result="result" @updateSystemData="updateSystemData" />
+          <SetLoadGif :result="result" @updateSystemData="updateSystemData" />
         </section>
       </ATab-pane>
       <ATab-pane key="2" tab="系统变量设置">
-        <section class="webSetItem"></section>
+        <section class="webSetItem">
+          <SetSystem :result="result"></SetSystem>
+        </section>
       </ATab-pane>
       <ATab-pane key="3" tab="Ai密钥配置">
         <section class="webSetItem"></section>
@@ -50,6 +57,22 @@ const updateSystemData = async (arr) => {
 </template>
 
 <style scoped>
+:deep(.ant-card-body) {
+  height: 100%;
+
+  & > div {
+    height: 100%;
+
+    .ant-tabs-content {
+      height: 100%;
+
+      .ant-tabs-tabpane {
+        height: 100%;
+      }
+    }
+  }
+}
+
 .webSetItem {
   height: 100%;
 }

@@ -21,7 +21,6 @@ declare module 'vue' {
     AFormItem: typeof import('ant-design-vue/es')['FormItem']
     AiForm: typeof import('./src/components/webSet/AiForm.vue')['default']
     AInput: typeof import('ant-design-vue/es')['Input']
-    AInputPassword: typeof import('ant-design-vue/es')['InputPassword']
     ALayout: typeof import('ant-design-vue/es')['Layout']
     ALayoutContent: typeof import('ant-design-vue/es')['LayoutContent']
     ALayoutHeader: typeof import('ant-design-vue/es')['LayoutHeader']
@@ -29,6 +28,7 @@ declare module 'vue' {
     AMenu: typeof import('ant-design-vue/es')['Menu']
     AMenuDivider: typeof import('ant-design-vue/es')['MenuDivider']
     AMenuItem: typeof import('ant-design-vue/es')['MenuItem']
+    APopconfirm: typeof import('ant-design-vue/es')['Popconfirm']
     APopover: typeof import('ant-design-vue/es')['Popover']
     ARadioButton: typeof import('ant-design-vue/es')['RadioButton']
     ARadioGroup: typeof import('ant-design-vue/es')['RadioGroup']
@@ -40,8 +40,10 @@ declare module 'vue' {
     ATable: typeof import('ant-design-vue/es')['Table']
     ATabPane: typeof import('ant-design-vue/es')['TabPane']
     ATabs: typeof import('ant-design-vue/es')['Tabs']
+    ATag: typeof import('ant-design-vue/es')['Tag']
     ATextarea: typeof import('ant-design-vue/es')['Textarea']
     ATooltip: typeof import('ant-design-vue/es')['Tooltip']
+    ATypographyLink: typeof import('ant-design-vue/es')['TypographyLink']
     AUpload: typeof import('ant-design-vue/es')['Upload']
     BetterScroll: typeof import('./src/components/BetterScroll.vue')['default']
     DraggableCard: typeof import('./src/components/DraggableCard.vue')['default']
@@ -58,6 +60,5 @@ declare module 'vue' {
     Toolbar: typeof import('./src/components/markdown/Toolbar.vue')['default']
     ToolbarButton: typeof import('./src/components/markdown/ToolbarButton.vue')['default']
     UserForm: typeof import('./src/components/form/UserForm.vue')['default']
-    WebSet: typeof import('./src/components/webSet/WebSet.vue')['default']
   }
 }

@@ -1,100 +1,177 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 import { WebSystemType } from "@/typings/WebSetType";
-import { cloneDeep, differenceWith, isEqual } from "lodash";
+import { cloneDeep } from "lodash";
+import { message, TableProps } from "ant-design-vue";
+import { UnwrapRef } from "vue";
 
-const { result } = defineProps<{
-  result: WebSystemType[];
-}>();
+const { result } = defineProps<{ result: WebSystemType[] }>();
 
 const data = ref(cloneDeep(result));
 
+const editableData: UnwrapRef<Record<string, WebSystemType>> = reactive({});
+
 const emit = defineEmits(["updateSystemData"]);
 
-const addAiKey = () => {
-  data.value.push({
-    configDesc: "",
-    configId: 0,
-    configKey: "",
-    configValue: "",
-    configType: "string",
-  });
+// 修改
+const edit = (record: WebSystemType) => {
+  const { configKey } = record;
+  editableData[configKey] = cloneDeep(
+    data.value.filter((item) => configKey === item.configKey)[0],
+  );
 };
 
 // 保存
-const save = () => {
-  const diffArr = differenceWith(data.value, result, isEqual);
-  emit("updateSystemData", diffArr);
+const save = (record: WebSystemType) => {
+  if (record.configKey == "load_animation_gif")
+    return message.error("加载动画不可修改,请前往图片懒加载设置修改");
+  const { configKey } = record;
+  Object.assign(
+    data.value.filter((item) => configKey === item.configKey)[0],
+    editableData[configKey],
+  );
+  delete editableData[configKey];
+  console.log(editableData);
+  // emit("updateSystemData", data.value);
 };
 
-const handleDelect = (scope: any) => {
-  data.value.splice(scope.$index, 1);
+const cancel = (record: WebSystemType) => {
+  delete editableData[record.configKey];
+};
+
+const columns = ref<TableProps["columns"]>([
+  {
+    title: "key",
+    dataIndex: "configKey",
+    key: "configKey",
+    width: 200,
+  },
+  {
+    title: "value",
+    dataIndex: "configValue",
+    key: "configValue",
+    ellipsis: true,
+    width: 350,
+  },
+  {
+    title: "类型",
+    dataIndex: "configType",
+    key: "configType",
+    width: 100,
+  },
+  {
+    title: "说明",
+    dataIndex: "configDesc",
+    key: "configDesc",
+    width: 200,
+  },
+  {
+    title: "操作",
+    key: "action",
+    width: 110,
+    align: "center",
+    // slots: {customRender: "action"},
+  },
+]);
+
+const inputShow = (column) => {
+  return ["configKey", "configValue", "configDesc"].includes(column.dataIndex);
+};
+
+const selectOption = [
+  { value: "string", label: "字符串" },
+  { value: "image", label: "图片" },
+];
+
+const selectShow = (column) => {
+  return ["configType"].includes(column.dataIndex);
 };
 </script>
 
 <template>
   <div class="setSystem">
-    <ElTable :data="data" class="aiKeyTable">
-      <ElTableColumn label="key" width="200">
-        <template #default="scope">
-          <ElInput v-model="scope.row.config_key" />
+    <ATable
+      :columns="columns"
+      :data-source="data"
+      :pagination="{ size: 'small' }"
+      :scroll="{ x: 750, y: 475 }"
+    >
+      <template #bodyCell="{ column, record, text }">
+        <template v-if="inputShow(column) && editableData[record.configKey]">
+          <a-input
+            v-model:value="editableData[record.configKey][column.dataIndex]"
+            size="small"
+            :disabled="record.configKey === 'load_animation_gif'"
+          />
         </template>
-      </ElTableColumn>
-      <ElTableColumn label="value">
-        <template #default="{ row }">
-          <ElInput v-if="row.config_type == 'string'" v-model="row.config_value" />
-          <div v-else class="img-box">
-            <ElUpload :limit="1" :auto-upload="false" list-type="picture-card">
-              <img v-if="row.config_value" :src="'hono/static' + row.config_value" />
-            </ElUpload>
+
+        <template v-if="selectShow(column)">
+          <ASelect
+            v-if="editableData[record.configKey]"
+            v-model:value="editableData[record.configKey][column.dataIndex]"
+            size="small"
+            style="width: 80px"
+            :disabled="record.configKey === 'load_animation_gif'"
+          >
+            <ASelectOption
+              v-for="item in selectOption"
+              :key="item.value"
+              :value="item.value"
+            >
+              {{ item.label }}
+            </ASelectOption>
+          </ASelect>
+          <span v-else>{{
+            selectOption.filter((item) => item.value == text)[0].label
+          }}</span>
+        </template>
+
+        <template v-else-if="column.key === 'action'">
+          <div class="editable-row-operations">
+            <span v-if="editableData[record.configKey]">
+              <a-typography-link>
+                <AButton size="small" type="primary" @click="save(record)">
+                  保存
+                </AButton>
+              </a-typography-link>
+              <a-popconfirm title="确定取消?" @confirm="cancel(record)">
+                <AButton size="small" danger @click="edit(record)">
+                  取消
+                </AButton>
+              </a-popconfirm>
+            </span>
+            <AButton v-else size="small" type="primary" @click="edit(record)">
+              修改
+            </AButton>
           </div>
         </template>
-      </ElTableColumn>
-      <ElTableColumn label="类型" width="120">
-        <template #default="scope">
-          <ElSelect v-model="scope.row.config_type" placeholder="请选择">
-            <ElOption label="字符串" value="string" />
-            <ElOption label="图片" value="image" />
-          </ElSelect>
-        </template>
-      </ElTableColumn>
-      <ElTableColumn label="说明">
-        <template #default="scope">
-          <ElInput v-model="scope.row.config_desc" />
-        </template>
-      </ElTableColumn>
-      <ElTableColumn label="操作" width="80px" center>
-        <template #default="scope">
-          <ElButton type="text" @click="handleDelect(scope)">删除</ElButton>
-        </template>
-      </ElTableColumn>
-    </ElTable>
-    <div class="aiKeyTools">
-      <ElButton type="primary" @click="addAiKey"> 添加更多 </ElButton>
-      <ElButton type="primary" @click="save"> 保存设置 </ElButton>
-    </div>
+      </template>
+    </ATable>
   </div>
 </template>
 
-<style lang="scss" scoped>
+<style scoped>
 .setSystem {
+  overflow: hidden;
   overflow-y: auto;
   padding: 10px;
-  :deep(.el-table__inner-wrapper) {
-    padding-bottom: 20px;
+  height: 100%;
+
+  .ant-table-wrapper {
+    flex: 1 1 0;
   }
-  :deep(.el-upload-list--picture-card) {
+
+  .editable-row-operations {
     display: flex;
-  }
-  :deep(.el-upload.el-upload--picture-card) {
-    width: 200%;
-    height: 90%;
-    padding: 10px;
-    img {
-      flex: 1;
-      height: auto;
-      max-height: 100px;
-      border-radius: 10px;
-      object-fit: cover;
+    gap: 10px;
+    justify-content: center;
+
+    span {
+      display: flex;
+      gap: 10px;
+    }
+
+    button {
+      font-size: 12px;
     }
   }
 }
