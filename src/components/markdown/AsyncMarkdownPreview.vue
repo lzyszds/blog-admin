@@ -9,7 +9,7 @@ import MarkdownIt from "markdown-it";
 import {createHighlighterCore} from "shiki/core";
 import {createOnigurumaEngine} from "shiki/engine/oniguruma";
 import {fromHighlighter} from "@shikijs/markdown-it/core";
-import {Fancybox, Carousel, Panzoom} from "@fancyapps/ui"; //图片放大
+import {Fancybox} from "@fancyapps/ui"; //图片放大
 
 // 手动导入每个语言模块
 import htmlLang from "shiki/langs/html.mjs";
@@ -26,7 +26,6 @@ import xmlLang from "shiki/langs/xml.mjs";
 import markDownLang from "shiki/langs/markdown.mjs";
 import yamlLang from "shiki/langs/yaml.mjs";
 
-import {useEditor} from "@/hook/useEditor";
 
 /* 插件 */
 import mdMark from "markdown-it-mark"; // 高亮标记
@@ -38,7 +37,6 @@ import mdTipsCollectPlugin from "./plugin/tipsCollect";
 import mdImagePlugin from "./plugin/image";
 import setDirectoryId from "./plugin/directoryid";
 
-import getWasm from "shiki/wasm";
 
 const props = defineProps({
   markdownInput: String,
@@ -53,22 +51,6 @@ const md = MarkdownIt({
   breaks: true,
 });
 
-const langs = [
-  "html",
-  "css",
-  "js",
-  "jsx",
-  "ts",
-  "tsx",
-  "vue",
-  "json",
-  "sh",
-  "nginx",
-  "xml",
-  "markdown",
-  "md",
-  "yaml",
-];
 
 // 批量导入所有语言模块
 const langModules = [

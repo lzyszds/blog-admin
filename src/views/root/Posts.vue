@@ -171,6 +171,7 @@ const multipleDel = () => {
       </template>
 
       <main class="contentCard">
+        <!--   scroll如果你想表格进行滚动，那么table的父元素一定不能是grid     -->
         <ATable
           ref="tableWrapperRef"
           :row-selection="{ selectedRowKeys, onChange: onSelectChange }"
