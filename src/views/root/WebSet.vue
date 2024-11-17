@@ -8,6 +8,7 @@ import SetLoadGif from "@/components/webSet/SetLoadGif.vue";
 import { WebSystemType } from "@/typings/WebSetType";
 import { message } from "ant-design-vue";
 import SetSystem from "@/components/webSet/SetSystem.vue";
+import SetAiKey from "@/components/webSet/SetAiKey.vue";
 
 const activeKey = useStorage("activeKey", "1");
 
@@ -43,11 +44,13 @@ const updateSystemData = async (arr) => {
       </ATab-pane>
       <ATab-pane key="2" tab="系统变量设置">
         <section class="webSetItem">
-          <SetSystem :result="result"></SetSystem>
+          <SetSystem :result="result" />
         </section>
       </ATab-pane>
       <ATab-pane key="3" tab="Ai密钥配置">
-        <section class="webSetItem"></section>
+        <section class="webSetItem">
+          <SetAiKey :result="result" />
+        </section>
       </ATab-pane>
       <ATab-pane key="4" tab="页脚内容设置">
         <section class="webSetItem"></section>

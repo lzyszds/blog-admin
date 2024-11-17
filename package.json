@@ -17,7 +17,7 @@
     "@shikijs/markdown-it": "^1.22.2",
     "@vueuse/core": "^10.11.1",
     "animate.css": "^4.1.1",
-    "ant-design-vue": "^4.2.5",
+    "ant-design-vue": "^4.2.6",
     "axios": "^1.7.7",
     "echarts": "^5.4.2",
     "insert-text-at-cursor": "^0.3.0",

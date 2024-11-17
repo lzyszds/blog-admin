@@ -63,7 +63,7 @@ const handleLoadGif = async (val: string) => {
         border-radius: 10px;
         cursor: pointer;
         border: 3px solid transparent;
-        mix-blend-mode: multiply;
+        //mix-blend-mode: multiply;
       }
       &:hover {
         img {
