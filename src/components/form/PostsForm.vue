@@ -1,5 +1,9 @@
 <script lang="ts" setup>
-import { addArticleCategory, getArticleCategory, uploadArticleImg } from "@/api/posts";
+import {
+  addArticleCategory,
+  getArticleCategory,
+  uploadArticleImg,
+} from "@/api/posts";
 import { ArticledataType, TagDataType } from "@/typings/Posts";
 import { isEqual, optimizeImage, toProxys } from "@/utils/comment";
 import { message, Modal } from "ant-design-vue";
@@ -7,7 +11,6 @@ import MarkdownEditor from "../markdown/MarkdownEditor.vue";
 import LzyIcon from "../LzyIcon.vue";
 import { ExclamationCircleOutlined } from "@ant-design/icons-vue";
 import { createVNode } from "vue";
-import _ from "lodash";
 
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
@@ -44,7 +47,9 @@ console.log(modalParams, "modalParams");
 const coverUpLoad = ref(false);
 
 //当前选中的标签数据
-const tagData: any = ref(information.value?.tags || modalParams.params?.tags || []);
+const tagData: any = ref(
+  information.value?.tags || modalParams.params?.tags || [],
+);
 
 /* 全局配置缓存 */
 // const globlConfig = useStorage("globlConfig", {
@@ -84,7 +89,7 @@ const saveForm = () => {
   };
 
   const values: any = Object.values(
-    isEqual(formState.value[params.aid || "add"], params)
+    isEqual(formState.value[params.aid || "add"], params),
   );
   for (let item of values) {
     if (item.length != 0) {
@@ -114,7 +119,6 @@ const submitForm = async () => {
     delete formState.value[modalParams.params.aid || "add"];
   });
 };
-
 
 //图片上传方法
 const coverUpdate = async (file) => {
@@ -148,7 +152,7 @@ const handleUploadImage = async ([insertImage, files]) => {
   try {
     const res = await coverUpdate(files[0]);
     console.log(res);
-    
+
     if (res.code === 200) {
       insertImage({
         url: res.data.filename,
@@ -161,8 +165,6 @@ const handleUploadImage = async ([insertImage, files]) => {
   }
 };
 
-
-
 /**
  * 设置数据
  * @returns {ArticledataType} 文章数据
@@ -171,11 +173,23 @@ function setData(): ArticledataType {
   console.log(information.value);
 
   const { aid, title, content, coverImg } = information.value;
+  const first = document.querySelector(".preview-pane>div")?.children;
+  let firstText = "";
+  //遍历所有子元素 如果tagname 标题h1 h2 h3 h4 h5 h6 则跳过
+  for (const firstKey in first) {
+    console.log(first[firstKey]);
+    if (
+      !["H1", "H2", "H3", "H4", "H5", "H6"].includes(first[firstKey].tagName)
+    ) {
+      firstText = first[firstKey].innerText;
+      break;
+    }
+  }
+
   // 初始化文章数据
   const data = {
     title, // 文章标题
-    partial_content: document.querySelector(".preview-pane")?.firstElementChild!
-      .innerHTML!, // 文章开头第一段话
+    partial_content: firstText, // 文章开头第一段话
     content, // 文章内容
     main: document.querySelector(".preview-pane")?.innerHTML!, // 文章主体内容
     cover_img: coverImg, // 文章封面图片
@@ -339,7 +353,10 @@ onMounted(() => {
             </template>
           </a-upload>
           <a-divider>文章标题</a-divider>
-          <AInput v-model:value="information.title" placeholder="必填 | 请输入文章标题" />
+          <AInput
+            v-model:value="information.title"
+            placeholder="必填 | 请输入文章标题"
+          />
           <a-divider>文章分类</a-divider>
           <a-select
             ref="selectRef"
@@ -357,7 +374,9 @@ onMounted(() => {
               <a-space style="padding: 4px 8px">
                 <a-input ref="inputRef" v-model:value="typeInput" />
                 <a-button type="text" @click="addArticleType">
-                  <template #icon><LzyIcon size="17" name="iconoir:plus" /></template>
+                  <template #icon>
+                    <LzyIcon size="17" name="iconoir:plus" />
+                  </template>
                   添加分类
                 </a-button>
               </a-space>
@@ -443,6 +462,7 @@ onMounted(() => {
     overflow: hidden;
   }
 }
+
 .edit-content {
   flex: 7;
 }
@@ -450,6 +470,7 @@ onMounted(() => {
 :deep(.markdown-editor) {
   border-radius: 12px;
   box-shadow: none;
+
   .v-md-editor-preview {
     padding: 20px 20px 30px;
   }
@@ -460,6 +481,7 @@ onMounted(() => {
     h3 {
       font-size: 16px !important;
     }
+
     h2 {
       font-size: 18px !important;
     }
@@ -473,9 +495,11 @@ onMounted(() => {
     border-radius: 12px;
   }
 }
+
 .drawer-extra {
   display: flex;
   gap: 10px;
+
   :deep(span) {
     margin-left: 5px;
   }
@@ -485,6 +509,7 @@ onMounted(() => {
   .edit-container {
     flex-direction: column;
   }
+
   .drawer-extra {
     :deep(span) {
       display: none;
@@ -496,6 +521,7 @@ onMounted(() => {
   .edit-container {
     flex-direction: column;
   }
+
   .drawer-extra {
     :deep(span) {
       display: none;
