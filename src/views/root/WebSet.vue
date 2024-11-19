@@ -9,6 +9,7 @@ import { WebSystemType } from "@/typings/WebSetType";
 import { message } from "ant-design-vue";
 import SetSystem from "@/components/webSet/SetSystem.vue";
 import SetAiKey from "@/components/webSet/SetAiKey.vue";
+import SetFooterOrAi from "@/components/webSet/SetFooterOrAi.vue";
 
 const activeKey = useStorage("activeKey", "1");
 
@@ -53,7 +54,9 @@ const updateSystemData = async (arr) => {
         </section>
       </ATab-pane>
       <ATab-pane key="4" tab="页脚内容设置">
-        <section class="webSetItem"></section>
+        <section class="webSetItem">
+          <SetFooterOrAi />
+        </section>
       </ATab-pane>
     </ATabs>
   </ACard>

@@ -53,6 +53,16 @@ export const addFooterInfo = (data: object) => {
           data,
      })
 }
+
+// 新增二级底部信息
+export const addFooterLink = (data: object) => {
+     return request({
+          url: "/system/addFooterLink",
+          method: "post",
+          data,
+     })
+}
+
 // 更新底部信息
 export const updateFooterInfo = (data: object) => {
      return request({
@@ -62,3 +72,20 @@ export const updateFooterInfo = (data: object) => {
      })
 }
 
+//更新页脚一级分类信息
+export const updateFooterCategory = (data: object) => {
+     return request({
+          url: "/system/updateFooterCategory",
+          method: "post",
+          data,
+     })
+}
+
+//更新页脚二级分类信息
+export const updateFooterLink = (data: object) => {
+     return request({
+          url: "/system/updateFooterLink",
+          method: "post",
+          data,
+     })
+}

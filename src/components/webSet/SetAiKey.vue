@@ -227,10 +227,10 @@ watch(
 
   .ant-table-wrapper {
     flex: 1 1 0;
+  }
 
-    :deep(.ant-table-footer) {
-      background: transparent;
-    }
+  :deep(.ant-table-footer) {
+    background: transparent;
   }
 
   .editable-row-operations {
