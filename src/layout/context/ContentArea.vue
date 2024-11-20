@@ -24,7 +24,7 @@ const refreshSrcoll = () => {
       <template v-for="(item, index) in tabsState.tabsKeyArr" :key="index">
         <ToolsMenu
           :disabled-keys="['1']"
-          :tab-id="item.key + ''"
+          :tab-id="item.meta.key + ''"
           @refresh="refreshSrcoll"
         >
           <a-button
@@ -33,8 +33,8 @@ const refreshSrcoll = () => {
             :class="{ active: index === tabsState.activeKey }"
             @click.stop="$emit('push-router', index)"
           >
-            <LzyIcon :name="item.uicon" :size="16" />
-            {{ item.name }}
+            <LzyIcon :name="item.meta.uicon" :size="16" />
+            {{ item.meta.name }}
             <LzyIcon
               class="icon-close"
               v-if="!item.noClose"
@@ -69,7 +69,7 @@ const refreshSrcoll = () => {
       padding: '14px',
       overflow: 'hidden auto',
       minHeight: '500px',
-      height: '100%'
+      height: '100%',
     }"
   >
     <RouterView v-slot="{ Component }">

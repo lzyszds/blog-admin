@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useTabsState } from "@/store/useTabsStore"; // 导入用于管理标签页状态的 store
-import items from "@/layout/config"; // 导入布局配置项
+import routeItem from "@/router/config";
 import SidebarMenu from "@/layout/context/SidebarMenu.vue"; // 导入侧边菜单组件
 import HeaderComponent from "@/layout/context/HeaderComponent.vue"; // 导入头部组件
 import ContentArea from "@/layout/context/ContentArea.vue"; // 导入内容区域组件
@@ -12,25 +12,26 @@ const collapsed = ref(false);
 // 定义 isFixed 状态，表示菜单是否固定
 const isFixed = ref(false);
 // 使用 localStorage 存储当前选中的菜单项
-const selected = useStorage("selected", items[0]);
+const selected = useStorage("selected", routeItem[0]);
 // 存储当前选中菜单项的键
-const selectedKeys = ref<number[]>([selected.value && selected.value.key]);
+const selectedKeys = ref<number[]>([selected.value && selected.value.meta.key]);
 const router = useRouter(); // 获取 Vue Router 实例
 const tabsState = useTabsState(); // 获取标签页状态
 const refreshKey = ref(0); // 刷新键，用于触发内容区域的刷新
 
 // 跳转到选中的路由
 const pushRouter = (item) => {
+  
   // 如果 item 是数字，则获取对应的菜单项
   if (typeof item == "number") {
     item = tabsState.getKeyArr(item);
   }
-  selectedKeys.value = [item.key]; // 更新选中的菜单键
+  selectedKeys.value = [item.meta.key]; // 更新选中的菜单键
   selected.value = item; // 更新当前选中的菜单项
   tabsState.setKeyArr(item); // 更新标签页状态
 
   /* 实现脱离动画 */
-  if (item.component) router.push({ name: item.component }); // 路由跳转到对应的组件
+  if (item.name) router.push({ name: item.name }); // 路由跳转到对应的组件
 };
 
 // 处理响应式布局断点
@@ -49,8 +50,10 @@ onMounted(() => {
 
 // 监听路由变化，更新选中的菜单项
 watchEffect(() => {
-  selected.value = items.find((item) => item.component == router.currentRoute.value.name); // 查找当前路由对应的菜单项
-  if (selected.value) selectedKeys.value = [selected.value?.key];
+  selected.value = routeItem.find(
+    (item) => item.name == router.currentRoute.value.name
+  ); // 查找当前路由对应的菜单项
+  if (selected.value) selectedKeys.value = [selected.value?.meta.key];
   // 更新选中键
   else selectedKeys.value = []; // 如果没有选中项，则清空选中键
 });

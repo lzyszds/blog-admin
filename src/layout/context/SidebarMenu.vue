@@ -1,8 +1,10 @@
 <script setup lang="ts">
-import items from "../config";
+import routeItem from "@/router/config";
 const { isFixed, selectedKeys, collapsed } = inject<any>("paramsRef");
 
 const emit = defineEmits(["breakpoint", "push-router"]);
+
+let routeItems = routeItem.filter((item) => !item.meta.isHide);
 </script>
 
 <template>
@@ -15,21 +17,22 @@ const emit = defineEmits(["breakpoint", "push-router"]);
     :class="{ fixed: isFixed }"
     @breakpoint="emit('breakpoint', $event)"
   >
-    <div class="logo" @click="emit('push-router', items[0])">
+    <div class="logo" @click="emit('push-router', routeItems[0])">
       <h2>{{ collapsed ? "Jz" : "Jz 博客管理系统" }}</h2>
     </div>
 
     <AMenu v-model:selectedKeys="selectedKeys" mode="inline">
       <AMenu-item
-        v-for="item in items"
-        :key="item.key"
+        v-for="item in routeItems"
+        :key="item.meta.key"
         @click="emit('push-router', item)"
         class="menuitem"
       >
+        {{ item.meta.isHide }}
         <span class="anticon anticon-user">
-          <LzyIcon :name="item.uicon" style="font-weight: 600" />
+          <LzyIcon :name="item.meta.uicon" style="font-weight: 600" />
         </span>
-        <span class="menu-title-item">{{ item.name }}</span>
+        <span class="menu-title-item">{{ item.meta.name }}</span>
       </AMenu-item>
     </AMenu>
   </ALayoutSider>

@@ -1,5 +1,6 @@
 import { createRouter, createWebHashHistory, createWebHistory } from 'vue-router'
 import type { RouteRecordRaw } from 'vue-router'
+import routesChildren from './config'
 import NProgress from 'nprogress' // 进度条
 import 'nprogress/nprogress.css' // 引入样式
 import { App } from 'vue'
@@ -8,62 +9,7 @@ const routes: RouteRecordRaw[] = [
     path: '/',
     name: 'root',
     component: () => import('@/views/root/index.vue'),
-    children: [
-      {
-        path: '',
-        name: 'dashboard',
-        component: () => import('@/views/root/Dashboard.vue'),
-        meta: { icon: 'dashboard-icon', title: '首页数据' }
-      },
-      {
-        path: 'users',
-        name: 'users',
-        component: () => import('@/views/root/Users.vue'),
-        meta: { icon: 'user-icon', title: '用户管理' }
-      },
-      {
-        path: 'posts',
-        name: 'posts',
-        component: () => import('@/views/root/Posts.vue'),
-        meta: { icon: 'post-icon', title: '文章管理' }
-      },
-      {
-        path: 'comments',
-        name: 'comments',
-        component: () => import('@/views/root/Comments.vue'),
-        meta: { icon: 'comment-icon', title: '评论管理' }
-      },
-      {
-        path: 'categories',
-        name: 'categories',
-        component: () => import('@/views/root/Categories.vue'),
-        meta: { icon: 'category-icon', title: '分类管理' }
-      },
-      {
-        path: 'plantask',
-        name: 'plantask',
-        component: () => import('@/views/root/Plantask.vue'),
-        meta: { icon: 'task-icon', title: '任务队列' }
-      },
-      {
-        path: 'links',
-        name: 'links',
-        component: () => import('@/views/root/Links.vue'),
-        meta: { icon: 'link-icon', title: '友链管理' }
-      },
-      {
-        path: 'webset',
-        name: 'webset',
-        component: () => import('@/views/root/WebSet.vue'),
-        meta: { icon: 'computer-settings-icon', title: '网站设置' }
-      },
-      {
-        path: 'userCenter',
-        name: 'userCenter',
-        component: () => import('@/views/root/UserCenter.vue'),
-        meta: { icon: 'user-icon', title: '个人中心' }
-      }
-    ]
+    children: routesChildren
   },
   {
     path: '/login',
