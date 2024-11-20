@@ -2,6 +2,8 @@ import { defineStore } from 'pinia'
 import { getUserInfoToken } from '@/api/user'
 import { User } from '@/typings/User'
 import { useTabsState } from "@/store/useTabsStore";
+import routeItem from "@/router/config";
+
 const tabsState = useTabsState()
 
 export const useUserInfoState = defineStore('useUserInfoState', () => {
@@ -36,12 +38,7 @@ export const useUserInfoState = defineStore('useUserInfoState', () => {
 
   /* 前往个人中心 */
   const goToUserCenter = async () => {
-    tabsState.setKeyArr({
-      name: '个人中心',
-      component: 'userCenter',
-      uicon: 'ph:user-circle-gear',
-      key: 999
-    })
+    tabsState.setKeyArr(routeItem.find(item => item.name === 'userCenter')!)
     router.push({ name: 'userCenter' })
   }
 
