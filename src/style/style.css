@@ -13,7 +13,7 @@
   --darkColor: rgb(255, 255, 255, .8);
   --textcolor: #fe9600;
   --borderColor: #ffe14d;
-  --delColor: #dc143c;
+  --delColor: #ff4d4f;
   --article-cover: linear-gradient(180deg, hsla(0, 0%, 98%, 0) 0, hsla(0, 0%, 98%, .013) 8.1%, hsla(0, 0%, 98%, .049) 15.5%, hsla(0, 0%, 98%, .104) 22.5%, hsla(0, 0%, 98%, .175) 29%, hsla(0, 0%, 98%, .259) 35.3%, hsla(0, 0%, 98%, .352) 41.2%, hsla(0, 0%, 98%, .45) 47.1%, hsla(0, 0%, 98%, .55) 52.9%, hsla(0, 0%, 98%, .648) 58.8%, hsla(0, 0%, 98%, .741) 64.7%, hsla(0, 0%, 98%, .825) 71%, hsla(0, 0%, 98%, .896) 77.5%, hsla(0, 0%, 98%, .951) 84.5%, hsla(0, 0%, 98%, .987) 91.9%, #fff);
   --broRadius: 9px;
   --breakpoint-sm: 576px;

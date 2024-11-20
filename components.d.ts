@@ -7,6 +7,7 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    AAvatar: typeof import('ant-design-vue/es')['Avatar']
     ABreadcrumb: typeof import('ant-design-vue/es')['Breadcrumb']
     ABreadcrumbItem: typeof import('ant-design-vue/es')['BreadcrumbItem']
     AButton: typeof import('ant-design-vue/es')['Button']
@@ -26,6 +27,9 @@ declare module 'vue' {
     ALayoutContent: typeof import('ant-design-vue/es')['LayoutContent']
     ALayoutHeader: typeof import('ant-design-vue/es')['LayoutHeader']
     ALayoutSider: typeof import('ant-design-vue/es')['LayoutSider']
+    AList: typeof import('ant-design-vue/es')['List']
+    AListItem: typeof import('ant-design-vue/es')['ListItem']
+    AListItemMeta: typeof import('ant-design-vue/es')['ListItemMeta']
     AMenu: typeof import('ant-design-vue/es')['Menu']
     AMenuDivider: typeof import('ant-design-vue/es')['MenuDivider']
     AMenuItem: typeof import('ant-design-vue/es')['MenuItem']
@@ -42,6 +46,7 @@ declare module 'vue' {
     ATable: typeof import('ant-design-vue/es')['Table']
     ATabPane: typeof import('ant-design-vue/es')['TabPane']
     ATabs: typeof import('ant-design-vue/es')['Tabs']
+    ATag: typeof import('ant-design-vue/es')['Tag']
     ATextarea: typeof import('ant-design-vue/es')['Textarea']
     ATooltip: typeof import('ant-design-vue/es')['Tooltip']
     ATree: typeof import('ant-design-vue/es')['Tree']

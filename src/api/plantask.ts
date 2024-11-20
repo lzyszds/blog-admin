@@ -18,5 +18,13 @@ export const updateEmailTaskConfig = (data: object)=> {
   })
 }
 
+//获取所有任务
+export const getAllTask = ()=> {
+  return request({
+    url: "/plantask/tasks",
+    method: "get",
+  })
+}
+
 
 
