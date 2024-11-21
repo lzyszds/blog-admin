@@ -1,7 +1,7 @@
-
 /* 生成随机密码(难度指数 1-5) 函数 */
 export function randomPassword(difficulty: number) {
-  const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+  const chars =
+    "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
   let password = "";
 
   for (let i = 0; i < difficulty; i++) {
@@ -13,14 +13,14 @@ export function randomPassword(difficulty: number) {
 
 // 驼峰转下划线的函数
 function camelToSnake(key) {
-  return key.replace(/([A-Z])/g, '_$1').toLowerCase();
+  return key.replace(/([A-Z])/g, "_$1").toLowerCase();
 }
 
 // 递归处理 JSON 对象的函数，遍历所有键
 export function convertKeysToSnakeCase(obj) {
   if (Array.isArray(obj)) {
     return obj.map((item) => convertKeysToSnakeCase(item));
-  } else if (obj !== null && typeof obj === 'object') {
+  } else if (obj !== null && typeof obj === "object") {
     return Object.keys(obj).reduce((acc, key) => {
       const snakeKey = camelToSnake(key);
       acc[snakeKey] = convertKeysToSnakeCase(obj[key]);
@@ -38,7 +38,7 @@ export function convertKeysToSnakeCase(obj) {
  */
 export function toProxys(obj: any): any {
   // 如果obj不是对象，则直接返回
-  if (typeof obj !== 'object' || obj === null) {
+  if (typeof obj !== "object" || obj === null) {
     return obj;
   }
 
@@ -55,7 +55,7 @@ export function toProxys(obj: any): any {
       result[key] = [...value];
 
       // 如果键对应的值是对象
-    } else if (value && typeof value === 'object' && value !== null) {
+    } else if (value && typeof value === "object" && value !== null) {
       // 递归调用toProxys函数转换对象
       result[key] = toProxys(value);
 
@@ -78,41 +78,47 @@ export function toProxys(obj: any): any {
  * @param newResult 用来存储比较结果的空对象
  * @returns 比较结果对象，如果两个对象相等，则返回空对象，否则返回包含差异的键值对
  */
-export function isEqual(obj: object, other: object, keepNeededValue?: string[] | string, newResult: object = {}): any {
-  keepNeededValue = keepNeededValue || ''
+export function isEqual(
+  obj: object,
+  other: object,
+  keepNeededValue?: string[] | string,
+  newResult: object = {},
+): any {
+  keepNeededValue = keepNeededValue || "";
 
   // 遍历第一个对象的每个键
   for (const key in obj) {
     // 如果需要保留的值是字符串，转换为数组
-    if (typeof keepNeededValue === 'string') {
-      keepNeededValue = [keepNeededValue]
+    if (typeof keepNeededValue === "string") {
+      keepNeededValue = [keepNeededValue];
     }
     // 如果需要保留的值存在
     if (obj.hasOwnProperty(key) && keepNeededValue.includes(key)) {
-      newResult[key] = obj[key]
-      continue
+      newResult[key] = obj[key];
+      continue;
     }
 
     // 如果键对应的值是数组
     if (obj[key] instanceof Array && other[key] instanceof Array) {
       // 递归比较两个数组
-      newResult[key] = obj[key].filter((item, index) => item !== other[key][index])
+      newResult[key] = obj[key].filter(
+        (item, index) => item !== other[key][index],
+      );
       // 如果键对应的值是对象
     } else if (obj[key] instanceof Object && other[key] instanceof Object) {
       // 递归比较两个对象
-      newResult = isEqual(obj[key], other[key], keepNeededValue, newResult)
+      newResult = isEqual(obj[key], other[key], keepNeededValue, newResult);
 
       // 如果两个键对应的值不相等
     } else if (obj[key] !== other[key]) {
       // 将差异的键值对添加到结果对象中
-      newResult[key] = obj[key]
+      newResult[key] = obj[key];
     }
   }
 
   // 返回比较结果对象
-  return newResult
+  return newResult;
 }
-
 
 /**
  * 将base64编码的字符串转换为Blob对象
@@ -156,16 +162,18 @@ export function getBase64Binary(data, type) {
 }
 
 /**
- * 压缩图片 
+ * 压缩图片
  * @param file - 图片文件
  * @param quality - 压缩质量 0-1之间  值越小压缩的越大 图片质量越差
  * @returns Promise对象，包含base64格式的压缩图片和压缩后的文件对象
  */
-export function optimizeImage(file, quality): Promise<{ base64: string, fileCompress: Blob }> {
+export function optimizeImage(
+  file,
+  quality,
+): Promise<{ base64: string; fileCompress: Blob }> {
   return new Promise((resolve, reject) => {
-
     if (quality == 1) {
-      return resolve({ base64: "", fileCompress: file })
+      return resolve({ base64: "", fileCompress: file });
     } else {
       getBase64Binary(file, file.type).then((res: string) => {
         const canvas = document.createElement("canvas") as HTMLCanvasElement;
@@ -189,34 +197,38 @@ export function optimizeImage(file, quality): Promise<{ base64: string, fileComp
           img.onload = img.onerror = null;
           img.src = "";
           img = null;
-          reject(new Error('图片加载失败'));
+          reject(new Error("图片加载失败"));
         };
       });
     }
   });
 }
 
-
 /**
  * `setTimeAgoLocalMessages` 是一个包含本地化时间格式的对象，用于根据时间的过去或未来状态
  * 动态生成中文的“时间前”或“时间后”表达。
- * 
+ *
  * 该对象包含一个 `messages` 属性，定义了不同时间单位的本地化消息格式。
  * 可以用在显示“刚刚”、“几分钟前”、“几小时前”等时间提示的场景。
  */
 export const setTimeAgoLocalMessages = {
   messages: {
-    justNow: '刚刚',
-    past: n => (n.match(/\d/) ? `${n}前` : n),
-    future: n => (n.match(/\d/) ? `在${n}` : n),
-    month: (n, past) => (n === 1 ? (past ? '上个月' : '下个月') : `${n}月`),
-    year: (n, past) => (n === 1 ? (past ? '去年' : '明年') : `${n}年`),
-    day: (n, past) => (n === 1 ? (past ? '昨天' : '明天') : `${n}天`),
-    week: (n, past) => (n === 1 ? (past ? '上周' : '下周') : `${n}周`),
-    hour: n => `${n}小时`,
-    minute: n => `${n}分钟`,
-    second: n => `${n}秒`,
-    invalid: '',
-  }
-}
+    justNow: "刚刚",
+    past: (n) => (n.match(/\d/) ? `${n}前` : n),
+    future: (n) => (n.match(/\d/) ? `在${n}` : n),
+    month: (n, past) => (n === 1 ? (past ? "上个月" : "下个月") : `${n}月`),
+    year: (n, past) => (n === 1 ? (past ? "去年" : "明年") : `${n}年`),
+    day: (n, past) => (n === 1 ? (past ? "昨天" : "明天") : `${n}天`),
+    week: (n, past) => (n === 1 ? (past ? "上周" : "下周") : `${n}周`),
+    hour: (n) => `${n}小时`,
+    minute: (n) => `${n}分钟`,
+    second: (n) => `${n}秒`,
+    invalid: "",
+  },
+};
 
+//移除内联样式
+export function removeInlineStyles(htmlString) {
+  if (!htmlString) return "";
+  return htmlString.replace(/<style[^>]*>[\s\S]*?<\/style>/gi, "");
+}

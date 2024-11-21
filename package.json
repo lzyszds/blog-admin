@@ -36,6 +36,7 @@
     "pinia-plugin-persistedstate": "^4.1.2",
     "postcss": "^8.4.47",
     "qs": "^6.13.0",
+    "swiper": "^11.1.15",
     "unplugin-auto-import": "^0.18.3",
     "vue": "^3.5.12",
     "vue-draggable-plus": "^0.5.6",

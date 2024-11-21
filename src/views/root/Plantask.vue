@@ -1,163 +1,334 @@
 <script setup lang="ts">
-import { getAllTask, runTask, updateTask } from "@/api/plantask.ts";
-import { useDateFormat } from "@vueuse/shared";
+import {
+  deleteTask,
+  disableTask,
+  enableTask,
+  getAllTask,
+  getTaskLog,
+  runTask,
+  updateTask,
+} from "@/api/plantask.ts";
 import LzyIcon from "@/components/LzyIcon.vue";
+import { message, Modal } from "ant-design-vue";
+import { MenuData, Task, TaskLog } from "@/typings/Plantask.ts";
+import { useRefMoreUsage } from "@/hook/useRefMoreUsage.ts";
+import TaskCard from "@/components/TaskCard.vue";
+import { ExclamationCircleOutlined } from "@ant-design/icons-vue";
+import { createVNode } from "vue";
+import { useDateFormat } from "@vueuse/shared";
+import { Swiper, SwiperSlide } from "swiper/vue";
+import "swiper/css";
+import { removeInlineStyles } from "@/utils/comment.ts";
 
-const taskData = await getAllTask();
+const { width } = useWindowSize();
+const taskData = ref<any>([]);
 
-updateTask({
-  taskId: "b4698f2e-464d-48da-bb6e-86de8660867c",
-  name: "每日爱心邮件",
-  type: "sendEmailLove",
-  cron_expression: "0 58 0 * * *",
-  params_body: JSON.stringify({
-    planTime: "0 59 23 * * *",
-    subject: "爱你哦宝贝，快来看看今天的内容",
-    toEmail: "lzyszds@qq.com",
-    content:
-      "请帮我写一封情书，使用 HTML 格式，内容以古代情诗为主题，收信人是静怡妹妹，发信人是爱你的 lzy。请只输出完整的情书 HTML 结构，不需要任何解释或附加说明。",
-    aiKey: "sk-ybmwpaxbqfwvgaynwwsbyiohifxrtbqkottuwzdrnztrvgcq",
-    openAiBaseUrl: "https://api.siliconflow.cn/v1",
-    model: "Qwen/Qwen2-7B-Instruct",
-    describe: `为什么要在每天的晚上23点59分钟发送情书呢？因为我第二天你第一个想到的永远是我! <p style="text-align:right">-----爱你的lzy</p>`,
-  }),
+//获取任务列表
+const getTaskDatat = async () => {
+  const { data } = await getAllTask();
+  taskData.value = [...data, {}];
+};
+getTaskDatat();
+
+//所有指令栈
+const stackInstruction = ref({});
+
+//编辑任务抽屉
+const editTaskDrawer = ref(false);
+
+//查看日志
+const logModal = ref({
+  open: false,
+  data: [] as TaskLog[],
+  taskName: "",
+  page: 1,
+  title: "",
 });
 
-//立即执行
-const immediateExecution = (id: number) => {
-  runTask(id);
-};
-
-//启动任务
-const startTask = (id: number) => {};
-
-//停止任务
-const stopTask = (id: number) => {};
+//当前编辑的任务
+const { data: currentEditTask } = useRefMoreUsage<Ref<Task>>({
+  id: "",
+  name: "",
+  type: "",
+  cronExpression: "",
+  paramsBody: "",
+  createdAt: "",
+  updatedAt: "",
+  lastExecutedAt: "",
+  isEnabled: 0,
+});
 
 //新增任务
 const addTask = () => {};
-//删除任务
-const deleteTask = (id: number) => {};
 
-// 编辑任务
-const editTask = (id: number) => {};
+const menuData = (item: Task): MenuData[] => [
+  {
+    key: "1",
+    name: item.isEnabled == 0 ? "启用任务" : "暂停任务",
+    icon:
+      item.isEnabled == 0
+        ? "material-symbols:motion-play-outline"
+        : "material-symbols:motion-photos-paused-outline",
+    click: async () => {
+      Modal.confirm({
+        title: item.isEnabled == 0 ? "启用任务" : "暂停任务",
+        icon: createVNode(ExclamationCircleOutlined),
+        content:
+          "你确定要" + (item.isEnabled == 0 ? "启用" : "暂停") + "该任务吗?",
+        onOk: async () => {
+          const result =
+            item.isEnabled == 0
+              ? await enableTask(item.id)
+              : await disableTask(item.id);
+          if (result.code === 200) {
+            message.success("操作成功");
+            //重新获取任务列表
+            await getTaskDatat();
+          }
+        },
+      });
+    },
+  },
+  {
+    key: "2",
+    name: "立即执行",
+    icon: "material-symbols:not-started-outline",
+    click: async () => {
+      const { id } = item;
+      if (stackInstruction.value[id]) {
+        message.warning("任务正在执行中，请稍后再试");
+        return;
+      }
+      stackInstruction.value[id] = true;
+      try {
+        const result = await runTask(id);
+        message.success(result.data);
+      } catch (error) {}
+      stackInstruction.value[id] = false;
+    },
+  },
+  {
+    key: "3",
+    name: "编辑任务",
+    icon: "material-symbols:edit-calendar",
+    click: async () => {
+      editTaskDrawer.value = true;
+      try {
+        item.paramsBody = JSON.parse(item.paramsBody!);
+      } catch (e) {}
+      currentEditTask.value = item;
+    },
+  },
+  {
+    key: "4",
+    name: "删除任务",
+    icon: "material-symbols:auto-delete-outline",
+    click: async () => {
+      Modal.confirm({
+        title: "删除任务",
+        icon: createVNode(ExclamationCircleOutlined),
+        content: "你确定要删除该任务吗?",
+        onOk: async () => {
+          const result = await deleteTask(item.id);
+          if (result.code === 200) {
+            message.success("删除成功");
+            //重新获取任务列表
+            await getTaskDatat();
+          }
+        },
+      });
+    },
+  },
+  {
+    key: "5",
+    name: "查看日志",
+    icon: "material-symbols:preview",
+    click: async () => {
+      let { data } = await getTaskLog(item.id);
+      if(data.length === 0) {
+        message.warning("暂无日志");
+        return;
+      }
+      data.forEach((item) => {
+        if (!item.content) item.content = "暂无日志";
+        else item.content = removeInlineStyles(item.content);
+      });
+      logModal.value = {
+        open: true,
+        data: data,
+        taskName: item.name,
+        page: 1,
+        title: item.name + "的历史日志" + "（共" + data.length + "条）",
+      };
+    },
+  },
+];
 
-//查看日志
-const viewLog = (id: number) => {};
+//保存编辑
+const saveEdit = async () => {
+  try {
+    const taskData = { ...currentEditTask.value };
+    taskData.paramsBody = JSON.stringify(taskData.paramsBody);
+    const result = await updateTask(taskData);
+    if (result.code === 200) {
+      message.success("修改成功");
+    }
+    editTaskDrawer.value = false;
+    //重新获取任务列表
+    await getTaskDatat();
+  } catch (error) {}
+};
 
-//右键菜单点击事件
-const onMenuClick = (key: string, item: any) => {
-  switch (key) {
-    case "1":
-      startTask(item.id);
-      break;
-    case "2":
-      immediateExecution(item.id);
-      break;
-    case "3":
-      editTask(item.id);
-      break;
-    case "4":
-      deleteTask(item.id);
-      break;
-    case "5":
-      viewLog(item.id);
-  }
+const onSwiper = (swiper) => {
+  console.log(swiper)
+};
+
+const onSlideChange = (swiper: any) => {
+  logModal.value.page = swiper.activeIndex + 1;
 };
 </script>
 
 <template>
-  <a-list
-    :grid="{ gutter: 10, xs: 1, sm: 1, md: 2, lg: 2, xl: 3, xxl: 4 }"
-    :data-source="[...taskData.data, {}]"
-  >
-    <template #renderItem="{ item }">
-      <a-dropdown :trigger="['contextmenu']" v-if="item.id">
-        <a-list-item>
-          <a-card>
-            <h2>{{ item.name }}</h2>
-            <p><span>执行服务：</span>{{ item.type }}()</p>
-            <p><span>计划执行：</span>{{ item.cronExpression }}</p>
-            <p>
-              <span> 上次执行：</span>
-              {{
-                item.lastExecutedAt
-                  ? useDateFormat(item.lastExecutedAt, "YYYY-MM-DD HH:mm:ss")
-                  : "暂无"
-              }}
-            </p>
-            <p>
-              <span> 创建时间：</span>
-              {{ useDateFormat(item.createdAt, "YYYY-MM-DD HH:mm:ss") }}
-            </p>
-            <p>
-              <span> 更新时间：</span>
-              {{ useDateFormat(item.updatedAt, "YYYY-MM-DD HH:mm:ss") }}
-            </p>
-            <a-divider />
-
-            <div class="bottom">
-              <section>
-                <ATag color="#dc143c" style="color: #fff">已暂停</ATag>
-                <a-divider type="vertical" />
-                <LzyIcon
-                  size="20"
-                  name="solar:stopwatch-play-broken"
-                  style="color: #dc143c"
-                />
-              </section>
-              <section>
-                <AButton type="text">
-                  <LzyIcon name="material-symbols:edit-calendar" size="20" />
-                </AButton>
-                <AButton type="text">
-                  <LzyIcon name="material-symbols:auto-delete-outline" size="20" />
-                </AButton>
-              </section>
-            </div>
+  <div>
+    <a-list
+      :grid="{ gutter: 10, xs: 1, sm: 1, md: 2, lg: 2, xl: 3, xxl: 4 }"
+      :data-source="taskData"
+    >
+      <template #renderItem="{ item }">
+        <a-dropdown :trigger="['contextmenu']" v-if="item.id">
+          <a-list-item>
+            <a-spin :spinning="!!stackInstruction[item.id]">
+              <TaskCard :item="item" :menuData="menuData" />
+            </a-spin>
+          </a-list-item>
+          <template #overlay>
+            <a-menu>
+              <a-menu-item
+                v-for="menu in menuData(item)"
+                :key="menu.key"
+                :disabled="stackInstruction[item.id]"
+                @click="menu.click"
+              >
+                <LzyIcon :name="menu.icon" />
+                <span>{{ menu.name }}</span>
+              </a-menu-item>
+            </a-menu>
+          </template>
+        </a-dropdown>
+        <a-list-item v-else>
+          <a-card class="add-new">
+            <a-button type="dashed">
+              <LzyIcon size="70" name="iconoir:plus" />
+              <span>添加计划任务</span>
+            </a-button>
           </a-card>
         </a-list-item>
-        <template #overlay>
-          <a-menu @click="({ key }) => onMenuClick(key, item)">
-            <a-menu-item key="1">
-              <LzyIcon
-                :name="
-                  item.isEnabled != 0
-                    ? 'material-symbols:motion-photos-paused-outline'
-                    : 'material-symbols:motion-play-outline'
-                "
-              />
-              {{ item.isEnabled == 0 ? "启用任务" : "暂停任务" }}
-            </a-menu-item>
-            <a-menu-item key="2">
-              <LzyIcon name="material-symbols:not-started-outline" />
-              立即执行
-            </a-menu-item>
-            <a-menu-item key="3">
-              <LzyIcon name="material-symbols:edit-calendar" />
-              编辑任务
-            </a-menu-item>
-            <a-menu-item key="4">
-              <LzyIcon name="material-symbols:auto-delete-outline" />
-              删除任务
-            </a-menu-item>
-            <a-menu-item key="5">
-              <LzyIcon name="material-symbols:preview" />
-              查看日志
-            </a-menu-item>
-          </a-menu>
-        </template>
-      </a-dropdown>
-      <a-list-item v-else>
-        <a-card class="add-new">
-          <a-button type="dashed">
-            <LzyIcon size="70" name="iconoir:plus" />
-            <span>添加计划任务</span>
-          </a-button>
-        </a-card>
-      </a-list-item>
-    </template>
-  </a-list>
+      </template>
+    </a-list>
+    <a-drawer
+      v-model:open="editTaskDrawer"
+      class="custom-class"
+      root-class-name="root-class-name"
+      title="编辑任务"
+      placement="right"
+      :width="width < 960 ? '100%' : '50%'"
+    >
+      <template #extra>
+        <a-button type="primary" @click="saveEdit">保存修改</a-button>
+      </template>
+      <a-form
+        ref="formRef"
+        :model="currentEditTask"
+        :wrapper-col="{ span: 20 }"
+        :label-col="{ span: 6 }"
+        style="width: 100%"
+      >
+        <a-form-item ref="name" label="任务名" name="name">
+          <a-input v-model:value="currentEditTask.name" />
+        </a-form-item>
+        <a-form-item label="任务函数" name="type">
+          <a-select v-model:value="currentEditTask.type">
+            <a-select-option value="sendEmailLove">
+              sendEmailLove
+            </a-select-option>
+            <a-select-option value="sendEmailWarn">
+              sendEmailWarn
+            </a-select-option>
+          </a-select>
+        </a-form-item>
+        <a-form-item label="计划执行时间" required name="cronExpression">
+          <a-input v-model:value="currentEditTask.cronExpression" />
+        </a-form-item>
+
+        <a-form-item
+          v-for="(_item, key) in currentEditTask.paramsBody"
+          :label="key"
+          :name="key"
+        >
+          <AInput
+            v-model:value="currentEditTask.paramsBody![key]"
+            v-if="_item.length < 80"
+          />
+          <ATextarea
+            v-model:value="currentEditTask.paramsBody![key]"
+            v-else
+            :auto-size="{ minRows: 2, maxRows: 5 }"
+          />
+        </a-form-item>
+      </a-form>
+    </a-drawer>
+
+    <!-- 日志 -->
+    <a-modal
+      v-model:open="logModal.open"
+      :title="logModal.title"
+      class="logModal"
+      width="90%"
+      style="max-height: 90%"
+    >
+      <ACard
+        style="height: 68vh"
+        :body-style="{
+          height: 'calc(100% - 50px)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: '20px',
+        }"
+      >
+        <LzyIcon name="iconoir:nav-arrow-left" size="30" />
+        <swiper
+          class="mySwiper"
+          style="flex: 1 1 0"
+          @Swiper="onSwiper"
+          @slideChange="onSlideChange"
+          v-if="logModal.open"
+        >
+          <swiper-slide v-for="item in logModal.data">
+            <main class="html-container">
+              <section v-html="item.content"></section>
+            </main>
+          </swiper-slide>
+        </swiper>
+        <!--        v-html="logModal.data[logModal.page - 1]?.content" -->
+        <LzyIcon name="iconoir:nav-arrow-right" size="30" />
+      </ACard>
+      <template #footer>
+        <div style="display: flex; justify-content: space-between">
+          <span> ID：{{ logModal.data[logModal.page - 1].id }} </span>
+          <span>
+            执行时间：
+            {{
+              useDateFormat(
+                logModal.data[logModal.page - 1].executedAt,
+                "YYYY-MM-DD HH:mm:ss",
+              )
+            }}
+          </span>
+        </div>
+      </template>
+    </a-modal>
+  </div>
 </template>
 
 <style scoped>
@@ -195,6 +366,11 @@ const onMenuClick = (key: string, item: any) => {
     display: flex;
     align-items: center;
     justify-content: space-between;
+
+    section {
+      display: flex;
+      align-items: center;
+    }
   }
 
   /*分割线*/
@@ -236,6 +412,19 @@ const onMenuClick = (key: string, item: any) => {
 
     .LzyIcon {
       font-size: 18px;
+    }
+  }
+}
+
+.mySwiper {
+  user-select: none;
+
+  main.html-container {
+    height: 60vh;
+    overflow: auto;
+    margin-top: 30px;
+
+    section {
     }
   }
 }
