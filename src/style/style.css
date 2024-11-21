@@ -2,6 +2,7 @@
 @import url('./loading.css');
 @import url('./transition.css');
 @import url('./antDesign.css');
+@import url('./swiper.css');
 
 :root {
   --themeColor: rgb(81, 97, 206);
