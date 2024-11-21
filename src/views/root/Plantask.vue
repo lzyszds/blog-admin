@@ -17,7 +17,7 @@ import { ExclamationCircleOutlined } from "@ant-design/icons-vue";
 import { createVNode } from "vue";
 import { useDateFormat } from "@vueuse/shared";
 import { Swiper, SwiperSlide } from "swiper/vue";
-import "swiper/css";
+
 import { removeInlineStyles } from "@/utils/comment.ts";
 
 const { width } = useWindowSize();
@@ -59,7 +59,7 @@ const { data: currentEditTask } = useRefMoreUsage<Ref<Task>>({
 });
 
 //新增任务
-const addTask = () => {};
+// const addTask = () => {};
 
 const menuData = (item: Task): MenuData[] => [
   {

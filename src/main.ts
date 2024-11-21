@@ -1,6 +1,6 @@
 import { createApp } from 'vue'
 import "@fancyapps/ui/dist/fancybox/fancybox.css";
-
+import "swiper/css";
 import App from './App.vue'
 
 import { setupRouter } from './router'
