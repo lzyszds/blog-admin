@@ -1,9 +1,69 @@
 <script setup lang="ts">
-import { getAllTask } from "@/api/plantask.ts";
+import { getAllTask, runTask, updateTask } from "@/api/plantask.ts";
 import { useDateFormat } from "@vueuse/shared";
 import LzyIcon from "@/components/LzyIcon.vue";
 
 const taskData = await getAllTask();
+
+updateTask({
+  taskId: "b4698f2e-464d-48da-bb6e-86de8660867c",
+  name: "每日爱心邮件",
+  type: "sendEmailLove",
+  cron_expression: "0 58 0 * * *",
+  params_body: JSON.stringify({
+    planTime: "0 59 23 * * *",
+    subject: "爱你哦宝贝，快来看看今天的内容",
+    toEmail: "lzyszds@qq.com",
+    content:
+      "请帮我写一封情书，使用 HTML 格式，内容以古代情诗为主题，收信人是静怡妹妹，发信人是爱你的 lzy。请只输出完整的情书 HTML 结构，不需要任何解释或附加说明。",
+    aiKey: "sk-ybmwpaxbqfwvgaynwwsbyiohifxrtbqkottuwzdrnztrvgcq",
+    openAiBaseUrl: "https://api.siliconflow.cn/v1",
+    model: "Qwen/Qwen2-7B-Instruct",
+    describe: `为什么要在每天的晚上23点59分钟发送情书呢？因为我第二天你第一个想到的永远是我! <p style="text-align:right">-----爱你的lzy</p>`,
+  }),
+});
+
+//立即执行
+const immediateExecution = (id: number) => {
+  runTask(id);
+};
+
+//启动任务
+const startTask = (id: number) => {};
+
+//停止任务
+const stopTask = (id: number) => {};
+
+//新增任务
+const addTask = () => {};
+//删除任务
+const deleteTask = (id: number) => {};
+
+// 编辑任务
+const editTask = (id: number) => {};
+
+//查看日志
+const viewLog = (id: number) => {};
+
+//右键菜单点击事件
+const onMenuClick = (key: string, item: any) => {
+  switch (key) {
+    case "1":
+      startTask(item.id);
+      break;
+    case "2":
+      immediateExecution(item.id);
+      break;
+    case "3":
+      editTask(item.id);
+      break;
+    case "4":
+      deleteTask(item.id);
+      break;
+    case "5":
+      viewLog(item.id);
+  }
+};
 </script>
 
 <template>
@@ -58,7 +118,7 @@ const taskData = await getAllTask();
           </a-card>
         </a-list-item>
         <template #overlay>
-          <a-menu>
+          <a-menu @click="({ key }) => onMenuClick(key, item)">
             <a-menu-item key="1">
               <LzyIcon
                 :name="
@@ -121,7 +181,6 @@ const taskData = await getAllTask();
     text-wrap: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-
   }
 
   p {
