@@ -2,12 +2,14 @@
 import { login } from "@/api/user";
 import { useRouter } from "vue-router";
 import { useRequest } from "@/hook/useRequest";
+import { TokenService } from "@/hook/useTokenService";
 
 // const baseURL = import.meta.env.VITE_BASE_URL;
 const isTransition = ref(false);
 const router = useRouter();
 //进入页面先判断是否登陆着,localStorage.getItem('token')是登陆时候存的token
-if (localStorage.getItem("lzy_token")) {
+
+if (TokenService.isAuthenticated()) {
   //路由重定向
   router.replace("/");
 }
@@ -16,7 +18,7 @@ const { loading, throttledRequest } = useRequest(
   login,
   {
     success: (data) => {
-      localStorage.setItem("lzy_token", data);
+      TokenService.setToken(data);
       router.replace("/");
     },
   },
@@ -271,7 +273,7 @@ onMounted(() => {
         .item {
           padding: 0;
           align-items: baseline;
-          button{
+          button {
             width: 100%;
           }
         }

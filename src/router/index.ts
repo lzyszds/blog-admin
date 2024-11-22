@@ -4,6 +4,7 @@ import routesChildren from './config'
 import NProgress from 'nprogress' // 进度条
 import 'nprogress/nprogress.css' // 引入样式
 import { App } from 'vue'
+import { TokenService } from '@/hook/useTokenService'
 const routes: RouteRecordRaw[] = [
   {
     path: '/',
@@ -44,7 +45,7 @@ NProgress.configure({ easing: 'ease', speed: 1000, showSpinner: false })
 router.beforeEach((_to, _from, next) => {
   NProgress.start()
   /* 登陆验证 */
-  if (!localStorage.getItem('lzy_token')) {
+  if (!TokenService.isAuthenticated()) {
     if (_to.path !== '/login') {
       next('/login')
     } else {

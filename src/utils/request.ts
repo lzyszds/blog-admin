@@ -2,6 +2,9 @@ import { message } from "ant-design-vue";
 import router from "@/router";
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios";
 import { merge } from "lodash";
+import { TokenService } from "@/hook/useTokenService";
+
+
 
 interface AxiosConfig extends AxiosRequestConfig {
   baseURL?: string;
@@ -31,7 +34,6 @@ export default function makeRequest<T = any>({
       timeout: 30 * 1000,
       headers: {
         "Content-Type": "application/json",
-        Authorization: localStorage.getItem("lzy_token") || "",
         "x-real-ip": import.meta.env.VITE_IP_ADDRESS,
       },
       withCredentials: true, // 重要：允许发送 cookies 和 HTTP 认证
@@ -89,7 +91,7 @@ export default function makeRequest<T = any>({
       if (err.status === 401) {
         // 处理 token 失效的情况
         msg = "登录状态已过期，请重新登录";
-        localStorage.removeItem("lzy_token");
+        TokenService.removeToken();
         router.push("/login");
       } else {
         // 处理请求失败的情况

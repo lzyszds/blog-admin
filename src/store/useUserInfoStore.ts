@@ -3,6 +3,7 @@ import { getUserInfoToken } from '@/api/user'
 import { User } from '@/typings/User'
 import { useTabsState } from "@/store/useTabsStore";
 import routeItem from "@/router/config";
+import { TokenService } from '@/hook/useTokenService';
 
 const tabsState = useTabsState()
 
@@ -32,7 +33,7 @@ export const useUserInfoState = defineStore('useUserInfoState', () => {
 
   /* 退出登录 */
   const logout = async () => {
-    localStorage.removeItem('lzy_token')
+    TokenService.removeToken()
     router.push('/login')
   }
 
