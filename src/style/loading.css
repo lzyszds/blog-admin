@@ -141,7 +141,16 @@
     border: 1px solid var(--themeColor);
   }
 
-
+  .destroyStore {
+    background-color: var(--themeColor);
+    padding: 5px 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    color: #fff;
+    margin-top: 10px;
+    user-select: none;
+    display: none;
+  }
 }
 
 
