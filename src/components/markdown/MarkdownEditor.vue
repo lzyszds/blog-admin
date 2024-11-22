@@ -5,7 +5,6 @@ import { handleKeyDown } from "./utils/keydown";
 import { useEditor } from "@/hook/useEditor";
 import { useEditorStore } from "@/store/useEditorStore";
 
-const previewPaneRef = templateRef("previewPaneRef");
 
 // Markdown输入内容的模型定义
 const markdownInput = defineModel({
@@ -94,7 +93,6 @@ const updateImage = (...arg) => {
 // 键盘快捷键的初始化和处理
 onMounted(() => {
   saveHistory();
-  console.log(previewPaneRef.value);
 });
 const editorParams = {
   ref: markdownEditorRef, // 绑定编辑器元素
