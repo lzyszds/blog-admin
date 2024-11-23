@@ -1,10 +1,9 @@
 <script setup lang="ts">
 import { login } from "@/api/user";
-import { useRouter } from "vue-router";
 import { useRequest } from "@/hook/useRequest";
 import { TokenService } from "@/hook/useTokenService"; // const baseURL = import.meta.env.VITE_BASE_URL;
 
-// const baseURL = import.meta.env.VITE_BASE_URL;
+const imageBaseURL = import.meta.env.VITE_PICTURE_BED_IMAGE_PROXY;
 const isTransition = ref(false);
 const router = useRouter();
 //进入页面先判断是否登陆着,localStorage.getItem('token')是登陆时候存的token
@@ -104,7 +103,9 @@ onMounted(() => {
         </div>
         <div class="illustartion">
           <img
-            src="https://inews.gtimg.com/om_bt/O-ZPA__Gg5S9ju7bNWAXyhcyFsLLFYjvlekUK7YYm9f8AAA"
+            :src="
+              imageBaseURL + '/O-ZPA__Gg5S9ju7bNWAXyhcyFsLLFYjvlekUK7YYm9f8AAA'
+            "
             alt="logo"
           />
         </div>
@@ -135,7 +136,7 @@ onMounted(() => {
     width: 45vw;
     height: 45vw;
     border-radius: 50%;
-    background: url("https://inews.gtimg.com/om_bt/OT1RprU1MQX5TKg7gwZAQsbCk8T6K5xafdjbGxzYgsoJ8AA/641")
+    background: url("/pictureBedImage/OT1RprU1MQX5TKg7gwZAQsbCk8T6K5xafdjbGxzYgsoJ8AA")
       no-repeat center;
     background-size: 120%;
     border: 5px solid #000;
