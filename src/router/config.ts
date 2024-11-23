@@ -116,11 +116,22 @@ const routeItem: RouteItem[] = [
     },
   },
   {
+    path: "resources",
+    name: "resources",
+    component: () => import("@/views/root/Resources.vue"),
+    meta: {
+      key: 10,
+      name: "资源管理",
+      uicon: "iconoir:media-image-folder",
+      component: "resources",
+    },
+  },
+  {
     path: "sysLogs",
     name: "sysLogs",
     component: () => import("@/views/root/SysLogs.vue"),
     meta: {
-      key: 10,
+      key: 11,
       name: "系统日志",
       uicon: "iconoir:calendar",
       component: "sysLogs",

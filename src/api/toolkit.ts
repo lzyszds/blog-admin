@@ -17,5 +17,22 @@ export const getWeather = ()=> {
   });
 }
 
+//获取已存进图库中的图片
+export const getPictureBedImageList = ()=> {
+  return request({
+    url: "/toolkit/getPictureBedImageList",
+    method: "get",
+  });
+}
+
+//将图片上传至图库
+export const uploadImageToPictureBed = (data: any)=> {
+  return request({
+    url: "/toolkit/uploadImageToPictureBed",
+    method: "post",
+    data
+  });
+}
+
 
 

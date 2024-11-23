@@ -2,7 +2,7 @@
 import { login } from "@/api/user";
 import { useRouter } from "vue-router";
 import { useRequest } from "@/hook/useRequest";
-import { TokenService } from "@/hook/useTokenService";
+import { TokenService } from "@/hook/useTokenService"; // const baseURL = import.meta.env.VITE_BASE_URL;
 
 // const baseURL = import.meta.env.VITE_BASE_URL;
 const isTransition = ref(false);
@@ -18,11 +18,12 @@ const { loading, throttledRequest } = useRequest(
   login,
   {
     success: (data) => {
+      console.log(data);
       TokenService.setToken(data);
       router.replace("/");
     },
   },
-  500
+  500,
 );
 
 // 账号密码数据，用于提交
@@ -84,7 +85,9 @@ onMounted(() => {
             </AFormItem>
 
             <AFormItem name="remember">
-              <ACheckbox v-model:checked="ruleForm.remember">记住密码</ACheckbox>
+              <ACheckbox v-model:checked="ruleForm.remember"
+                >记住密码
+              </ACheckbox>
             </AFormItem>
 
             <AFormItem>
@@ -100,7 +103,10 @@ onMounted(() => {
           </AForm>
         </div>
         <div class="illustartion">
-          <img src="/loginCover.png" alt="logo" />
+          <img
+            src="https://inews.gtimg.com/om_bt/O-ZPA__Gg5S9ju7bNWAXyhcyFsLLFYjvlekUK7YYm9f8AAA"
+            alt="logo"
+          />
         </div>
       </div>
     </Transition>
@@ -129,7 +135,8 @@ onMounted(() => {
     width: 45vw;
     height: 45vw;
     border-radius: 50%;
-    background: url("/moon.png") no-repeat center;
+    background: url("https://inews.gtimg.com/om_bt/OT1RprU1MQX5TKg7gwZAQsbCk8T6K5xafdjbGxzYgsoJ8AA/641")
+      no-repeat center;
     background-size: 120%;
     border: 5px solid #000;
     z-index: -1;
@@ -153,7 +160,8 @@ onMounted(() => {
     border: 10px solid #000;
 
     &:focus-within {
-      box-shadow: 0 10px 10px rgba(0, 0, 0, 0.1),
+      box-shadow:
+        0 10px 10px rgba(0, 0, 0, 0.1),
         0px -30px 4px -10px rgba(255, 255, 255, 0.3),
         0px -60px 4px -20px rgba(255, 255, 255, 0.2),
         0px -90px 4px -30px rgba(255, 255, 255, 0.1);
@@ -232,6 +240,7 @@ onMounted(() => {
 
         :deep(.ant-form-item-control-input) {
           width: 150%;
+
           input {
             font-family: "dindin";
           }
@@ -250,9 +259,11 @@ onMounted(() => {
 .router-enter-active {
   transition: 0.15s;
 }
+
 .router-leave-active {
   transition: 0.3s;
 }
+
 .router-enter-from {
   transform: scale(1.2);
 }
@@ -266,13 +277,16 @@ onMounted(() => {
     .login {
       .card {
         grid-template-columns: 1fr;
+
         .title {
           margin: 15px;
           text-align: center;
         }
+
         .item {
           padding: 0;
           align-items: baseline;
+
           button {
             width: 100%;
           }
@@ -281,6 +295,7 @@ onMounted(() => {
         :deep(.ant-form-item-control-input) {
           width: 100%;
         }
+
         :deep(.ant-form-item-control) {
           max-width: 100%;
         }
