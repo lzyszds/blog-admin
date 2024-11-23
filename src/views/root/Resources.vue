@@ -17,6 +17,7 @@ const handleChange = (info: UploadChangeParam) => {
   uploading.value = info.file.status === "uploading";
   if (info.file.status === "done") {
     message.success(`${info.file.name} 文件上传成功`);
+    getImageList();
   } else if (info.file.status === "error") {
     message.error(`${info.file.name} 文件上传失败。`);
   }
@@ -30,42 +31,100 @@ const getImageList = async () => {
   imageList.value = data;
 };
 getImageList();
+
+// 预览图片
+const reserveSeat = ref({
+  visible: false,
+  url: "",
+});
+
+// 设置预览图片的显示状态
+const setVisible = (value): void => {
+  reserveSeat.value.visible = value;
+};
+
+// 打开图片
+const openImage = (item: PictureBedType) => {
+  reserveSeat.value.url = item.url;
+  reserveSeat.value.visible = true;
+};
+
+// 右键菜单点击事件
+const onClick = (item: PictureBedType, { key, domEvent }) => {
+  console.log(key, domEvent);
+  if (key == 1) {
+    openImage(item);
+  } else if (key == 2) {
+    console.log("删除图片");
+  } else if (key == 3) {
+    console.log("复制图片地址");
+  }
+};
 </script>
 
 <template>
-  <ACard class="resources">
-    <a-upload-dragger
-      :action="BASE_URL + '/api/toolkit/uploadImageToPictureBed'"
-      name="upload-image"
-      withCredentials
-      :showUploadList="false"
-      :multiple="true"
-      @change="handleChange"
-      @drop="handleDrop"
-      :disabled="uploading"
+  <div style="height: 100%">
+    <ACard
+      class="resources"
+      :body-style="{
+        height: '100%',
+        display: 'grid',
+        gridTemplateRows: '0 0 auto 1fr 0',
+        gap: '10px',
+      }"
     >
-      <p class="ant-upload-drag-icon">
-        <LzyIcon v-if="!uploading" size="50" name="hugeicons:image-01" />
-        <template v-else>
-          <LzyIcon size="50" name="line-md:uploading-loop" />
-          <span>上传中...</span>
-        </template>
-      </p>
-      <p class="ant-upload-text">单击或拖动文件到此区域进行上传</p>
-      <p class="ant-upload-hint">
-        支持单次或批量上传。严禁上传 公司数据或其他频段文件
-      </p>
-    </a-upload-dragger>
-
-    <div class="preview">
       <a-image
-        height="180px"
-        v-for="item in imageList"
-        :src="item.url"
-        class="preview-item"
+        :style="{ display: 'none' }"
+        :preview="{
+          visible: reserveSeat.visible,
+          onVisibleChange: setVisible,
+        }"
+        :src="reserveSeat.url"
       />
-    </div>
-  </ACard>
+      <a-upload-dragger
+        :action="BASE_URL + '/api/toolkit/uploadImageToPictureBed'"
+        name="upload-image"
+        withCredentials
+        :showUploadList="false"
+        :multiple="true"
+        @change="handleChange"
+        @drop="handleDrop"
+        :disabled="uploading"
+      >
+        <p class="ant-upload-drag-icon">
+          <LzyIcon v-if="!uploading" size="50" name="hugeicons:image-01" />
+          <template v-else>
+            <LzyIcon size="50" name="line-md:uploading-loop" />
+            <span>上传中...</span>
+          </template>
+        </p>
+        <p class="ant-upload-text">单击或拖动文件到此区域进行上传</p>
+        <p class="ant-upload-hint">
+          支持单次或批量上传。严禁上传 公司数据或其他频段文件
+        </p>
+      </a-upload-dragger>
+
+      <div class="preview">
+        <a-dropdown :trigger="['contextmenu']" v-for="item in imageList">
+          <img
+            height="180px"
+            :src="item.url"
+            class="preview-item"
+            onerror="this.src='error.png'"
+            @click="openImage(item)"
+            alt="右键操作图片"
+          />
+          <template #overlay>
+            <a-menu @click="(arg) => onClick(item, arg)">
+              <a-menu-item key="1">打开预览</a-menu-item>
+              <a-menu-item key="2">删除图片</a-menu-item>
+              <a-menu-item key="3">复制图片地址</a-menu-item>
+            </a-menu>
+          </template>
+        </a-dropdown>
+      </div>
+    </ACard>
+  </div>
 </template>
 
 <style scoped>
@@ -87,21 +146,40 @@ getImageList();
 </style>
 <style>
 .resources {
+  height: 100%;
+
   .preview {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
     gap: 10px;
-    margin-top: 40px;
+    height: 100%;
+    padding-top: 3px;
+    padding-right: 3px;
+    overflow-y: auto;
+    border-radius: 10px;
 
     .preview-item {
       border-radius: 8px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, .5);
+      box-shadow: 0 0 3px rgba(0, 0, 0, 0.5);
       object-fit: cover;
       background: var(--themeColor);
+      width: 100%;
+      cursor: pointer;
+      transition: 0.3s;
+
+      &:hover {
+        filter: brightness(0.8);
+      }
     }
 
-    .ant-image-mask {
-      border-radius: 8px !important;
+    &:hover {
+      &::-webkit-scrollbar-thumb {
+        background: var(--themeColor) !important;
+      }
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: transparent !important;
     }
   }
 }
