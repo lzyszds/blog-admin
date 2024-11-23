@@ -12,7 +12,7 @@ export const multDelData = (uids, request, callback) => {
     cancelText: "取消",
     onOk() {
       request({ uid: uids.join(",") }).then(() => {
-        callback()
+        callback();
         message.success("删除成功");
       });
     },

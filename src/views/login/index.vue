@@ -3,7 +3,6 @@ import { login } from "@/api/user";
 import { useRequest } from "@/hook/useRequest";
 import { TokenService } from "@/hook/useTokenService"; // const baseURL = import.meta.env.VITE_BASE_URL;
 
-const imageBaseURL = import.meta.env.VITE_PICTURE_BED_IMAGE_PROXY;
 const isTransition = ref(false);
 const router = useRouter();
 //进入页面先判断是否登陆着,localStorage.getItem('token')是登陆时候存的token
@@ -103,9 +102,7 @@ onMounted(() => {
         </div>
         <div class="illustartion">
           <img
-            :src="
-              imageBaseURL + '/O-ZPA__Gg5S9ju7bNWAXyhcyFsLLFYjvlekUK7YYm9f8AAA'
-            "
+            :src="'/pictureBedImage/O-ZPA__Gg5S9ju7bNWAXyhcyFsLLFYjvlekUK7YYm9f8AAA'"
             alt="logo"
           />
         </div>

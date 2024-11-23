@@ -1,16 +1,13 @@
 <script lang="ts" setup>
-import {
-  addArticleCategory,
-  getArticleCategory,
-  uploadArticleImg,
-} from "@/api/posts";
-import { ArticledataType, TagDataType } from "@/typings/Posts";
-import { isEqual, optimizeImage, toProxys } from "@/utils/comment";
+import { addArticleCategory, getArticleCategory } from "@/api/posts";
+import { ArticleDataType, TagDataType } from "@/typings/Posts";
+import { isEqual, toProxys } from "@/utils/comment";
 import { message, Modal } from "ant-design-vue";
 import MarkdownEditor from "../markdown/MarkdownEditor.vue";
 import LzyIcon from "../LzyIcon.vue";
-import { ExclamationCircleOutlined } from "@ant-design/icons-vue";
 import { createVNode } from "vue";
+import { ExclamationCircleOutlined } from "@ant-design/icons-vue";
+import { uploadImageToPictureBed } from "@/api/toolkit.ts";
 
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
@@ -18,7 +15,7 @@ type ModalParamsType = {
   modalParams: {
     isOpen: boolean;
     title: string;
-    params: ArticledataType;
+    params: ArticleDataType;
     headimgs: string[];
     sureCallback: {
       uploadHeadImg: Function;
@@ -37,7 +34,7 @@ const formState = useStorage("formState", {});
 const currentFormData = formState.value[modalParams.params.aid || "add"];
 
 /* 文章数据 */
-const information = ref<ArticledataType>({ ...modalParams.params });
+const information = ref<ArticleDataType>({ ...modalParams.params });
 /*  文章编辑器原始数据 */
 const protoInformation = toProxys({ ...modalParams.params });
 
@@ -120,29 +117,16 @@ const submitForm = async () => {
   });
 };
 
-//图片上传方法
-const coverUpdate = async (file) => {
-  // 如果文件大小小于300kb，不进行压缩，按比例压缩
-  const scale = file.size < 300 * 1024 ? 1 : 0.5;
-
-  /* 压缩图片 */
-  const { fileCompress } = await optimizeImage(file, scale);
-  return await uploadArticleImg(fileCompress);
-};
-
-/* 上传封面重置请求 */
-const customRequest = ({ file }) => {
-  coverUpLoad.value = true;
-  return new Promise(async (resolve) => {
-    coverUpdate(file).then((res) => {
-      setTimeout(() => {
-        information.value.coverImg = res.data.filename;
-        resolve(res);
-        message.info("封面上传成功！");
-        coverUpLoad.value = false;
-      }, 1000);
-    });
-  });
+/* 上传封面变化 */
+const handleChange = ({ file }) => {
+  // 是否正在上传
+  coverUpLoad.value = file.status === "coverUpLoad";
+  if (file.status === "done") {
+    information.value.coverImg = file.response.data;
+    message.success(`${file.name} 文件上传成功`);
+  } else if (file.status === "error") {
+    message.error(`${file.name} 文件上传失败。`);
+  }
 };
 
 /* 文章内部图片上传事件 */
@@ -150,7 +134,7 @@ const handleUploadImage = async ([insertImage, files]) => {
   console.log(insertImage, files);
 
   try {
-    const res = await coverUpdate(files[0]);
+    const res = await uploadImageToPictureBed(files[0]);
     console.log(res);
 
     if (res.code === 200) {
@@ -167,9 +151,9 @@ const handleUploadImage = async ([insertImage, files]) => {
 
 /**
  * 设置数据
- * @returns {ArticledataType} 文章数据
+ * @returns {ArticleDataType} 文章数据
  */
-function setData(): ArticledataType {
+function setData(): ArticleDataType {
   console.log(information.value);
 
   const { aid, title, content, coverImg } = information.value;
@@ -320,17 +304,21 @@ onMounted(() => {
           <a-divider>文章封面</a-divider>
           <!--  :before-upload="coverUpdate" -->
           <a-upload
-            list-type="picture-card"
+            :action="BASE_URL + '/api/toolkit/uploadImageToPictureBed'"
             name="upload-image"
-            :show-upload-list="false"
-            :customRequest="customRequest"
+            withCredentials
+            :showUploadList="false"
+            :multiple="false"
+            @change="handleChange"
+            :disabled="coverUpLoad"
             body-style="display: block;"
           >
             <img
               v-if="information.coverImg"
-              :src="BASE_URL + information.coverImg"
+              :src="information.coverImg"
               alt="coverImg"
               style="width: 100%; height: 100%; object-fit: cover"
+              onerror="this.src='error.png';"
             />
 
             <template v-else>

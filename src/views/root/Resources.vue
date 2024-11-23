@@ -4,7 +4,7 @@ import { getPictureBedImageList } from "@/api/toolkit.ts";
 import { message, UploadChangeParam } from "ant-design-vue";
 import { PictureBedType } from "@/typings/PictureBedType.ts";
 
-const api = import.meta.env.VITE_BASE_URL;
+const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 // 是否正在上传
 const uploading = ref(false);
@@ -35,7 +35,7 @@ getImageList();
 <template>
   <ACard class="resources">
     <a-upload-dragger
-      :action="api + '/api/toolkit/uploadImageToPictureBed'"
+      :action="BASE_URL + '/api/toolkit/uploadImageToPictureBed'"
       name="upload-image"
       withCredentials
       :showUploadList="false"

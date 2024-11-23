@@ -4,7 +4,7 @@ import useResetRefState from "@/hook/useResetRefState";
 import { getTableStore } from "@/store/useTableStore";
 import { useRequest } from "@/hook/useRequest";
 import { useScrollY } from "@/hook/useTableConfig";
-import { multDelData } from "@/hook/useTableData";
+import { multDelData } from "@/utils/tableHandles.ts";
 import { Key } from "ant-design-vue/es/_util/type";
 import TableHeaderOperation from "@/components/TableHeaderOperation.vue";
 import { TableProps } from "ant-design-vue";

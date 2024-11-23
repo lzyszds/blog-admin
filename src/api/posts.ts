@@ -57,22 +57,6 @@ export const articleDelete = (params) => {
   });
 }
 
-//上传文章图片
-export const uploadArticleImg = (fileCompress) => {
-  // 拿到 files 之后上传到文件服务器，然后向编辑框中插入对应的内容
-  let formData = new FormData();
-  formData.append("upload-image", fileCompress);
-
-  let headers = {
-    "Content-Type": "multipart/form-data",
-  };
-  return request({
-    url: "/article/uploadArticleImg",
-    method: "post",
-    data: formData,
-    headers
-  });
-}
 
 //获取所有文章分类
 export const getArticleCategory = () => {

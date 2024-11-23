@@ -1,9 +1,16 @@
-import { Avatar, Button, message, Popconfirm, TableProps, Tag } from "ant-design-vue";
+import {
+  Avatar,
+  Button,
+  message,
+  Popconfirm,
+  TableProps,
+  Tag,
+} from "ant-design-vue";
 import { Params } from "@/typings/Column";
 import { setTimeAgoLocalMessages } from "@/utils/comment";
 
 export const getArticleColumns = (params: Params) => {
-  let columns: TableProps['columns'] = [
+  let columns: TableProps["columns"] = [
     {
       title: "ID",
       dataIndex: "aid",
@@ -17,7 +24,7 @@ export const getArticleColumns = (params: Params) => {
       width: "80px",
       // 可用于显示图片或设置渲染方法
       customRender: ({ text }) => {
-        return h(Avatar, { src: import.meta.env.VITE_BASE_URL + text, shape: "square" });
+        return h(Avatar, { src: text, shape: "square" });
       },
     },
     {
@@ -65,22 +72,23 @@ export const getArticleColumns = (params: Params) => {
       width: "70px",
       filters: [
         {
-          text: '启用',
-          value: '1',
+          text: "启用",
+          value: "1",
         },
         {
-          text: '禁用',
-          value: '0',
+          text: "禁用",
+          value: "0",
         },
       ],
-      filterMode: 'tree',
+      filterMode: "tree",
       filterSearch: true,
-      onFilter: (value, record) => record.whetherUse.toString().startsWith(value),
+      onFilter: (value, record) =>
+        record.whetherUse.toString().startsWith(value),
 
       customRender: ({ text }) => {
         return h(
           Tag,
-          () => text == 1 ? "启用" : "禁用" // 使用函数形式
+          () => (text == 1 ? "启用" : "禁用"), // 使用函数形式
         );
       },
     },
@@ -99,7 +107,7 @@ export const getArticleColumns = (params: Params) => {
               style: { fontSize: "12px" },
               onClick: () => params.openModal(record),
             },
-            { default: () => "编辑" } // 插槽内容
+            { default: () => "编辑" }, // 插槽内容
           ),
           h(
             Popconfirm,
@@ -125,14 +133,14 @@ export const getArticleColumns = (params: Params) => {
                     danger: true,
                     style: { fontSize: "12px", marginLeft: "10px" },
                   },
-                  { default: () => "删除" } // 插槽内容
+                  { default: () => "删除" }, // 插槽内容
                 ),
-            }
+            },
           ),
         ];
       },
     },
-  ]
+  ];
 
   columns = columns.map((item) => {
     return { ...item, ellipsis: true, checked: true };

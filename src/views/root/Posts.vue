@@ -1,15 +1,21 @@
 <script setup lang="ts">
-import { articleList, articleAdd, articleEditor, articleDelete } from "@/api/posts";
+import {
+  articleAdd,
+  articleDelete,
+  articleEditor,
+  articleList,
+} from "@/api/posts";
 import PostsForm from "@/components/form/PostsForm.vue";
 import useResetRefState from "@/hook/useResetRefState";
 import { getTableStore } from "@/store/useTableStore";
 import { useRequest } from "@/hook/useRequest";
 import { useScrollY } from "@/hook/useTableConfig";
-import { multDelData } from "@/hook/useTableData";
+import { multDelData } from "@/utils/tableHandles.ts";
 import { Key } from "ant-design-vue/es/_util/type";
 import TableHeaderOperation from "@/components/TableHeaderOperation.vue";
 import { TableProps } from "ant-design-vue";
 import { getArticleColumns } from "@/table/postsColumns";
+import { ArticleDataType } from "@/typings/Posts.ts";
 
 /* 获取表格滚动条高度 */
 const { scrollConfig } = useScrollY();
@@ -86,9 +92,11 @@ const handleTableChange: TableProps["onChange"] = (pagination) => {
 };
 
 /* 添加/编辑弹窗 */
-const setUserModal = async (params) => {
+const setUserModal = async (params: ArticleDataType) => {
   const isEdit = !!params.uid;
-
+  if (typeof params.tags === "string") {
+    params.tags = params.tags.split(",");
+  }
   modalParams.value.params = isEdit ? params : {};
   modalParams.value.isOpen = true;
   modalParams.value.title = isEdit ? "修改文章" : "添加文章";
@@ -115,7 +123,9 @@ const multipleDel = () => {
 </script>
 
 <template>
-  <section style="display: flex; flex-direction: column; gap: 20px; height: 100%">
+  <section
+    style="display: flex; flex-direction: column; gap: 20px; height: 100%"
+  >
     <ACard title="搜索工具" :bordered="false">
       <main class="searchCard">
         <section>
@@ -137,17 +147,23 @@ const multipleDel = () => {
 
         <section>
           <span>文章权限：</span>
-          <ASelect v-model:value="searchCondition.power" style="width: 160px" allowClear>
+          <ASelect
+            v-model:value="searchCondition.power"
+            style="width: 160px"
+            allowClear
+          >
             <ASelectOption value="0">超级管理员</ASelectOption>
             <ASelectOption value="1">普通文章</ASelectOption>
           </ASelect>
         </section>
         <section style="display: flex; gap: 10px">
           <AButton @click="reset" style="flex: 1">
-            <LzyIcon name="hugeicons:exchange-01" /> 重置
+            <LzyIcon name="hugeicons:exchange-01" />
+            重置
           </AButton>
           <AButton @click="throttledRequest(searchCondition)" style="flex: 1">
-            <LzyIcon name="hugeicons:search-area" /> 搜索
+            <LzyIcon name="hugeicons:search-area" />
+            搜索
           </AButton>
         </section>
       </main>
