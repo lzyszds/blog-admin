@@ -61,7 +61,22 @@ const onClick = async (item: PictureBedType, { key, domEvent }) => {
     await deletePictureBedImage({ id: item.id });
     await getImageList();
   } else if (key == 3) {
-    console.log("复制图片地址");
+    const text = window.location.origin + item.url;
+    //将文本通过 clipboard 传入剪切板
+    navigator.clipboard.writeText(text).then(
+      () => {
+        if (!text) return message.error("复制失败，图片地址为空");
+        message.success("图片地址已复制到剪切板");
+      },
+      function (res) {
+        console.log("lzy ~ res", res);
+      },
+    );
+  }else if (key == 4) {
+    const a = document.createElement("a");
+    a.href = item.url;
+    a.download = item.url;
+    a.click();
   }
 };
 </script>
@@ -123,6 +138,7 @@ const onClick = async (item: PictureBedType, { key, domEvent }) => {
               <a-menu-item key="1">打开预览</a-menu-item>
               <a-menu-item key="2">删除图片</a-menu-item>
               <a-menu-item key="3">复制图片地址</a-menu-item>
+              <a-menu-item key="4">下载图片</a-menu-item>
             </a-menu>
           </template>
         </a-dropdown>

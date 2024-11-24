@@ -145,7 +145,7 @@ const menuData = (item: Task): MenuData[] => [
     icon: "material-symbols:preview",
     click: async () => {
       let { data } = await getTaskLog(item.id);
-      if(data.length === 0) {
+      if (data.length === 0) {
         message.warning("暂无日志");
         return;
       }
@@ -180,7 +180,7 @@ const saveEdit = async () => {
 };
 
 const onSwiper = (swiper) => {
-  console.log(swiper)
+  console.log(swiper);
 };
 
 const onSlideChange = (swiper: any) => {
@@ -295,6 +295,7 @@ const onSlideChange = (swiper: any) => {
           justifyContent: 'space-between',
           gap: '20px',
         }"
+        class="logCard"
       >
         <LzyIcon name="iconoir:nav-arrow-left" size="30" />
         <swiper
@@ -426,6 +427,17 @@ const onSlideChange = (swiper: any) => {
 
     section {
     }
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .logCard {
+    .LzyIcon {
+      display: none;
+    }
+  }
+  :deep(.ant-card-body){
+    padding: 0;
   }
 }
 </style>
