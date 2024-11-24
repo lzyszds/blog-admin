@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import LzyIcon from "@/components/LzyIcon.vue";
-import { getPictureBedImageList } from "@/api/toolkit.ts";
+import {
+  deletePictureBedImage,
+  getPictureBedImageList,
+} from "@/api/toolkit.ts";
 import { message, UploadChangeParam } from "ant-design-vue";
 import { PictureBedType } from "@/typings/PictureBedType.ts";
 
@@ -50,12 +53,13 @@ const openImage = (item: PictureBedType) => {
 };
 
 // 右键菜单点击事件
-const onClick = (item: PictureBedType, { key, domEvent }) => {
+const onClick = async (item: PictureBedType, { key, domEvent }) => {
   console.log(key, domEvent);
   if (key == 1) {
     openImage(item);
   } else if (key == 2) {
-    console.log("删除图片");
+    await deletePictureBedImage({ id: item.id });
+    await getImageList();
   } else if (key == 3) {
     console.log("复制图片地址");
   }

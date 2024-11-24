@@ -34,5 +34,14 @@ export const uploadImageToPictureBed = (data: any)=> {
   });
 }
 
+//删除图库中的图片以及数据库存储中的记录
+export const deletePictureBedImage = (data: any)=> {
+  return request({
+    url: "/toolkit/deletePictureBedImage",
+    method: "post",
+    data
+  });
+}
+
 
 
