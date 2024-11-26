@@ -44,9 +44,7 @@ console.log(modalParams, "modalParams");
 const coverUpLoad = ref(false);
 
 //当前选中的标签数据
-const tagData: any = ref(
-  information.value?.tags || modalParams.params?.tags || [],
-);
+const tagData: any = ref(information.value?.tags || modalParams.params?.tags || []);
 
 /* 全局配置缓存 */
 // const globlConfig = useStorage("globlConfig", {
@@ -86,7 +84,7 @@ const saveForm = () => {
   };
 
   const values: any = Object.values(
-    isEqual(formState.value[params.aid || "add"], params),
+    isEqual(formState.value[params.aid || "add"], params)
   );
   for (let item of values) {
     if (item.length != 0) {
@@ -162,9 +160,7 @@ function setData(): ArticleDataType {
   //遍历所有子元素 如果tagname 标题h1 h2 h3 h4 h5 h6 则跳过
   for (const firstKey in first) {
     console.log(first[firstKey]);
-    if (
-      !["H1", "H2", "H3", "H4", "H5", "H6"].includes(first[firstKey].tagName)
-    ) {
+    if (!["H1", "H2", "H3", "H4", "H5", "H6"].includes(first[firstKey].tagName)) {
       firstText = first[firstKey].innerText;
       break;
     }
@@ -324,7 +320,7 @@ onMounted(() => {
             <template v-else>
               <template v-if="!coverUpLoad">
                 <LzyIcon
-                  size="18"
+                  size="25"
                   name="hugeicons:image-01"
                   style="vertical-align: middle"
                 />
@@ -341,10 +337,7 @@ onMounted(() => {
             </template>
           </a-upload>
           <a-divider>文章标题</a-divider>
-          <AInput
-            v-model:value="information.title"
-            placeholder="必填 | 请输入文章标题"
-          />
+          <AInput v-model:value="information.title" placeholder="必填 | 请输入文章标题" />
           <a-divider>文章分类</a-divider>
           <a-select
             ref="selectRef"
@@ -448,6 +441,19 @@ onMounted(() => {
     width: 100% !important;
     height: 150px !important;
     overflow: hidden;
+    transition: .3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    background-color: var(--color-bg-light);
+    border-radius: 8px;
+    border: 1px dashed #d9d9d9;
+    &:hover{
+      cursor: pointer;
+      background-color: var(--color-bg-light-hover);
+      border-color: var(--themeColor);
+    }
   }
 }
 
