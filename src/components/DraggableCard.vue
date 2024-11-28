@@ -7,7 +7,7 @@ const getTable = getTableStore();
 </script>
 
 <template>
-  <APopover placement="bottomRight" trigger="click">
+  <APopover placement="left" trigger="click" >
     <AButton>
       <template #icon>
         <LzyIcon name="iconoir:settings" size="18" />
@@ -37,6 +37,7 @@ const getTable = getTableStore();
   align-items: center;
   padding: 0;
   border-radius: 5px;
+  user-select: none;
 
   & > svg {
     cursor: move;

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import routeItem from "@/router/config";
+
 const { isFixed, selectedKeys, collapsed } = inject<any>("paramsRef");
 
 const emit = defineEmits(["breakpoint", "push-router"]);
@@ -18,8 +19,12 @@ let routeItems = routeItem.filter((item) => !item.meta.isHide);
     @breakpoint="emit('breakpoint', $event)"
   >
     <div class="ant-layout-sider-children-item">
-      <div class="logo" @click="emit('push-router', routeItems[0])">
-        <h2>{{ collapsed ? "Jz" : "Jz 博客管理系统" }}</h2>
+      <div
+        :class="{ collapsed: collapsed, logo: true }"
+        @click="emit('push-router', routeItems[0])"
+      >
+        <span>Jz</span>
+        <h2>博客管理系统</h2>
       </div>
 
       <AMenu v-model:selectedKeys="selectedKeys" mode="inline">
@@ -30,7 +35,7 @@ let routeItems = routeItem.filter((item) => !item.meta.isHide);
           class="menuitem"
         >
           {{ item.meta.isHide }}
-          <span class="anticon anticon-user">
+          <span class="anticon">
             <LzyIcon :name="item.meta.uicon" style="font-weight: 600" />
           </span>
           <span class="menu-title-item">{{ item.meta.name }}</span>
@@ -51,33 +56,66 @@ let routeItems = routeItem.filter((item) => !item.meta.isHide);
   background-color: var(--color-bg);
   z-index: 2;
   box-shadow: 2px 0 8px 0px rgb(29, 35, 41, 0.05);
+
   .ant-layout-sider-children-item {
     height: 100%;
     display: flex;
     flex-direction: column;
+
     .ant-menu {
       flex: 1;
     }
   }
+
   .logo {
     height: 60px;
     margin: 16px;
     text-align: center;
     color: var(--themeColor);
-    font-family: "dindin";
-    overflow: hidden;
+    font-family: "dindin", serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     cursor: pointer;
     background-color: transparent;
+
+    span {
+      font-size: 1.5em;
+    }
+
     h2 {
       text-wrap: nowrap;
+      transition: 0.2s;
+    }
+
+    &.collapsed {
+      h2 {
+        opacity: 0;
+      }
+
+      span {
+        position: absolute;
+        padding: 10px 15px;
+        font-size: 2em;
+      }
     }
   }
+
   .moeCounter {
     width: 100%;
     padding: 10%;
   }
+
   ul.ant-menu {
     border-inline-end: none !important;
+  }
+}
+</style>
+<style>
+.menuitem {
+  span:nth-child(1) {
+    display: flex;
+    align-items: center;
   }
 }
 </style>

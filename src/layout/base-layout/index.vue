@@ -3,7 +3,8 @@ import { useTabsState } from "@/store/useTabsStore"; // 导入用于管理标签
 import routeItem from "@/router/config";
 import SidebarMenu from "@/layout/context/SidebarMenu.vue"; // 导入侧边菜单组件
 import HeaderComponent from "@/layout/context/HeaderComponent.vue"; // 导入头部组件
-import ContentArea from "@/layout/context/ContentArea.vue"; // 导入内容区域组件
+import ContentArea from "@/layout/context/ContentArea.vue";
+import CacheNavigation from "@/layout/context/CacheNavigation.vue"; // 导入内容区域组件
 
 // 定义 layout 引用，用于获取布局元素
 const layout = ref<HTMLElement | null>(null);
@@ -21,7 +22,6 @@ const refreshKey = ref(0); // 刷新键，用于触发内容区域的刷新
 
 // 跳转到选中的路由
 const pushRouter = (item) => {
-  
   // 如果 item 是数字，则获取对应的菜单项
   if (typeof item == "number") {
     item = tabsState.getKeyArr(item);
@@ -51,7 +51,7 @@ onMounted(() => {
 // 监听路由变化，更新选中的菜单项
 watchEffect(() => {
   selected.value = routeItem.find(
-    (item) => item.name == router.currentRoute.value.name
+    (item) => item.name == router.currentRoute.value.name,
   ); // 查找当前路由对应的菜单项
   if (selected.value) selectedKeys.value = [selected.value?.meta.key];
   // 更新选中键
@@ -85,6 +85,10 @@ provide("paramsRef", {
     <ALayout>
       <!-- 头部组件 -->
       <HeaderComponent />
+
+      <!-- 历史缓存导航组件 -->
+      <CacheNavigation @push-router="pushRouter" />
+
       <!-- 内容区域组件 -->
       <ContentArea @push-router="pushRouter" />
     </ALayout>
@@ -106,6 +110,7 @@ provide("paramsRef", {
   width: 100vw; /* 全屏宽度 */
   height: 100vh; /* 全屏高度 */
 }
+
 .show.mask {
   display: block; /* 显示遮罩层 */
 }

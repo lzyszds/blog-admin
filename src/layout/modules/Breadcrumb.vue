@@ -1,11 +1,16 @@
 <script setup lang="ts">
+import LzyIcon from "@/components/LzyIcon.vue";
+
 const { selected } = inject<any>("paramsRef");
 </script>
 
 <template>
   <!-- 面包屑 -->
   <Transition name="fade" mode="out-in">
-    <ABreadcrumb :key="selected && selected.meta.key" style="flex: 1">
+    <ABreadcrumb
+      :key="selected && selected.meta.key"
+      style="flex: 1; margin-top: 2px"
+    >
       <ABreadcrumb-item>
         <LzyIcon
           :name="selected && selected.meta.uicon"
