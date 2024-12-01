@@ -25,6 +25,7 @@ import nginxLang from "shiki/langs/nginx.mjs";
 import xmlLang from "shiki/langs/xml.mjs";
 import markDownLang from "shiki/langs/markdown.mjs";
 import yamlLang from "shiki/langs/yaml.mjs";
+import { HighlighterCore } from "shiki";
 
 const md = MarkdownIt({
   html: true,
@@ -50,35 +51,35 @@ const langModules = [
   yamlLang,
 ];
 
-const highlighter = await createHighlighterCore({
+createHighlighterCore({
   themes: [import("shiki/themes/one-dark-pro.mjs")],
   langs: langModules,
   engine: createOnigurumaEngine(import("shiki/wasm")),
-});
+}).then((highlighter: HighlighterCore) => {
+  /* 自定义容器插件 折叠面板 */
 
-/* 自定义容器插件 折叠面板 */
-
-/* shiki代码块高亮插件 */
-md.use(
-  fromHighlighter(highlighter, {
-    theme: "one-dark-pro",
-  }),
-);
-/* 自定义属性插件 attrs */
-md.use(mdAttrs, {
-  // optional, these are default options
-  leftDelimiter: "{",
-  rightDelimiter: "}",
-  allowedAttributes: [], // empty array = all attributes are allowed
+  /* shiki代码块高亮插件 */
+  md.use(
+    fromHighlighter(highlighter, {
+      theme: "one-dark-pro",
+    }),
+  );
+  /* 自定义属性插件 attrs */
+  md.use(mdAttrs, {
+    // optional, these are default options
+    leftDelimiter: "{",
+    rightDelimiter: "}",
+    allowedAttributes: [], // empty array = all attributes are allowed
+  });
+  md.use(mdMark);
+  md.use(mdEmoji);
+  md.use(mdBracketedSpans);
+  md.use(mdInlineComments);
+  md.use(mdImagePlugin, {
+    baseUrl: import.meta.env.VITE_BASE_URL,
+  });
+  setDirectoryId(md);
+  mdTipsCollectPlugin(md);
 });
-md.use(mdMark);
-md.use(mdEmoji);
-md.use(mdBracketedSpans);
-md.use(mdInlineComments);
-md.use(mdImagePlugin, {
-  baseUrl: import.meta.env.VITE_BASE_URL,
-});
-setDirectoryId(md);
-mdTipsCollectPlugin(md);
 
 export default md;
