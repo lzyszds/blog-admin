@@ -73,7 +73,7 @@ const usersTableData = getTableStore();
 /* 设置表格列表数据的回调方法 */
 usersTableData.setCallbackArr({
   getData: () => throttledRequest(searchCondition),
-  delData: ({ uid }) => articleDelete({ uid }),
+  delData: ({ aid }) => articleDelete({ id: aid }),
   openModal: (params) => setUserModal(params),
   columns: getArticleColumns,
 });

@@ -112,7 +112,7 @@ export const getArticleColumns = (params: Params) => {
           h(
             Popconfirm,
             {
-              title: "确定删除该用户吗？",
+              title: "确定删除此文章吗？",
               cancelText: "取消",
               okText: "确定",
               onConfirm: async () => {
