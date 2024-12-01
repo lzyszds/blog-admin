@@ -3,11 +3,12 @@ import { addArticleCategory, getArticleCategory } from "@/api/posts";
 import { ArticleDataType, TagDataType } from "@/typings/Posts";
 import { isEqual, toProxys } from "@/utils/comment";
 import { message, Modal } from "ant-design-vue";
-import MarkdownEditor from "../markdown/MarkdownEditor.vue";
 import LzyIcon from "../LzyIcon.vue";
 import { createVNode } from "vue";
 import { ExclamationCircleOutlined } from "@ant-design/icons-vue";
 import { uploadImageToPictureBed } from "@/api/toolkit.ts";
+import Editor from "@/components/ckeditor/CkEditor.vue";
+import md, { langModules } from "@/utils/markdownInit.ts";
 
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
@@ -44,7 +45,9 @@ console.log(modalParams, "modalParams");
 const coverUpLoad = ref(false);
 
 //当前选中的标签数据
-const tagData: any = ref(information.value?.tags || modalParams.params?.tags || []);
+const tagData: any = ref(
+  information.value?.tags || modalParams.params?.tags || [],
+);
 
 /* 全局配置缓存 */
 // const globlConfig = useStorage("globlConfig", {
@@ -72,19 +75,20 @@ const exitForm = () => {
 };
 
 // 保存编辑器内容
-const saveForm = () => {
+const saveForm = (content?: string) => {
   const params = modalParams.params;
   let isNext = false;
   formState.value[params.aid || "add"] = {
     title: information.value.title,
-    content: information.value.content,
+    content: content ?? information.value.content,
+    main: document.querySelector(".ck-editor__main>div")?.innerHTML,
     coverImg: information.value.coverImg,
     tags: tagData.value,
     partialContent: information.value.partialContent,
   };
-
+  console.log(formState.value[params.aid || "add"]);
   const values: any = Object.values(
-    isEqual(formState.value[params.aid || "add"], params)
+    isEqual(formState.value[params.aid || "add"], params),
   );
   for (let item of values) {
     if (item.length != 0) {
@@ -98,7 +102,7 @@ const saveForm = () => {
 
 // 确认提交
 const submitForm = async () => {
-  const data = setData();
+  const data = await setData();
   // 检查内容是否相同
   modalParams.sureCallback.callback(data).then((res) => {
     console.log("提交数据", res);
@@ -151,27 +155,27 @@ const handleUploadImage = async ([insertImage, files]) => {
  * 设置数据
  * @returns {ArticleDataType} 文章数据
  */
-function setData(): ArticleDataType {
-  console.log(information.value);
-
+async function setData(): Promise<ArticleDataType> {
   const { aid, title, content, coverImg } = information.value;
-  const first = document.querySelector(".preview-pane>div")?.children;
+  const first = document.querySelector(".ck-editor__main>div")?.children;
   let firstText = "";
   //遍历所有子元素 如果tagname 标题h1 h2 h3 h4 h5 h6 则跳过
   for (const firstKey in first) {
-    console.log(first[firstKey]);
-    if (!["H1", "H2", "H3", "H4", "H5", "H6"].includes(first[firstKey].tagName)) {
+    if (
+      !["H1", "H2", "H3", "H4", "H5", "H6"].includes(first[firstKey].tagName)
+    ) {
       firstText = first[firstKey].innerText;
       break;
     }
   }
+  const main = md.render(content || "");
 
   // 初始化文章数据
   const data = {
     title, // 文章标题
     partial_content: firstText, // 文章开头第一段话
     content, // 文章内容
-    main: document.querySelector(".preview-pane")?.innerHTML!, // 文章主体内容
+    main: main, // 文章主体内容
     cover_img: coverImg, // 文章封面图片
     aid, // 文章ID（修改时为当前文章ID，创建时为null）
     tags: tagData.value, // 文章标签
@@ -228,39 +232,6 @@ const VNodes = defineComponent({
 });
 
 const infoCard = shallowRef();
-// const { width: infoCard_w, height: infoCard_h } = useElementSize(infoCard);
-
-// const changePlaces = (val) => {
-//   globlConfig.value.previewPosition = val;
-//   // setPlace(val);
-// };
-
-// function setPlace(val) {
-//   const preview = document.querySelector(".v-md-editor__preview-wrapper") as HTMLElement;
-//   const container = document.querySelector(".edit-container") as HTMLElement;
-//   container.style.flexDirection = "row";
-//   /* 设置位置 如果val为flex 则设置为相对定位 */
-//   if (val !== "flex") {
-//     preview.style.position = "fixed";
-//     preview.style.height = infoCard_h.value + "px";
-//     preview.style.width = infoCard_w.value + "px";
-//     preview.style.top = "90px";
-//     if (val == "right") {
-//       preview.style.right = "24px";
-//       preview.style.left = "inherit";
-//       container.style.flexDirection = "row-reverse";
-//     } else {
-//       preview.style.left = "24px";
-//       preview.style.right = "inherit";
-//     }
-//   } else {
-//     preview.style.position = "relative";
-//     preview.style.height = "auto";
-//     preview.style.width = "auto";
-//     preview.style.top = "0";
-//     preview.style.left = "0";
-//   }
-// }
 
 onMounted(() => {
   setTimeout(() => {
@@ -337,7 +308,10 @@ onMounted(() => {
             </template>
           </a-upload>
           <a-divider>文章标题</a-divider>
-          <AInput v-model:value="information.title" placeholder="必填 | 请输入文章标题" />
+          <AInput
+            v-model:value="information.title"
+            placeholder="必填 | 请输入文章标题"
+          />
           <a-divider>文章分类</a-divider>
           <a-select
             ref="selectRef"
@@ -365,7 +339,7 @@ onMounted(() => {
           </a-select>
           <a-divider>文章介绍</a-divider>
           <ATextarea
-            v-model:value="information.partialContent"
+            v-model="information.partialContent"
             placeholder="选填 | 为空则将自动设置为文章开头第一段"
             :auto-size="{ minRows: 10, maxRows: 10 }"
           />
@@ -376,11 +350,17 @@ onMounted(() => {
           :bordered="false"
           :body-style="{ padding: '0', height: '100%' }"
         >
-          <MarkdownEditor
+          <!--          <MarkdownEditor-->
+          <!--            v-model="information.content"-->
+          <!--            :saveForm="saveForm"-->
+          <!--            @update-image="handleUploadImage"-->
+          <!--          ></MarkdownEditor>-->
+
+          <Editor
             v-model="information.content"
             :saveForm="saveForm"
             @update-image="handleUploadImage"
-          ></MarkdownEditor>
+          ></Editor>
         </ACard>
       </main>
     </template>
@@ -441,7 +421,7 @@ onMounted(() => {
     width: 100% !important;
     height: 150px !important;
     overflow: hidden;
-    transition: .3s;
+    transition: 0.3s;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -449,7 +429,8 @@ onMounted(() => {
     background-color: var(--color-bg-light);
     border-radius: 8px;
     border: 1px dashed #d9d9d9;
-    &:hover{
+
+    &:hover {
       cursor: pointer;
       background-color: var(--color-bg-light-hover);
       border-color: var(--themeColor);
