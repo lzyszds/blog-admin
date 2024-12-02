@@ -40,6 +40,9 @@ const editor = ClassicEditor;
   flex-direction: column;
 
   .ck {
+    background-color: var(--color-bg);
+    color: var(--color-text);
+
     .ck-sticky-panel__content {
       border: none;
 
@@ -93,7 +96,8 @@ const editor = ClassicEditor;
     &.ck-dropdown__panel_se {
       border-top-left-radius: 8px;
       margin-top: 5px;
-      ul{
+
+      ul {
         border-top-left-radius: 8px;
       }
     }

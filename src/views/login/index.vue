@@ -115,7 +115,7 @@ onMounted(() => {
 .login {
   width: 100vw;
   height: 100vh;
-  background-color: var(--themeColor);
+  background-color: var(--theme-bg-color);
   background-position: center;
   display: flex;
   justify-content: center;
@@ -143,7 +143,7 @@ onMounted(() => {
   .card {
     width: 80%;
     height: 80%;
-    background-color: rgba(255, 255, 255, 0.85);
+    background-color: var(--color-login-bg);
     backdrop-filter: blur(10px);
     border-radius: 30px;
     box-shadow: 0 1px 8px 10px rgba(0, 0, 0, 0.2);
@@ -208,7 +208,7 @@ onMounted(() => {
         p {
           font-size: 40px;
           font-weight: 600;
-          color: #000;
+          color: var(--color-bg);
           flex: 3;
         }
 
@@ -227,10 +227,10 @@ onMounted(() => {
         p.title {
           font-size: 60px;
           font-weight: 600;
-          color: #000;
-          text-shadow: 2px 2px 1px #fff;
+          color: var(--color-text);
+          text-shadow: 2px 2px 1px var(--color-bg);
           flex: 3;
-          font-family: "dindin";
+          font-family: "dindin", serif;
           pointer-events: none;
           user-select: none;
           filter: drop-shadow(3px 2px 1px var(--themeColor));
@@ -240,14 +240,14 @@ onMounted(() => {
           width: 150%;
 
           input {
-            font-family: "dindin";
+            font-family: "dindin", monospace;
           }
         }
 
         :deep(.ant-input-prefix) {
-          color: #000 !important;
+          color: var(--color-text) !important;
           gap: 10px;
-          font-family: "dindin";
+          font-family: "dindin", ui-serif;
         }
       }
     }

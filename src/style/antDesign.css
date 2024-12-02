@@ -1,76 +1,80 @@
 :root {
-  /* 基础颜色 */
-  --color-primary: var(--themeColor);
-  --color-primary-Rgb: var(--themeColorRgb);
-  --color-bg: #ffffff;
-  --color-bg-light: #f5f5f5;
-  --color-bg-light-hover: #f0f0f0;
-  --color-text: rgba(0, 0, 0, 0.85);
-  --color-text-secondary: rgba(0, 0, 0, 0.45);
-  --color-border: #d9d9d9;
+    --theme-bg-color: var(--themeColor);
+    /* 基础颜色 */
+    --color-primary: var(--themeColor);
+    --color-primary-Rgb: var(--themeColorRgb);
+    --color-bg: #ffffff;
+    --color-bg-light: #f5f5f5;
+    --color-bg-light-hover: #f0f0f0;
+    --color-text: rgba(0, 0, 0, 0.85);
+    --color-text-secondary: rgba(0, 0, 0, 0.45);
+    --color-border: #d9d9d9;
+    --color-login-bg: rgba(255, 255, 255, 0.85);
 
-  /* 组件特定颜色 */
-  --color-btn-primary-bg: var(--color-primary);
-  --color-btn-primary-text: #ffffff;
-  --color-input-bg: #ffffff;
-  --color-input-border: var(--color-border);
-  --color-table-header-bg: #fafafa;
-  --color-table-row-hover-bg: #5161ce15;
+    /* 组件特定颜色 */
+    --color-btn-primary-bg: var(--color-primary);
+    --color-btn-primary-text: #ffffff;
+    --color-input-bg: #ffffff;
+    --color-input-border: var(--color-border);
+    --color-table-header-bg: #fafafa;
+    --color-table-row-hover-bg: #5161ce15;
 }
 
 :root[data-theme='dark'] {
-  /* 基础颜色 */
-  --color-primary: #177ddc;
-  --color-bg: #141414;
-  --color-bg-light: #0f0f0f;
+    --theme-bg-color: #141414;
+    /* 基础颜色 */
+    --color-primary: #177ddc;
+    --color-bg: #141414;
+    --color-bg-light: #0f0f0f;
     --color-bg-light-hover: #1a1a1a;
-  --color-text: rgba(255, 255, 255, 0.85);
-  --color-text-secondary: rgba(255, 255, 255, 0.45);
-  --color-border: #434343;
+    --color-text: rgba(255, 255, 255, 0.85);
+    --color-text-secondary: rgba(255, 255, 255, 0.45);
+    --color-border: #434343;
+    --color-login-bg: rgba(0, 0, 0, 0.85);
 
-  /* 组件特定颜色 */
-  --color-btn-primary-bg: var(--color-primary);
-  --color-btn-primary-text: #ffffff;
-  --color-input-bg: #1f1f1f;
-  --color-input-border: var(--color-border);
-  --color-table-header-bg: #1d1d1d;
-  --color-table-row-hover-bg: #262626;
+    /* 组件特定颜色 */
+    --color-btn-primary-bg: var(--color-primary);
+    --color-btn-primary-text: #ffffff;
+    --color-input-bg: #1f1f1f;
+    --color-input-border: var(--color-border);
+    --color-table-header-bg: #1d1d1d;
+    --color-table-row-hover-bg: #262626;
 }
 
 .app-container {
-  min-height: 100vh;
-  background-color: var(--color-bg);
-  color: var(--color-text);
-  transition: background-color 0.3s, color 0.3s;
+    min-height: 100vh;
+    background-color: var(--color-bg);
+    color: var(--color-text);
+    transition: background-color 0.3s, color 0.3s;
 }
 
 .theme-toggle {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
 }
 
 /* Utility classes for theme variables */
 .use-theme {
-  color: var(--color-text);
-  background-color: var(--color-bg);
-  border-color: var(--color-border);
+    color: var(--color-text);
+    background-color: var(--color-bg);
+    border-color: var(--color-border);
 }
 
 .use-theme-primary {
-  color: var(--color-btn-primary-text);
-  background-color: var(--color-btn-primary-bg);
+    color: var(--color-btn-primary-text);
+    background-color: var(--color-btn-primary-bg);
 }
 
 .use-theme-input {
-  color: var(--color-text);
-  background-color: var(--color-input-bg);
-  border-color: var(--color-input-border);
+    color: var(--color-text);
+    background-color: var(--color-input-bg);
+    border-color: var(--color-input-border);
 }
 
 .use-theme-table {
-  --table-header-bg: var(--color-table-header-bg);
-  --table-row-hover-bg: var(--color-table-row-hover-bg);
+    --table-header-bg: var(--color-table-header-bg);
+    --table-row-hover-bg: var(--color-table-row-hover-bg);
 }
 
 
@@ -79,35 +83,39 @@
 .ant-input-focused,
 .ant-input-affix-wrapper:focus,
 .ant-input-affix-wrapper-focused {
-  box-shadow: none !important;
+    box-shadow: none !important;
 }
 
 /* 移除所有按钮的阴影 */
 .ant-btn {
-  box-shadow: none !important;
+    box-shadow: none !important;
 }
 
 
-.ant-table-wrapper .ant-table-tbody>tr.ant-table-row-selected>td {
-  background-color: var(--color-table-row-hover-bg) !important;
+.ant-table-wrapper .ant-table-tbody > tr.ant-table-row-selected > td {
+    background-color: var(--color-table-row-hover-bg) !important;
 }
 
 
 /* 解决导航栏选中背景颜色闪烁的问题 */
 .ant-menu-item:active {
-  background-color: var(--color-bg) !important;
+    background-color: var(--color-bg) !important;
 }
 
 .ant-table-body {
-  td {
-    font-size: .85rem;
-  }
+    td {
+        font-size: .85rem;
+    }
 }
 
 .ant-table-thead {
 
-  th {
-    font-family: "HarmonyOS_Medium";
-    font-weight: 500 !important;
-  }
+    th {
+        font-family: "HarmonyOS_Medium";
+        font-weight: 500 !important;
+    }
+}
+
+.anticon-close {
+    color: var(--color-text-secondary);
 }
