@@ -37,5 +37,5 @@ jobs:
                   SOURCE: 'dist/'  # 源目录
                   REMOTE_HOST: ${{ secrets.SERVER_HOST }}  # 服务器地址
                   REMOTE_USER: 'root'  # 用户名
-                  TARGET: '/www/wwwroot/101.201.171.168_1026'  # 目标路径，注意这里应该是一个有效的路径
+                  TARGET: '/www/wwwroot/lzyszds.cn'  # 目标路径，注意这里应该是一个有效的路径
 
