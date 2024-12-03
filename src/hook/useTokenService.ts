@@ -7,6 +7,7 @@ export const TokenService = {
   setToken(token: string) {
     cookies.set("lzytkn", token, {
       expires: new Date(Date.now() + 24 * 60 * 60 * 1000 * 2),
+      domain:  import.meta.env.VITE_COOKIE_DOMAIN
     });
   },
 
