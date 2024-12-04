@@ -7,7 +7,7 @@ export const TokenService = {
   setToken(token: string) {
     cookies.set("lzytkn", token, {
       expires: new Date(Date.now() + 24 * 60 * 60 * 1000 * 2),
-      domain:  import.meta.env.VITE_COOKIE_DOMAIN
+      domain: import.meta.env.VITE_COOKIE_DOMAIN
     });
   },
 
@@ -16,7 +16,9 @@ export const TokenService = {
   },
 
   removeToken() {
-    cookies.remove("lzytkn");
+    cookies.remove("lzytkn", {
+      domain: import.meta.env.VITE_COOKIE_DOMAIN
+    });
   },
 
   isAuthenticated(): boolean {
