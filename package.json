@@ -14,8 +14,6 @@
     "@ckeditor/ckeditor5-build-classic": "^43.3.1",
     "@ckeditor/ckeditor5-markdown-gfm": "^43.3.1",
     "@ckeditor/ckeditor5-vue": "^7.3.0",
-    "@codemirror/commands": "^6.7.1",
-    "@codemirror/state": "^6.4.1",
     "@fancyapps/ui": "^5.0.36",
     "@shikijs/markdown-it": "^1.22.2",
     "@vueuse/core": "^11.3.0",
@@ -27,7 +25,6 @@
     "ckeditor5": "^43.3.1",
     "ckeditor5-premium-features": "^43.3.1",
     "echarts": "^5.4.2",
-    "insert-text-at-cursor": "^0.3.0",
     "lodash-es": "^4.17.21",
     "markdown-it": "^13.0.1",
     "markdown-it-attrs": "^4.1.6",
@@ -50,7 +47,6 @@
     "vue": "^3.5.12",
     "vue-chartjs": "^5.3.2",
     "vue-draggable-plus": "^0.5.6",
-    "vue-i18n": "^10.0.3",
     "vue-router": "^4.4.5"
   },
   "devDependencies": {
