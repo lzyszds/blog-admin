@@ -33,10 +33,11 @@ let routeItems = routeItem.filter((item) => !item.meta.isHide);
           :key="item.meta.key"
           @click="emit('push-router', item)"
           class="menuitem"
+          style="display: flex;align-items: center"
         >
           {{ item.meta.isHide }}
           <span class="anticon">
-            <LzyIcon :name="item.meta.uicon" style="font-weight: 600" />
+            <LzyIcon :name="item.meta.uicon" style="font-weight: 600" size="20" />
           </span>
           <span class="menu-title-item">{{ item.meta.name }}</span>
         </AMenu-item>
@@ -56,7 +57,10 @@ let routeItems = routeItem.filter((item) => !item.meta.isHide);
   background-color: var(--color-bg);
   z-index: 2;
   box-shadow: 2px 0 8px 0px rgb(29, 35, 41, 0.05);
+  overflow-x: hidden;
 
+
+  
   .ant-layout-sider-children-item {
     height: 100%;
     display: flex;
@@ -64,6 +68,7 @@ let routeItems = routeItem.filter((item) => !item.meta.isHide);
 
     .ant-menu {
       flex: 1;
+      overflow-y: auto;
     }
   }
 
@@ -112,7 +117,15 @@ let routeItems = routeItem.filter((item) => !item.meta.isHide);
 }
 </style>
 <style>
+.ant-menu-inline-collapsed {
+  .menu-title-item {
+    display: none !important;
+  }
+}
 .menuitem {
+  display: flex;
+  align-items: center;
+
   span:nth-child(1) {
     display: flex;
     align-items: center;

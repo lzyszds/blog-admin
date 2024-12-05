@@ -22,5 +22,8 @@ if (props.size) {
 .LzyIcon {
   cursor: pointer;
   vertical-align: sub;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
 }
 </style>

@@ -68,7 +68,7 @@ const refreshSrcoll = () => {
 
 <style scoped>
 .content-area {
-  padding: 10px 15px;
+  padding: 5px 15px;
   background-color: var(--color-bg);
   display: flex;
   justify-content: space-around;
@@ -76,17 +76,20 @@ const refreshSrcoll = () => {
 
 /* Keep the relevant styles from the original component */
 .icon-btn {
-  display: flex;
+  display: grid;
+  grid-template-columns: 15px 1fr 12px;
   justify-content: space-around;
   align-items: center;
   gap: 5px;
-  font-size: 14px;
+  font-size: 12px;
+  font-weight: 600;
   border-bottom: 2px solid transparent;
-  border-radius: 5px;
-  margin-right: 3px;
+  border-radius: 8px;
+  margin-right: 4px;
   background-color: var(--color-bg-light);
   transition: 0s;
-  width: 140px;
+  width: 120px;
+  padding: 2px 15px 2px 10px;
 
   &.active {
     color: #fff;
@@ -95,7 +98,6 @@ const refreshSrcoll = () => {
   }
 
   svg.icon-close {
-    margin-left: 5px;
     font-size: 18px !important;
     z-index: 99;
 

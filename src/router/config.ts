@@ -21,7 +21,7 @@ const routeItem: RouteItem[] = [
     meta: {
       key: 1,
       name: "首页数据",
-      uicon: "hugeicons:home-01",
+      uicon: "solar:pie-chart-2-broken",
       component: "dashboard",
       noClose: true,
     },
@@ -110,7 +110,7 @@ const routeItem: RouteItem[] = [
     meta: {
       key: 9,
       name: "个人中心",
-      uicon: "user-icon",
+      uicon: "ph:user-circle-duotone",
       component: "userCenter",
       isHide: true,
     },
