@@ -1,24 +1,24 @@
 <script setup lang="ts">
 import { login } from "@/api/user";
 import { useRequest } from "@/hook/useRequest";
-import { TokenService } from "@/hook/useTokenService"; // const baseURL = import.meta.env.VITE_BASE_URL;
+import { TokenService } from "@/hook/useTokenService";
+import { useTabsState } from "@/store/useTabsStore.ts"; // const baseURL = import.meta.env.VITE_BASE_URL;
 
 const isTransition = ref(false);
 const router = useRouter();
+const tabsState = useTabsState();
 //进入页面先判断是否登陆着,localStorage.getItem('token')是登陆时候存的token
-
 if (TokenService.isAuthenticated()) {
   //路由重定向
-  router.replace("/");
+  router.replace("/" + tabsState.tabsKeyArr[tabsState.activeKey].path);
 }
 
 const { loading, throttledRequest } = useRequest(
   login,
   {
     success: (data) => {
-      console.log(data);
       TokenService.setToken(data);
-      router.replace("/");
+      router.replace("/" + tabsState.tabsKeyArr[tabsState.activeKey].path);
     },
   },
   500,

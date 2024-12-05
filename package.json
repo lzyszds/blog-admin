@@ -18,6 +18,7 @@
     "@shikijs/markdown-it": "^1.22.2",
     "@vueuse/core": "^11.3.0",
     "@vueuse/integrations": "^11.3.0",
+    "alova": "^3.2.6",
     "animate.css": "^4.1.1",
     "ant-design-vue": "^4.2.6",
     "axios": "^1.7.7",

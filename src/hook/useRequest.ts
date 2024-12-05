@@ -24,7 +24,7 @@ export function useRequest(
   apiFunction: (...args: any[]) => Promise<any>,
   requestAfterCall: RequestAfterCall = {},
   throttleDelay = 1000,
-  retryCount = 0
+  retryCount = 0,
 ): UseRequestReturn {
   const loading = ref<boolean>(false); /* 加载状态 */
   const error = ref<any>(null); /* 错误信息 */
@@ -33,7 +33,7 @@ export function useRequest(
   /*  节流函数 */
   const throttledRequest = useThrottleFn(async (...args: any[]) => {
     /* 时间戳 */
-    const oldTime = Date.now()
+    const oldTime = Date.now();
     loading.value = true;
     error.value = null;
 
@@ -43,11 +43,13 @@ export function useRequest(
       try {
         /* 执行请求 */
         const result = (await apiFunction(...args)).data;
-        const newTime = Date.now()
-        console.log(`请求耗时：${newTime - oldTime}ms`)
+        const newTime = Date.now();
+        console.log(`请求耗时：${newTime - oldTime}ms`);
         /* 如果耗时在 1s 以内，则延迟至 1s */
         if (newTime - oldTime < 500) {
-          await new Promise((resolve) => setTimeout(resolve, 500 - (newTime - oldTime)));
+          await new Promise((resolve) =>
+            setTimeout(resolve, 500 - (newTime - oldTime)),
+          );
         }
         data.value = result;
         requestAfterCall.success?.(data.value); // 使用可选链调用
@@ -70,6 +72,7 @@ export function useRequest(
     /* 执行一次请求 */
     await executeRequest();
   }, throttleDelay);
+
 
   return { data, loading, error, throttledRequest };
 }
