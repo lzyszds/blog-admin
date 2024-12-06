@@ -191,7 +191,7 @@ const multipleDel = () => {
           :pagination="pagination"
           size="small"
           row-key="uid"
-          @change="({ current }) => (searchCondition.pages = current)"
+          @change="handleTableChange"
         />
       </main>
     </ACard>
