@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { articleAdd, articleDelete, articleEditor, articleList } from "@/api/posts";
-import PostsForm from "@/components/form/PostsForm.vue";
 import useResetRefState from "@/hook/useResetRefState";
 import { getTableStore } from "@/store/useTableStore";
 import { useScrollY } from "@/hook/useTableConfig";
@@ -11,6 +10,8 @@ import { TableProps } from "ant-design-vue";
 import { getArticleColumns } from "@/table/postsColumns";
 import { ArticleDataType } from "@/typings/Posts.ts";
 import { useRequest } from "alova/client";
+
+const PostsForm = defineAsyncComponent(() => import("@/components/form/PostsForm.vue"));
 
 /* 获取表格滚动条高度 */
 const { scrollConfig } = useScrollY();

@@ -7,7 +7,7 @@ import VueHook from "alova/vue";
 import { message } from "ant-design-vue";
 
 export const AlovaInstance = createAlova({
-  baseURL: import.meta.env.VITE_BASE_URL+'/api',
+  baseURL: import.meta.env.VITE_BASE_URL + '/api',
   statesHook: VueHook,
   // 请求适配器，这里我们使用fetch请求适配器
   requestAdapter: adapterFetch(),
@@ -27,7 +27,10 @@ export const AlovaInstance = createAlova({
       const json = await response.json();
       if (json.code !== 200) {
         // 抛出错误或返回reject状态的Promise实例时，此请求将抛出错误
-        throw new Error(json.message);
+        console.log(json);
+        
+        message.error(json.msg);
+        throw new Error(json.msg);
       }
       // 解析的响应数据将传给method实例的transformData钩子函数，这些函数将在后续讲解
       return json;

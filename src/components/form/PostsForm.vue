@@ -8,7 +8,6 @@ import { createVNode } from "vue";
 import { ExclamationCircleOutlined } from "@ant-design/icons-vue";
 import { uploadImageToPictureBed } from "@/api/toolkit.ts";
 import Editor from "@/components/ckeditor/CkEditor.vue";
-import md from "@/utils/markdownInit.ts";
 
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
@@ -45,9 +44,7 @@ console.log(modalParams, "modalParams");
 const coverUpLoad = ref(false);
 
 //当前选中的标签数据
-const tagData: any = ref(
-  information.value?.tags || modalParams.params?.tags || [],
-);
+const tagData: any = ref(information.value?.tags || modalParams.params?.tags || []);
 
 /* 全局配置缓存 */
 // const globlConfig = useStorage("globlConfig", {
@@ -88,7 +85,7 @@ const saveForm = (content?: string) => {
   };
   console.log(formState.value[params.aid || "add"]);
   const values: any = Object.values(
-    isEqual(formState.value[params.aid || "add"], params),
+    isEqual(formState.value[params.aid || "add"], params)
   );
   for (let item of values) {
     if (item.length != 0) {
@@ -161,13 +158,14 @@ async function setData(): Promise<ArticleDataType> {
   let firstText = "";
   //遍历所有子元素 如果tagname 标题h1 h2 h3 h4 h5 h6 则跳过
   for (const firstKey in first) {
-    if (
-      !["H1", "H2", "H3", "H4", "H5", "H6"].includes(first[firstKey].tagName)
-    ) {
+    if (!["H1", "H2", "H3", "H4", "H5", "H6"].includes(first[firstKey].tagName)) {
       firstText = first[firstKey].innerText;
       break;
     }
   }
+
+  const md = (await import("@/utils/markdownInit.ts")).default;
+
   const main = md.render(content || "");
 
   // 初始化文章数据
@@ -308,10 +306,7 @@ onMounted(() => {
             </template>
           </a-upload>
           <a-divider>文章标题</a-divider>
-          <AInput
-            v-model:value="information.title"
-            placeholder="必填 | 请输入文章标题"
-          />
+          <AInput v-model:value="information.title" placeholder="必填 | 请输入文章标题" />
           <a-divider>文章分类</a-divider>
           <a-select
             ref="selectRef"
