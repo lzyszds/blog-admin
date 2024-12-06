@@ -1,4 +1,5 @@
 // api.js
+import { Method } from "alova";
 import { AlovaInstance } from "./index"; // 请求头
 // 请求头
 const headers = {
@@ -14,7 +15,7 @@ export const Alova = {
       cacheFor: 1000 * 60 * 10, // 缓存时间
       timeout: 10000, // 超时时间
       credentials: "include",
-    }) as Promise<any>;
+    }) as Method<any>;
   },
   // 这是post请求
   createPost(
@@ -26,6 +27,6 @@ export const Alova = {
       headers,
       ...options,
       credentials: "include",
-    }) as Promise<any>;
+    }) as Method<any>;
   },
 };

@@ -10,7 +10,7 @@ import {
 import UserForm from "@/components/form/UserForm.vue";
 import useResetRefState from "@/hook/useResetRefState";
 import { getTableStore } from "@/store/useTableStore";
-import { useRequest } from "@/hook/useRequest";
+import { useRequest } from "alova/client";
 import { useScrollY } from "@/hook/useTableConfig";
 import { multDelData } from "@/utils/tableHandles.ts";
 import { Key } from "ant-design-vue/es/_util/type";
@@ -45,13 +45,17 @@ const modalParams = ref({
   sureCallback: {
     uploadHeadImg,
     callback: addUser,
-    refreshData: () => throttledRequest(searchCondition),
+    refreshData: () => send(),
   },
 });
 
-/* 获取表格数据 并生成防抖函数  */
-const { data: tableData, loading, throttledRequest } = useRequest(getUsersList);
-throttledRequest(searchCondition);
+// 请求数据 自带防抖监听
+const { loading, data, send } = useRequest(getUsersList(searchCondition), {
+  immediate: true,
+});
+
+// 表格数据
+const tableData = computed(() => data.value?.data);
 
 /* 分页参数 */
 const pagination = computed(() => {
@@ -64,7 +68,7 @@ const pagination = computed(() => {
     onShowSizeChange: (current, pageSize) => {
       searchCondition.value.pages = current;
       searchCondition.value.limit = pageSize;
-      throttledRequest(searchCondition);
+      send();
     },
   };
 });
@@ -74,7 +78,7 @@ const getTable = getTableStore();
 
 /* 设置表格列表数据的回调方法 */
 getTable.setCallbackArr({
-  getData: () => throttledRequest(searchCondition),
+  getData: () => send(),
   delData: ({ uid }) => delUser({ uid }),
   openModal: (params) => setUserModal(params),
   columns: getUserColumns,
@@ -91,7 +95,7 @@ const columns = computed(() => {
 
 const handleTableChange: TableProps["onChange"] = (pagination) => {
   searchCondition.value.pages = pagination.current;
-  throttledRequest(searchCondition);
+  send();
 };
 
 /* 获取所有可用头像 */
@@ -122,7 +126,7 @@ watchEffect(async () => {
 const multipleDel = () => {
   multDelData(selectedRowKeys.value, delUser, () => {
     selectedRowKeys.value = [];
-    throttledRequest(searchCondition);
+    send();
   });
 };
 </script>
@@ -134,7 +138,7 @@ const multipleDel = () => {
         <section>
           <span>用户名：</span>
           <AInput
-            @pressEnter="throttledRequest(searchCondition)"
+            @pressEnter="send()"
             v-model:value="searchCondition.name"
             placeholder="请输入用户名称"
           />
@@ -142,7 +146,7 @@ const multipleDel = () => {
         <section>
           <span>用户账号：</span>
           <AInput
-            @pressEnter="throttledRequest(searchCondition)"
+            @pressEnter="send()"
             v-model:value="searchCondition.username"
             placeholder="请输入用户账号"
           />
@@ -159,7 +163,7 @@ const multipleDel = () => {
           <AButton @click="reset" style="flex: 1">
             <LzyIcon name="hugeicons:exchange-01" /> 重置
           </AButton>
-          <AButton @click="throttledRequest(searchCondition)" style="flex: 1">
+          <AButton @click="send()" style="flex: 1">
             <LzyIcon name="hugeicons:search-area" /> 搜索
           </AButton>
         </section>
@@ -177,7 +181,7 @@ const multipleDel = () => {
           :selectedRowKeys="selectedRowKeys"
           :addModal="setUserModal"
           :loading="loading"
-          @refresh="throttledRequest(searchCondition)"
+          @refresh="send()"
           @multipleDel="multipleDel"
         />
       </template>

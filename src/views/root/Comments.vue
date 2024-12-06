@@ -2,7 +2,7 @@
 import { getCommentList, deleteComment } from "@/api/comment";
 import useResetRefState from "@/hook/useResetRefState";
 import { getTableStore } from "@/store/useTableStore";
-import { useRequest } from "@/hook/useRequest";
+import { useRequest } from "alova/client";
 import { useScrollY } from "@/hook/useTableConfig";
 import { multDelData } from "@/utils/tableHandles.ts";
 import { Key } from "ant-design-vue/es/_util/type";
@@ -31,9 +31,13 @@ const onSelectChange = (keys: Key[]) => {
   selectedRowKeys.value = keys;
 };
 
-/* 获取表格数据 并生成防抖函数  */
-const { data: tableData, loading, throttledRequest } = useRequest(getCommentList);
-throttledRequest(searchCondition);
+// 请求数据 自带防抖监听
+const { loading, data, send } = useRequest(getCommentList(searchCondition), {
+  immediate: true,
+});
+
+// 表格数据
+const tableData = computed(() => data.value?.data);
 
 /* 分页参数 */
 const pagination = computed(() => {
@@ -48,7 +52,7 @@ const pagination = computed(() => {
     onShowSizeChange: (current, pageSize) => {
       searchCondition.value.pages = current;
       searchCondition.value.limit = pageSize;
-      throttledRequest(searchCondition);
+      send();
     },
   };
 });
@@ -58,7 +62,7 @@ const getTable = getTableStore();
 
 /* 设置表格列表数据的回调方法 */
 getTable.setCallbackArr({
-  getData: () => throttledRequest(searchCondition),
+  getData: () => send(),
   delData: ({ commentId }) => deleteComment({ commentId }),
   columns: getcommentColumns,
 });
@@ -74,14 +78,14 @@ const columns = computed(() => {
 
 const handleTableChange: TableProps["onChange"] = (pagination) => {
   searchCondition.value.pages = pagination.current;
-  throttledRequest(searchCondition);
+  send();
 };
 
 //多选删除列表事件
 const multipleDel = () => {
   multDelData(selectedRowKeys.value, deleteComment, () => {
     selectedRowKeys.value = [];
-    throttledRequest(searchCondition);
+    send();
   });
 };
 </script>
@@ -93,7 +97,7 @@ const multipleDel = () => {
         <section>
           <span>评论邮箱</span>
           <AInput
-            @pressEnter="throttledRequest(searchCondition)"
+            @pressEnter="send()"
             v-model:value="searchCondition.email"
             placeholder="请输入邮箱"
           />
@@ -101,7 +105,7 @@ const multipleDel = () => {
         <section>
           <span>评论ID</span>
           <AInput
-            @pressEnter="throttledRequest(searchCondition)"
+            @pressEnter="send()"
             v-model:value="searchCondition.comment_id"
             placeholder="请输入评论ID"
           />
@@ -109,7 +113,7 @@ const multipleDel = () => {
         <section>
           <span>评论内容</span>
           <AInput
-            @pressEnter="throttledRequest(searchCondition)"
+            @pressEnter="send()"
             v-model:value="searchCondition.content"
             placeholder="请输入评论内容"
           />
@@ -127,7 +131,7 @@ const multipleDel = () => {
           <AButton @click="reset" style="flex: 1">
             <LzyIcon name="hugeicons:exchange-01" /> 重置
           </AButton>
-          <AButton @click="throttledRequest(searchCondition)" style="flex: 1">
+          <AButton @click="send()" style="flex: 1">
             <LzyIcon name="hugeicons:search-area" /> 搜索
           </AButton>
         </section>
@@ -144,7 +148,7 @@ const multipleDel = () => {
         <TableHeaderOperation
           :selectedRowKeys="selectedRowKeys"
           :loading="loading"
-          @refresh="throttledRequest(searchCondition)"
+          @refresh="send()"
           @multipleDel="multipleDel"
         />
       </template>

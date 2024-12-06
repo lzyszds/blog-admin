@@ -1,14 +1,8 @@
 <script setup lang="ts">
-import {
-  articleAdd,
-  articleDelete,
-  articleEditor,
-  articleList,
-} from "@/api/posts";
+import { articleAdd, articleDelete, articleEditor, articleList } from "@/api/posts";
 import PostsForm from "@/components/form/PostsForm.vue";
 import useResetRefState from "@/hook/useResetRefState";
 import { getTableStore } from "@/store/useTableStore";
-import { useRequest } from "@/hook/useRequest";
 import { useScrollY } from "@/hook/useTableConfig";
 import { multDelData } from "@/utils/tableHandles.ts";
 import { Key } from "ant-design-vue/es/_util/type";
@@ -16,6 +10,7 @@ import TableHeaderOperation from "@/components/TableHeaderOperation.vue";
 import { TableProps } from "ant-design-vue";
 import { getArticleColumns } from "@/table/postsColumns";
 import { ArticleDataType } from "@/typings/Posts.ts";
+import { useRequest } from "alova/client";
 
 /* 获取表格滚动条高度 */
 const { scrollConfig } = useScrollY();
@@ -43,13 +38,17 @@ const modalParams = ref<any>({
   headimgs: [],
   sureCallback: {
     callback: articleAdd,
-    refreshData: () => throttledRequest(searchCondition),
+    refreshData: () => send,
   },
 });
 
-/* 获取表格数据 并生成防抖函数  */
-const { data: tableData, loading, throttledRequest } = useRequest(articleList);
-throttledRequest(searchCondition);
+// 请求数据 自带防抖监听
+const { loading, data, send } = useRequest(articleList(searchCondition), {
+  immediate: true,
+});
+
+// 表格数据
+const tableData = computed(() => data.value?.data);
 
 /* 分页参数 */
 const pagination = computed(() => {
@@ -60,9 +59,10 @@ const pagination = computed(() => {
     showSizeChanger: true,
     pageSizeOptions: ["5", "8", "10", "15", "20"],
     onShowSizeChange: (current, pageSize) => {
+      //切换每页条数，会触发这里
       searchCondition.value.pages = current;
       searchCondition.value.limit = pageSize;
-      throttledRequest(searchCondition);
+      send();
     },
   };
 });
@@ -72,7 +72,7 @@ const usersTableData = getTableStore();
 
 /* 设置表格列表数据的回调方法 */
 usersTableData.setCallbackArr({
-  getData: () => throttledRequest(searchCondition),
+  getData: () => send(),
   delData: ({ aid }) => articleDelete({ id: aid }),
   openModal: (params) => setUserModal(params),
   columns: getArticleColumns,
@@ -88,7 +88,6 @@ const columns = computed(() => {
 });
 const handleTableChange: TableProps["onChange"] = (pagination) => {
   searchCondition.value.pages = pagination.current;
-  throttledRequest(searchCondition);
 };
 
 /* 添加/编辑弹窗 */
@@ -117,21 +116,19 @@ watchEffect(async () => {
 const multipleDel = () => {
   multDelData(selectedRowKeys.value, articleDelete, () => {
     selectedRowKeys.value = [];
-    throttledRequest(searchCondition);
+    send();
   });
 };
 </script>
 
 <template>
-  <section
-    style="display: flex; flex-direction: column; gap: 20px; height: 100%"
-  >
+  <section style="display: flex; flex-direction: column; gap: 20px; height: 100%">
     <ACard title="搜索工具" :bordered="false">
       <main class="searchCard">
         <section>
           <span>文章名：</span>
           <AInput
-            @pressEnter="throttledRequest(searchCondition)"
+            @pressEnter="send"
             v-model:value="searchCondition.name"
             placeholder="请输入文章名称"
           />
@@ -139,7 +136,7 @@ const multipleDel = () => {
         <section>
           <span>文章账号：</span>
           <AInput
-            @pressEnter="throttledRequest(searchCondition)"
+            @pressEnter="send"
             v-model:value="searchCondition.username"
             placeholder="请输入文章账号"
           />
@@ -147,11 +144,7 @@ const multipleDel = () => {
 
         <section>
           <span>文章权限：</span>
-          <ASelect
-            v-model:value="searchCondition.power"
-            style="width: 160px"
-            allowClear
-          >
+          <ASelect v-model:value="searchCondition.power" style="width: 160px" allowClear>
             <ASelectOption value="0">超级管理员</ASelectOption>
             <ASelectOption value="1">普通文章</ASelectOption>
           </ASelect>
@@ -161,7 +154,7 @@ const multipleDel = () => {
             <LzyIcon name="hugeicons:exchange-01" />
             重置
           </AButton>
-          <AButton @click="throttledRequest(searchCondition)" style="flex: 1">
+          <AButton @click="send" style="flex: 1">
             <LzyIcon name="hugeicons:search-area" />
             搜索
           </AButton>
@@ -180,7 +173,7 @@ const multipleDel = () => {
           :selectedRowKeys="selectedRowKeys"
           :addModal="setUserModal"
           :loading="loading"
-          @refresh="throttledRequest(searchCondition)"
+          @refresh="send"
           @multipleDel="multipleDel"
           :usersTableData="usersTableData"
         />
@@ -198,7 +191,7 @@ const multipleDel = () => {
           :pagination="pagination"
           size="small"
           row-key="uid"
-          @change="handleTableChange"
+          @change="({ current }) => (searchCondition.pages = current)"
         />
       </main>
     </ACard>
