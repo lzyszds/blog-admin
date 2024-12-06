@@ -11,9 +11,11 @@ import { visualizer } from 'rollup-plugin-visualizer'
 import viteCompression from 'vite-plugin-compression'
 import { ViteImageOptimizer } from 'vite-plugin-image-optimizer'
 import AutoImport from 'unplugin-auto-import/vite'
+import dns from 'dns'
+
 
 const CWD = process.cwd()
-
+dns.setDefaultResultOrder('verbatim')
 // https://vitejs.dev/config/
 export default ({ mode }: any) => {
   const env = loadEnv(mode, CWD)
@@ -86,6 +88,7 @@ export default ({ mode }: any) => {
       },
     },
     server: {
+      host: 'localhost',
       open: false,
       port: 1026,
       proxy: {
