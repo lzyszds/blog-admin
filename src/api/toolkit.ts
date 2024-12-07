@@ -11,6 +11,11 @@ export const getWeather = () => {
   return Alova.createGet("/toolkit/getWeather");
 };
 
+//获取github前端项目的提交记录
+export const getGithubFrontCommit = () => {
+  return Alova.createGet("/toolkit/getGithubFrontCommit");
+};
+
 //获取已存进图库中的图片
 export const getPictureBedImageList = () => {
   return Alova.createGet("/toolkit/getPictureBedImageList");

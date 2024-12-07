@@ -1,41 +1,103 @@
-<template>
-  <div style="height: 100%;">
-    <Line :data="chartData" :options="chartOptions" />
-  </div>
-</template>
-
 <script setup>
-import { ref } from 'vue';
-import { Line } from 'vue-chartjs';
-import { Chart as ChartJS, Title, Tooltip, Legend, LineElement, PointElement, CategoryScale, LinearScale } from 'chart.js';
+import { ref } from "vue";
+import "vue-data-ui/style.css";
+import { getGithubFrontCommit } from "@/api/toolkit";
 
-ChartJS.register(Title, Tooltip, Legend, LineElement, PointElement, CategoryScale, LinearScale);
+const response = await getGithubFrontCommit();
+console.log(response);
 
-const chartData = ref({
-  labels: ['一月', '二月', '三月', '四月', '五月', '六月'],
-  datasets: [{
-    label: '收入',
-    data: [65, 59, 80, 81, 56, 55],
-    fill: false,
-    borderColor: 'rgb(75, 192, 192)',
-    // tension: 0.1
-  }]
+const config = ref({
+  theme: "",
+  customPalette: [],
+  style: {
+    fontFamily: "inherit",
+    backgroundColor: "#FFFFFFff",
+    animation: { show: true, animationFrames: 60 },
+    bar: {
+      gradient: { show: true, intensity: 40, underlayerColor: "#FFFFFF" },
+    },
+    legend: {
+      show: false,
+      textAlign: "left",
+      fontSize: 12,
+      margin: "6px 0 0 0",
+      name: { color: "#1A1A1Aff", bold: false },
+      value: {
+        show: true,
+        bold: false,
+        color: "#1A1A1Aff",
+        prefix: "",
+        suffix: "",
+        rounding: 0,
+        formatter: null,
+      },
+      percentage: { show: true, bold: true, color: "#1A1A1Aff", rounding: 1 },
+    },
+    title: {
+      text: "",
+      color: "#1A1A1Aff",
+      fontSize: 16,
+      bold: true,
+      textAlign: "left",
+      paddingLeft: 0,
+      paddingRight: 0,
+      subtitle: { color: "#A1A1A1ff", text: "", fontSize: 12, bold: false },
+      margin: "0 0 6px 0",
+    },
+    tooltip: {
+      show: true,
+      color: "#1A1A1Aff",
+      backgroundColor: "#FFFFFFff",
+      fontSize: 14,
+      customFormat: null,
+      borderRadius: 4,
+      borderColor: "#e1e5e8",
+      borderWidth: 1,
+      backgroundOpacity: 30,
+      position: "center",
+      offsetY: 24,
+    },
+  },
 });
 
-const chartOptions = ref({
-  responsive: true,
-  maintainAspectRatio: false,
-  scales: {
-    x: {
-      grid: {
-        display: false
-      }
-    },
-    y: {
-      grid: {
-        display: false
-      }
-    }
-  }
+const dataset = ref([]);
+
+dataset.value = response.data.typeMap.map((item) => {
+  return {
+    name: item.title,
+    value: item.value,
+    color: item.color,
+  };
 });
 </script>
+
+<template>
+  <!--    <a-steps-->
+  <!--      progress-dot-->
+  <!--      :current="1"-->
+  <!--      direction="vertical"-->
+  <!--      :items="[-->
+  <!--        {-->
+  <!--          title: 'Finished',-->
+  <!--          description: 'This is a description. This is a description.',-->
+  <!--        },-->
+  <!--        {-->
+  <!--          title: 'Finished',-->
+  <!--          description: 'This is a description. This is a description.',-->
+  <!--        },-->
+  <!--        {-->
+  <!--          title: 'In Progress',-->
+  <!--          description: 'This is a description. This is a description.',-->
+  <!--        },-->
+  <!--        {-->
+  <!--          title: 'Waiting',-->
+  <!--          description: 'This is a description.',-->
+  <!--        },-->
+  <!--        {-->
+  <!--          title: 'Waiting',-->
+  <!--          description: 'This is a description.',-->
+  <!--        },-->
+  <!--      ]"-->
+  <!--    ></a-steps>-->
+  <ACard :bordered="false" class="card-wrapper"> </ACard>
+</template>

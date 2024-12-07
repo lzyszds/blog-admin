@@ -1,197 +1,130 @@
-<script setup>
-import { VueUiDonut } from "vue-data-ui";
-import _ from "lodash";
-import "vue-data-ui/style.css";
+<script setup lang="ts">
+import { onMounted, ref } from "vue";
+import * as echarts from "echarts";
 
-const frontConfig = ref({
-  type: "classic",
-  responsive: false,
-  theme: "",
-  customPalette: [],
-  useCssAnimation: true,
-  useBlurOnHover: false,
-  userOptions: {
-    show: false,
-  },
-  translations: {
-    show: false,
-  },
-  table: {
-    show: false,
-    responsiveBreakpoint: 400,
-    th: {
-      backgroundColor: "#FFFFFFff",
-      color: "#1A1A1Aff",
-      outline: "none",
-    },
-    td: {
-      backgroundColor: "#FFFFFFff",
-      color: "#1A1A1Aff",
-      outline: "none",
-      roundingValue: 0,
-      roundingPercentage: 0,
-    },
-    columnNames: {
-      series: "Series",
-      value: "Value",
-      percentage: "Percentage",
-    },
-  },
-  style: {
-    fontFamily: "inherit",
-    chart: {
-      useGradient: false,
-      gradientIntensity: "14",
-      backgroundColor: "#ffffffff",
-      color: "#1a1a1aff",
-      layout: {
-        labels: {
-          dataLabels: {
-            show: true,
-            useLabelSlots: false,
-            hideUnderValue: 3,
-            prefix: "",
-            suffix: "",
-          },
-          value: {
-            rounding: 0,
-            show: true,
-            formatter: null,
-          },
-          percentage: {
-            color: "#1A1A1Aff",
-            bold: true,
-            fontSize: 18,
-            rounding: 0,
-            formatter: null,
-          },
-          name: {
-            color: "#1A1A1Aff",
-            bold: false,
-            fontSize: 14,
-          },
-          hollow: {
-            total: {
-              show: true,
-              bold: false,
-              color: "#000",
-              fontSize: 24,
-              text: "前端",
-              offsetY: 10,
-              value: {
-                color: "transparent",
-              },
-            },
-            average: {
-              show: false,
-            },
-          },
-        },
-        donut: {
-          strokeWidth: "59",
-          borderWidth: "0",
-          useShadow: true,
-          shadowColor: "rgba(26, 26, 26, 1)",
-        },
-      },
-      comments: {
-        show: true,
-        showInTooltip: true,
-        width: 100,
-        offsetY: 0,
-        offsetX: 0,
-      },
-      legend: {
-        show: false,
-        bold: false,
-        backgroundColor: "#FFFFFFff",
-        color: "#1a1a1aff",
-        fontSize: 16,
-        roundingValue: 0,
-        roundingPercentage: 0,
-      },
-      tooltip: {
-        show: true,
-        color: "#1A1A1Aff",
-        backgroundColor: "#FFFFFFff",
-        fontSize: 14,
-        customFormat: null,
-        borderRadius: 4,
-        borderColor: "#e1e5e8",
-        borderWidth: 1,
-        backgroundOpacity: 30,
-        position: "center",
-        offsetY: 24,
-        showValue: true,
-        showPercentage: true,
-        roundingValue: 0,
-        roundingPercentage: 0,
-      },
-    },
-  },
-});
-
-const backendConfig = ref(_.cloneDeep(frontConfig.value));
-backendConfig.value.style.chart.layout.labels.hollow.total.text = "后端";
+const domRef = ref<HTMLElement | null>(null);
+let chart: echarts.ECharts | null = null;
 
 const frontDataset = ref([
-  {
-    name: "Vue",
-    values: [39.8],
-    color: "#41B883",
-  },
-
-  {
-    name: "Css",
-    values: [36.3],
-    color: "#663399",
-  },
-  {
-    name: "Typescript",
-    values: [23.6],
-    color: "#3178C6",
-  },
-  {
-    name: "其他",
-    values: [9],
-    color: "#EDEDED",
-  },
+  { name: "Vue", value: 39.8, color: "#41B883" },
+  { name: "Css", value: 36.3, color: "#663399" },
+  { name: "Typescript", value: 23.6, color: "#3178C6" },
+  { name: "其他", value: 9, color: "#EDEDED" },
 ]);
 
 const backendDataset = ref([
-  {
-    name: "Hono",
-    values: [30],
-    color: "#FF3704",
-  },
-  {
-    name: "TypeScript",
-    values: [39.8],
-    color: "#3178C6",
-  },
-  {
-    name: "redis",
-    values: [10],
-    color: "#FF4438",
-  },
-  {
-    name: "mysql",
-    values: [30],
-    color: "#005B80",
-  },
+  { name: "Hono", value: 30, color: "#FF3704" },
+  { name: "TypeScript", value: 39.8, color: "#3178C6" },
+  { name: "redis", value: 10, color: "#FF4438" },
+  { name: "mysql", value: 30, color: "#005B80" },
 ]);
+
+const initChart = () => {
+  if (!domRef.value) return;
+
+  chart = echarts.init(domRef.value);
+  updateChartOption();
+};
+
+const updateChartOption = () => {
+  if (!chart) return;
+
+  chart.setOption({
+    tooltip: {
+      trigger: "item",
+      formatter: "{a} <br/>{b} : {c} ({d}%)",
+    },
+    title: {
+      text: "前端技术栈和后端技术栈",
+      x: "center",
+    },
+    series: [
+      {
+        name: "前端技术栈",
+        type: "pie",
+        radius: ["45%", "75%"],
+        avoidLabelOverlap: false,
+        itemStyle: {
+          borderRadius: 10,
+          borderColor: "#fff",
+          borderWidth: 1,
+        },
+        emphasis: {
+          label: {
+            show: true,
+            fontSize: 40,
+            fontWeight: "bold",
+          },
+        },
+        data: frontDataset.value,
+        label: {
+          show: false,
+          position: "center",
+        },
+      },
+      {
+        name: "后端技术栈",
+        type: "pie",
+        radius: ["20%", "40%"],
+        avoidLabelOverlap: false,
+        itemStyle: {
+          borderRadius: 5,
+          borderColor: "#fff",
+          borderWidth: 1,
+        },
+        emphasis: {
+          label: {
+            show: true,
+            fontSize: 40,
+            fontWeight: "bold",
+          },
+        },
+        data: backendDataset.value,
+        label: {
+          show: false,
+          position: "center",
+        },
+      },
+    ],
+  });
+};
+
+const { width } = useElementSize(domRef);
+
+watchDebounced(
+  width,
+  () => {
+    handleResize();
+  },
+  { debounce: 0, maxWait: 200 },
+);
+
+onMounted(() => {
+  initChart();
+});
+
+const handleResize = () => {
+  if (chart) {
+    chart.resize();
+  }
+};
 </script>
 
 <template>
-  <div class="circle">
-    <VueUiDonut :config="frontConfig" :dataset="frontDataset" />
-    <VueUiDonut :config="backendConfig" :dataset="backendDataset" />
+  <div class="card-wrapper">
+    <div ref="domRef" style="height: 360px; width: 100%"></div>
   </div>
 </template>
 
 <style scoped>
-.circle {
-  display: flex;
-  justify-content: space-around;
+.card-wrapper {
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  padding: 16px;
+
+  canvas {
+    transition: 0.3s;
+  }
 }
 </style>

@@ -1,41 +1,48 @@
 <template>
   <div class="dashboard-content">
-    <!-- 顶部四个卡片 -->
+    <!--    <ARow :gutter="[16, 16]" style="margin-top: 16px">-->
+    <!--      <ACol :span="12">-->
+    <!--        <ACard title="销售统计" style="height: 100%">-->
+    <!--          <SalesChart />-->
+    <!--        </ACard>-->
+    <!--      </ACol>-->
+    <!--      <ACol :span="12">-->
+    <!--        <ACard title="技术栈" style="height: 100%; overflow: hidden">-->
+    <!--          <UserDistributionChart />-->
+    <!--        </ACard>-->
+    <!--      </ACol>-->
+    <!--    </ARow>-->
+    <!--    <ARow :gutter="[16, 16]" style="margin-top: 16px">-->
+    <!--      <ACol :span="12">-->
+    <!--        <ACard title="最新评论" style="height: 100%"></ACard>-->
+    <!--      </ACol>-->
+    <!--      <ACol :span="12">-->
+    <!--        <ACard-->
+    <!--          title="更新记录"-->
+    <!--          style="height: 100%"-->
+    <!--          body-style="overflow-y: auto"-->
+    <!--        >-->
+    <!--          &lt;!&ndash;          <IncomeChart />&ndash;&gt;-->
+    <!--        </ACard>-->
+    <!--      </ACol>-->
+    <!--    </ARow>-->
     <ARow :gutter="[16, 16]">
-      <ACol :span="6" v-for="stat in stats" :key="stat.title">
-        <ACard>
-          <a-statistic
-            :title="stat.title"
-            :value="stat.value"
-            :precision="stat.precision"
-            :valueStyle="stat.style"
-          >
-            <template #prefix>
-              <component :is="stat.icon" />
-            </template>
-            <template #suffix>
-              <span v-if="stat.suffix">{{ stat.suffix }}</span>
-            </template>
-          </a-statistic>
-        </ACard>
+      <ACol :span="24" :lg="14">
+        <IncomeChart />
+      </ACol>
+      <ACol :span="24" :lg="10">
+        <UserDistributionChart />
       </ACol>
     </ARow>
     <ARow :gutter="[16, 16]" style="margin-top: 16px">
-      <ACol :span="12">
+      <ACol :span="24" :lg="14">
         <ACard title="销售统计" style="height: 100%">
-          <SalesChart />
+          <!--          <SalesChart />-->
         </ACard>
       </ACol>
-      <ACol :span="12">
-        <ACard title="技术栈" style="height: 100%" >
-          <UserDistributionChart />
-        </ACard>
-      </ACol>
-    </ARow>
-    <ARow :gutter="[16, 16]" style="margin-top: 16px">
-      <ACol :span="24">
-        <ACard title="收入趋势" style="height: 100%">
-          <IncomeChart />
+      <ACol :span="24" :lg="10">
+        <ACard title="技术栈" style="height: 100%; overflow: hidden">
+          <!--          <UserDistributionChart />-->
         </ACard>
       </ACol>
     </ARow>
@@ -49,9 +56,7 @@ import {
   ShoppingCartOutlined,
   UserOutlined,
 } from "@ant-design/icons-vue";
-import SalesChart from "@/components/dashboard/SalesChart.vue";
 import UserDistributionChart from "@/components/dashboard/UserDistributionChart.vue";
-import IncomeChart from "@/components/dashboard/IncomeChart.vue";
 
 const stats = ref([
   {
@@ -94,8 +99,6 @@ const stats = ref([
 .dashboard-content {
   height: 100%;
   overflow: hidden;
-  display: grid;
-  grid-template-rows: 1fr 4fr 5fr;
 }
 
 :deep(.ant-card) {
