@@ -1,35 +1,7 @@
 <template>
   <div class="dashboard-content">
-    <!--    <ARow :gutter="[16, 16]" style="margin-top: 16px">-->
-    <!--      <ACol :span="12">-->
-    <!--        <ACard title="销售统计" style="height: 100%">-->
-    <!--          <SalesChart />-->
-    <!--        </ACard>-->
-    <!--      </ACol>-->
-    <!--      <ACol :span="12">-->
-    <!--        <ACard title="技术栈" style="height: 100%; overflow: hidden">-->
-    <!--          <UserDistributionChart />-->
-    <!--        </ACard>-->
-    <!--      </ACol>-->
-    <!--    </ARow>-->
-    <!--    <ARow :gutter="[16, 16]" style="margin-top: 16px">-->
-    <!--      <ACol :span="12">-->
-    <!--        <ACard title="最新评论" style="height: 100%"></ACard>-->
-    <!--      </ACol>-->
-    <!--      <ACol :span="12">-->
-    <!--        <ACard-->
-    <!--          title="更新记录"-->
-    <!--          style="height: 100%"-->
-    <!--          body-style="overflow-y: auto"-->
-    <!--        >-->
-    <!--          &lt;!&ndash;          <IncomeChart />&ndash;&gt;-->
-    <!--        </ACard>-->
-    <!--      </ACol>-->
-    <!--    </ARow>-->
     <ARow :gutter="[16, 16]">
-      <ACol :span="24" :lg="14">
-        <IncomeChart />
-      </ACol>
+      <ACol :span="24" :lg="14"></ACol>
       <ACol :span="24" :lg="10">
         <UserDistributionChart />
       </ACol>
@@ -41,8 +13,11 @@
         </ACard>
       </ACol>
       <ACol :span="24" :lg="10">
-        <ACard title="技术栈" style="height: 100%; overflow: hidden">
-          <!--          <UserDistributionChart />-->
+        <ACard
+          title="更新日志"
+          :body-style="{ maxHeight: '400px', overflowY: 'auto' }"
+        >
+          <IncomeChart />
         </ACard>
       </ACol>
     </ARow>
@@ -57,6 +32,7 @@ import {
   UserOutlined,
 } from "@ant-design/icons-vue";
 import UserDistributionChart from "@/components/dashboard/UserDistributionChart.vue";
+import IncomeChart from "@/components/dashboard/IncomeChart.vue";
 
 const stats = ref([
   {
@@ -94,11 +70,6 @@ const stats = ref([
 .header {
   background: #001529;
   padding: 0 20px;
-}
-
-.dashboard-content {
-  height: 100%;
-  overflow: hidden;
 }
 
 :deep(.ant-card) {
