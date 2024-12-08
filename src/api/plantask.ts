@@ -14,7 +14,14 @@ export const updateEmailTaskConfig = (data: object) => {
 
 //获取所有任务
 export const getAllTask = () => {
-  return Alova.createGet("/plantask/tasks");
+  return Alova.createGet("/plantask/tasks", {
+    cacheFor: 0,
+  });
+};
+
+//获取可添加的任务参数
+export const getTaskParams = () => {
+  return Alova.createGet("/plantask/getTaskParams");
 };
 
 //更新任务
@@ -46,4 +53,10 @@ export const deleteTask = (taskId: string) => {
 //根据任务id获取任务日志
 export const getTaskLog = (taskId: string) => {
   return Alova.createGet(`/plantask/tasks/${taskId}/logs`);
+};
+
+//创建任务
+export const createTask = (data: Task) => {
+  data = convertKeysToSnakeCase(data);
+  return Alova.createPost("/plantask/createTask", data);
 };

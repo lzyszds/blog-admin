@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import {
+  createTask,
   deleteTask,
   disableTask,
   enableTask,
   getAllTask,
   getTaskLog,
+  getTaskParams,
   runTask,
   updateTask,
 } from "@/api/plantask.ts";
@@ -23,12 +25,14 @@ import { removeInlineStyles } from "@/utils/comment.ts";
 const { width } = useWindowSize();
 const taskData = ref<any>([]);
 
+const { data: params } = await getTaskParams();
+
 //获取任务列表
-const getTaskDatat = async () => {
+const getTaskData = async () => {
   const { data } = await getAllTask();
   taskData.value = [...data, {}];
 };
-getTaskDatat();
+getTaskData();
 
 //所有指令栈
 const stackInstruction = ref({});
@@ -83,7 +87,7 @@ const menuData = (item: Task): MenuData[] => [
           if (result.code === 200) {
             message.success("操作成功");
             //重新获取任务列表
-            await getTaskDatat();
+            await getTaskData();
           }
         },
       });
@@ -105,6 +109,7 @@ const menuData = (item: Task): MenuData[] => [
         message.success(result.data);
       } catch (error) {}
       stackInstruction.value[id] = false;
+      await getTaskData();
     },
   },
   {
@@ -114,7 +119,9 @@ const menuData = (item: Task): MenuData[] => [
     click: async () => {
       editTaskDrawer.value = true;
       try {
-        item.paramsBody = JSON.parse(item.paramsBody!);
+        if (typeof item.paramsBody === "string") {
+          item.paramsBody = JSON.parse(item.paramsBody);
+        }
       } catch (e) {}
       currentEditTask.value = item;
     },
@@ -133,7 +140,7 @@ const menuData = (item: Task): MenuData[] => [
           if (result.code === 200) {
             message.success("删除成功");
             //重新获取任务列表
-            await getTaskDatat();
+            await getTaskData();
           }
         },
       });
@@ -145,7 +152,7 @@ const menuData = (item: Task): MenuData[] => [
     icon: "material-symbols:preview",
     click: async () => {
       let { data } = await getTaskLog(item.id);
-      if(data.length === 0) {
+      if (data.length === 0) {
         message.warning("暂无日志");
         return;
       }
@@ -175,17 +182,55 @@ const saveEdit = async () => {
     }
     editTaskDrawer.value = false;
     //重新获取任务列表
-    await getTaskDatat();
+    await getTaskData();
+  } catch (error) {}
+};
+
+//保存添加
+const saveAdd = async () => {
+  try {
+    const taskData = { ...currentEditTask.value };
+    taskData.paramsBody = JSON.stringify(taskData.paramsBody);
+    const result = await createTask(taskData);
+    if (result.code === 200) {
+      message.success("添加成功");
+    }
+    editTaskDrawer.value = false;
+    //重新获取任务列表
+    await getTaskData();
   } catch (error) {}
 };
 
 const onSwiper = (swiper) => {
-  console.log(swiper)
+  console.log(swiper);
 };
 
 const onSlideChange = (swiper: any) => {
   logModal.value.page = swiper.activeIndex + 1;
 };
+
+//添加计划任务
+const addTaskPlan = async () => {
+  currentEditTask.value = {
+    id: "",
+    name: "",
+    type: "",
+    cronExpression: "",
+    paramsBody: "",
+    isEnabled: 0,
+  };
+
+  editTaskDrawer.value = true;
+};
+
+watchEffect(() => {
+  // 如果当前编辑任务的类型为空且id不为空，则返回
+  if (!currentEditTask.value.type || currentEditTask.value.id) return;
+  // 将当前编辑任务的类型对应的参数转换为对象，并赋值给当前编辑任务的paramsBody
+  currentEditTask.value.paramsBody = Object.fromEntries(
+    params[currentEditTask.value.type].map((item) => [item, ""]),
+  );
+});
 </script>
 
 <template>
@@ -217,7 +262,7 @@ const onSlideChange = (swiper: any) => {
         </a-dropdown>
         <a-list-item v-else>
           <a-card class="add-new">
-            <a-button type="dashed">
+            <a-button type="dashed" @click="addTaskPlan">
               <LzyIcon size="70" name="iconoir:plus" />
               <span>添加计划任务</span>
             </a-button>
@@ -234,7 +279,8 @@ const onSlideChange = (swiper: any) => {
       :width="width < 960 ? '100%' : '50%'"
     >
       <template #extra>
-        <a-button type="primary" @click="saveEdit">保存修改</a-button>
+        <a-button v-if="!!currentEditTask.id" type="primary" @click="saveEdit">保存修改</a-button>
+        <a-button v-else type="primary" @click="saveAdd">保存任务</a-button>
       </template>
       <a-form
         ref="formRef"
@@ -247,12 +293,16 @@ const onSlideChange = (swiper: any) => {
           <a-input v-model:value="currentEditTask.name" />
         </a-form-item>
         <a-form-item label="任务函数" name="type">
-          <a-select v-model:value="currentEditTask.type">
-            <a-select-option value="sendEmailLove">
-              sendEmailLove
-            </a-select-option>
-            <a-select-option value="sendEmailWarn">
-              sendEmailWarn
+          <a-select
+            v-model:value="currentEditTask.type"
+            :disabled="!!currentEditTask.id"
+          >
+            <a-select-option
+              v-for="(_item, index) in params"
+              :key="index"
+              :value="index"
+            >
+              {{ index }}
             </a-select-option>
           </a-select>
         </a-form-item>
@@ -296,7 +346,7 @@ const onSlideChange = (swiper: any) => {
           gap: '20px',
         }"
       >
-        <LzyIcon name="iconoir:nav-arrow-left" size="30" />
+        <!--        <LzyIcon name="iconoir:nav-arrow-left" size="30" />-->
         <swiper
           class="mySwiper"
           style="flex: 1 1 0"
@@ -311,7 +361,7 @@ const onSlideChange = (swiper: any) => {
           </swiper-slide>
         </swiper>
         <!--        v-html="logModal.data[logModal.page - 1]?.content" -->
-        <LzyIcon name="iconoir:nav-arrow-right" size="30" />
+        <!--        <LzyIcon name="iconoir:nav-arrow-right" size="30" />-->
       </ACard>
       <template #footer>
         <div style="display: flex; justify-content: space-between">
@@ -426,6 +476,12 @@ const onSlideChange = (swiper: any) => {
 
     section {
     }
+  }
+}
+
+@media screen and (max-width: 960px) {
+  :deep(.ant-card-body) {
+    padding: 0;
   }
 }
 </style>

@@ -11,10 +11,10 @@ export const Alova = {
   // 这是get请求
   createGet(url: string, options?: Record<string, any>) {
     return AlovaInstance.Get(url, {
-      ...options,
       cacheFor: 1000 * 60 * 10, // 缓存时间
       timeout: 10000, // 超时时间
       credentials: "include",
+      ...options,
     }) as Method<any>;
   },
   // 这是post请求

@@ -5,7 +5,7 @@ export interface Task {
   type: string;
   cronExpression: string;
   isEnabled?: number;
-  paramsBody?: string | null;
+  paramsBody?: string | null | object | any;
   lastExecutedAt?: Date | null;
   createdAt?: Date;
   updatedAt?: Date;
@@ -27,7 +27,6 @@ export interface TaskConfig {
   type: string;
   cronExpression: string;
 }
-
 
 export interface MenuData {
   key: string;
