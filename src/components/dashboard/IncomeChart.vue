@@ -1,47 +1,130 @@
-<script setup>
-import { ref } from "vue";
-import { getGithubFrontCommit } from "@/api/toolkit";
-import { setTimeAgoLocalMessages } from "@/utils/comment";
+<script setup lang="ts">
+import { onMounted, ref } from "vue";
+import * as echarts from "echarts";
 
-const response = await getGithubFrontCommit();
-console.log(response);
+const domRef = ref<HTMLElement | null>(null);
+let chart: echarts.ECharts | null = null;
 
-const dataset = ref([]);
-const stepsData = ref([]);
+const frontDataset = ref([
+  { name: "Vue", value: 39.8, color: "#41B883" },
+  { name: "Css", value: 36.3, color: "#663399" },
+  { name: "Typescript", value: 23.6, color: "#3178C6" },
+  { name: "其他", value: 9, color: "#EDEDED" },
+]);
 
-// dataset.value = response.data.typeMap.map((item) => {
-//   return {
-//     name: item.title,
-//     value: item.value,
-//     color: item.color,
-//   };
-// });
-//
-stepsData.value = response.data.runInfoList.map((item) => {
-  const description = useTimeAgo(item.createdAt, setTimeAgoLocalMessages).value;
-  return {
-    title:
-      item.commitMessage + (item.conclusion === "success" ? "✅" : "❌"),
-    description: description + " by " + item.commitAuthor,
-  };
+const backendDataset = ref([
+  { name: "Hono", value: 30, color: "#FF3704" },
+  { name: "TypeScript", value: 39.8, color: "#3178C6" },
+  { name: "redis", value: 10, color: "#FF4438" },
+  { name: "mysql", value: 30, color: "#005B80" },
+]);
+
+const initChart = () => {
+  if (!domRef.value) return;
+
+  chart = echarts.init(domRef.value);
+  updateChartOption();
+};
+
+const updateChartOption = () => {
+  if (!chart) return;
+
+  chart.setOption({
+    tooltip: {
+      trigger: "item",
+      formatter: "{a} <br/>{b} : {c} ({d}%)",
+    },
+    title: {
+      text: "前端技术栈和后端技术栈",
+      x: "center",
+    },
+    series: [
+      {
+        name: "前端技术栈",
+        type: "pie",
+        radius: ["45%", "75%"],
+        avoidLabelOverlap: false,
+        itemStyle: {
+          borderRadius: 10,
+          borderColor: "#fff",
+          borderWidth: 1,
+        },
+        emphasis: {
+          label: {
+            show: true,
+            fontSize: 40,
+            fontWeight: "bold",
+          },
+        },
+        data: frontDataset.value,
+        label: {
+          show: false,
+          position: "center",
+        },
+      },
+      {
+        name: "后端技术栈",
+        type: "pie",
+        radius: ["20%", "40%"],
+        avoidLabelOverlap: false,
+        itemStyle: {
+          borderRadius: 5,
+          borderColor: "#fff",
+          borderWidth: 1,
+        },
+        emphasis: {
+          label: {
+            show: true,
+            fontSize: 40,
+            fontWeight: "bold",
+          },
+        },
+        data: backendDataset.value,
+        label: {
+          show: false,
+          position: "center",
+        },
+      },
+    ],
+  });
+};
+
+const { width } = useElementSize(domRef);
+
+watchDebounced(
+  width,
+  () => {
+    handleResize();
+  },
+  { debounce: 0, maxWait: 200 },
+);
+
+onMounted(() => {
+  initChart();
 });
+
+const handleResize = () => {
+  if (chart) {
+    chart.resize();
+  }
+};
 </script>
 
 <template>
-  <a-steps
-    :current="100"
-    direction="vertical"
-    :items="stepsData"
-    size="small"
-  ></a-steps>
+  <div class="card-wrapper">
+    <div ref="domRef" style="height: 360px; width: 100%"></div>
+  </div>
 </template>
+
 <style scoped>
 .card-wrapper {
-  height: 360px;
-  overflow-y: auto;
-}
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  padding: 16px;
 
-.ant-steps-item {
-  cursor: pointer !important;
+  canvas {
+    transition: 0.3s;
+  }
 }
 </style>

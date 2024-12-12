@@ -19,9 +19,7 @@
 
     <ARow :gutter="[16, 16]" style="margin-top: 16px">
       <ACol :span="24" :lg="14">
-        <ACard title="热门统计" style="height: 100%">
-          <StatisticsChart />
-        </ACard>
+        <StatisticsChart />
       </ACol>
       <ACol :span="24" :lg="10">
         <UpdateLog />
@@ -49,8 +47,8 @@ import {
   ShoppingCartOutlined,
   UserOutlined,
 } from "@ant-design/icons-vue";
-import UpdateLog from "@/components/dashboard/UpdateLog.vue";
-import IncomeChart from "@/components/dashboard/IncomeChart.vue";
+import UpdateLog from "@/components/dashboard/IncomeChart.vue";
+import IncomeChart from "@/components/dashboard/UpdateLog.vue";
 import StatisticsChart from "@/components/dashboard/StatisticsChart.vue";
 import { getAdminHomeData } from "@/api/toolkit";
 import LzyIcon from "@/components/LzyIcon.vue";

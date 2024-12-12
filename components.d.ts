@@ -52,6 +52,7 @@ declare module 'vue' {
     CkEditor: typeof import('./src/components/ckeditor/CkEditor.vue')['default']
     DraggableCard: typeof import('./src/components/DraggableCard.vue')['default']
     IncomeChart: typeof import('./src/components/dashboard/IncomeChart.vue')['default']
+    IncomeChart1: typeof import('./src/components/dashboard/IncomeChart1.vue')['default']
     LzyIcon: typeof import('./src/components/LzyIcon.vue')['default']
     PostsForm: typeof import('./src/components/form/PostsForm.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
