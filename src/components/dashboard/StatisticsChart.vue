@@ -4,7 +4,6 @@ const echatsDom = ref(null);
 
 type EChartsOption = echarts.EChartsOption;
 
-var option: EChartsOption;
 let chart: echarts.ECharts | null = null;
 
 const initChart = () => {
