@@ -33,9 +33,7 @@ import premiumFeaturesTranslations from "ckeditor5-premium-features/translations
 
 import "ckeditor5/ckeditor5.css";
 import "ckeditor5-premium-features/ckeditor5-premium-features.css";
-import { useUserInfoState } from "@/store/useUserInfoStore";
 
-const { userInfo } = useUserInfoState()
 
 export const editorConfig: any = {
   translations: [coreTranslations, premiumFeaturesTranslations],
