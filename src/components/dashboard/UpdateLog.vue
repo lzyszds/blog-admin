@@ -1,15 +1,3 @@
-watchEffect(() => {
-    // 如果当前编辑任务的类型为空且id不为空，则返回
-    if (!currentEditTask.value.type && currentEditTask.value.id) return;
-    // 打印当前编辑任务的类型对应的参数
-    console.log(params[currentEditTask.value.type]);
-    // 将当前编辑任务的类型对应的参数转换为对象，并赋值给当前编辑任务的paramsBody
-    currentEditTask.value.paramsBody = Object.fromEntries(
-      params[currentEditTask.value.type].map((item) => [item, ""]),
-    );
-    // 打印当前编辑任务的paramsBody
-    console.log(currentEditTask.value.paramsBody);
-  });
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
 import * as echarts from "echarts";

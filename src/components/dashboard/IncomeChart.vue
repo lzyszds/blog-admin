@@ -1,6 +1,5 @@
 <script setup>
 import { ref } from "vue";
-import "vue-data-ui/style.css";
 import { getGithubFrontCommit } from "@/api/toolkit";
 import { setTimeAgoLocalMessages } from "@/utils/comment";
 
