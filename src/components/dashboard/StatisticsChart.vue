@@ -2,7 +2,6 @@
 import * as echarts from "echarts";
 const echatsDom = ref(null);
 
-type EChartsOption = echarts.EChartsOption;
 
 let chart: echarts.ECharts | null = null;
 
