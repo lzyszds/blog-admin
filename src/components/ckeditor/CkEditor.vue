@@ -20,7 +20,7 @@ const editor = ClassicEditor;
 
 <template>
   <div class="markdown-editor" id="markdown-editor">
-    <ckeditor v-model="editorData" :editor="editor" :config="editorConfig" />
+    <Ckeditor v-model="editorData" :editor="editor" :config="editorConfig" />
   </div>
 </template>
 
@@ -61,7 +61,7 @@ const editor = ClassicEditor;
     }
 
     .ck-editor__main {
-      overflow-y: auto;
+      overflow: auto;
       height: calc(100vh - 65px - 50px - 40px);
     }
 
@@ -90,6 +90,9 @@ const editor = ClassicEditor;
         height: 20px;
         line-height: 20px;
         transition: 0.12s;
+      }
+      p {
+        white-space: normal;
       }
     }
 

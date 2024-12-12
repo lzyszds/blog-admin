@@ -1,6 +1,6 @@
 import {
   Autoformat,
-  Base64UploadAdapter,
+  SimpleUploadAdapter,
   BlockQuote,
   Bold,
   CloudServices,
@@ -33,10 +33,14 @@ import premiumFeaturesTranslations from "ckeditor5-premium-features/translations
 
 import "ckeditor5/ckeditor5.css";
 import "ckeditor5-premium-features/ckeditor5-premium-features.css";
+import { useUserInfoState } from "@/store/useUserInfoStore";
+
+const { userInfo } = useUserInfoState()
 
 export const editorConfig: any = {
   translations: [coreTranslations, premiumFeaturesTranslations],
   plugins: [
+    SimpleUploadAdapter,//上传图片
     Autoformat, // 自动格式化
     BlockQuote, // 引用
     Bold, // 加粗
@@ -50,7 +54,7 @@ export const editorConfig: any = {
     Image, // 图片
     ImageToolbar, // 图片工具栏
     ImageUpload, // 图片上传
-    Base64UploadAdapter, // 图片上传
+    // Base64UploadAdapter, // 图片上传
     Italic, // 斜体
     Link, // 链接
     List, // 列表
@@ -174,5 +178,13 @@ export const editorConfig: any = {
   table: {
     contentToolbar: ["tableColumn", "tableRow", "mergeTableCells"],
   },
+
+  simpleUpload: {
+    // The URL that the images are uploaded to.
+    uploadUrl: import.meta.env.VITE_BASE_URL + '/api/toolkit/uploadImageToPictureBed',
+
+    // Enable the XMLHttpRequest.withCredentials property.
+    withCredentials: true,
+  }
 
 };

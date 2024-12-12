@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { getUserInfoToken } from '@/api/user'
-import { User } from '@/typings/User'
+import { UserAdmin } from '@/typings/User'
 import { useTabsState } from "@/store/useTabsStore";
 import routeItem from "@/router/config";
 import { TokenService } from '@/hook/useTokenService';
@@ -9,7 +9,7 @@ const tabsState = useTabsState()
 
 export const useUserInfoState = defineStore('useUserInfoState', () => {
 
-  const userInfo = ref<User>({})
+  const userInfo = ref<UserAdmin>({})
   const isLogin = ref(false)
   const isAdmin = ref(false)
   const isEditor = ref(false)
