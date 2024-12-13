@@ -50,9 +50,7 @@ onMounted(() => {
 
 // 监听路由变化，更新选中的菜单项
 watchEffect(() => {
-  selected.value = routeItem.find(
-    (item) => item.name == router.currentRoute.value.name,
-  ); // 查找当前路由对应的菜单项
+  selected.value = routeItem.find((item) => item.name == router.currentRoute.value.name); // 查找当前路由对应的菜单项
   if (selected.value) selectedKeys.value = [selected.value?.meta.key];
   // 更新选中键
   else selectedKeys.value = []; // 如果没有选中项，则清空选中键

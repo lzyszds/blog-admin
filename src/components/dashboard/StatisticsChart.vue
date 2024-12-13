@@ -28,7 +28,6 @@ for (let i = 0; i < 20; i++) {
 }
 
 const updateChartOption = () => {
-  console.log(chart);
 
   if (!chart) return;
 

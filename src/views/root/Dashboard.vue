@@ -81,7 +81,6 @@ const stats = ref([
 ]);
 
 getAdminHomeData().then((res) => {
-  console.log(res);
 
   stats.value.forEach((item) => {
     if (item.title === "总用户") {

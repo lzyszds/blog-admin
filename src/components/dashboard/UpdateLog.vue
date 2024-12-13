@@ -4,7 +4,6 @@ import { getGithubFrontCommit } from "@/api/toolkit";
 import { setTimeAgoLocalMessages } from "@/utils/comment";
 
 const response = await getGithubFrontCommit();
-console.log(response);
 
 const dataset = ref([]);
 const stepsData = ref([]);
