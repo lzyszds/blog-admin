@@ -1,37 +1,34 @@
 <script setup lang="ts">
 import { TokenService } from "@/hook/useTokenService";
 import { useUserInfoState } from "@/store/useUserInfoStore";
+import { useUserOnlineStore } from "@/store/useUserOnline.ts";
 /* 获取用户信息 */
 const userStore = useUserInfoState();
 
+const userOnlineStore = useUserOnlineStore();
+
 userStore.fetchUserInfo().then(() => {
   //发送在线长连接
-  const socket = new WebSocket("ws://localhost:2024/api/websocket");
+  const socket = new WebSocket("ws://localhost:2024/websocket");
 
   socket.addEventListener("open", () => {
     console.log("已连接到服务器");
 
     // 登录，发送 userId 给服务器
     const userId = userStore.userInfo.uid; // 假设这是用户的唯一标识，你需要根据你的实际情况生成或获取
-    socket.send(JSON.stringify({ type: "在线", userId, token: TokenService.getToken() }));
+    socket.send(
+      JSON.stringify({ type: "在线", userId, token: TokenService.getToken() }),
+    );
   });
 
   socket.addEventListener("message", (event) => {
     const data = JSON.parse(event.data);
-    console.log("Online users:", data.data);
-
     if (data.type === "onlineUsers") {
-      console.log("Online users:", data.data);
+      console.log("Online users:", userOnlineStore.onlinePeople);
       // 在这里更新页面上的在线用户列表
+      userOnlineStore.setUserOnline(data.data);
     }
   });
-  // socket.addEventListener("close", () => {
-  //   console.log("Connection closed");
-  // });
-
-  // socket.addEventListener("error", (error) => {
-  //   console.error("WebSocket error:", error);
-  // });
 });
 </script>
 

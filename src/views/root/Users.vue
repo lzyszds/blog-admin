@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import {
-  getUsersList,
   addUser,
-  editUser,
   delUser,
+  editUser,
   getAllHeadImg,
+  getUsersList,
   uploadHeadImg,
 } from "@/api/user";
 import UserForm from "@/components/form/UserForm.vue";
@@ -132,7 +132,9 @@ const multipleDel = () => {
 </script>
 
 <template>
-  <section style="display: flex; flex-direction: column; gap: 20px; height: 100%">
+  <section
+    style="display: flex; flex-direction: column; gap: 20px; height: 100%"
+  >
     <ACard title="搜索工具" :bordered="false">
       <main class="searchCard">
         <section>
@@ -154,17 +156,23 @@ const multipleDel = () => {
 
         <section>
           <span>用户权限：</span>
-          <ASelect v-model:value="searchCondition.power" style="width: 160px" allowClear>
+          <ASelect
+            v-model:value="searchCondition.power"
+            style="width: 160px"
+            allowClear
+          >
             <ASelectOption value="0">超级管理员</ASelectOption>
             <ASelectOption value="1">普通用户</ASelectOption>
           </ASelect>
         </section>
         <section style="display: flex; gap: 10px">
           <AButton @click="reset" style="flex: 1">
-            <LzyIcon name="hugeicons:exchange-01" /> 重置
+            <LzyIcon name="hugeicons:exchange-01" />
+            重置
           </AButton>
           <AButton @click="send()" style="flex: 1">
-            <LzyIcon name="hugeicons:search-area" /> 搜索
+            <LzyIcon name="hugeicons:search-area" />
+            搜索
           </AButton>
         </section>
       </main>
