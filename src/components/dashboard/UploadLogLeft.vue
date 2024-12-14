@@ -2,10 +2,15 @@
 import { getGithubFrontCommit } from "@/api/toolkit";
 import { setTimeAgoLocalMessages } from "@/utils/comment";
 
+type StepData = {
+  title: string;
+  description: string;
+  conclusion: string;
+};
 const response = await getGithubFrontCommit();
 
-const dataset = ref([]);
-const stepsData = ref([]);
+// const dataset = ref([]);
+const stepsData = ref<StepData[]>([]);
 
 // dataset.value = response.data.typeMap.map((item) => {
 //   return {

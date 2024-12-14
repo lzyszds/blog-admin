@@ -1,11 +1,17 @@
-<script setup>
+<script setup lang="ts">
 import { getGithubFrontCommit } from "@/api/toolkit";
 import { setTimeAgoLocalMessages } from "@/utils/comment";
 
+type StepData = {
+  title: string;
+  description: string;
+  conclusion: string;
+};
+
 const response = await getGithubFrontCommit();
 
-const dataset = ref([]);
-const stepsData = ref([]);
+// const dataset = ref([]);
+const stepsData = ref<StepData[]>([]);
 
 // dataset.value = response.data.typeMap.map((item) => {
 //   return {
@@ -20,6 +26,7 @@ stepsData.value = response.data.runInfoList.map((item) => {
   return {
     title: item.commitMessage + (item.conclusion === "success" ? "✅" : "❌"),
     description: description + " by " + item.commitAuthor,
+    conclusion: item.conclusion,
   };
 });
 </script>
