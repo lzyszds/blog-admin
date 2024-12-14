@@ -8,8 +8,12 @@ const userStore = useUserInfoState();
 const userOnlineStore = useUserOnlineStore();
 
 userStore.fetchUserInfo().then(() => {
+  const url = import.meta.env.VITE_BASE_URL.replace("http", "ws").replace(
+    "https",
+    "wss",
+  );
   //发送在线长连接
-  const socket = new WebSocket("ws://localhost:2024/websocket");
+  const socket = new WebSocket(url + "/websocket");
 
   socket.addEventListener("open", () => {
     console.log("已连接到服务器");
