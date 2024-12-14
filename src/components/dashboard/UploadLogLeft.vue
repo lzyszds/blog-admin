@@ -6,6 +6,7 @@ type StepData = {
   title: string;
   description: string;
   conclusion: string;
+  id: number;
 };
 const response = await getGithubFrontCommit();
 
@@ -26,6 +27,7 @@ stepsData.value = response.data.runInfoList.map((item) => {
     title: item.commitMessage,
     description: description + " by " + item.commitAuthor,
     conclusion: item.conclusion,
+    id: item.id,
   };
 });
 </script>
