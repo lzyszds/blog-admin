@@ -94,7 +94,9 @@ const { width } = useElementSize(domRef);
 watchDebounced(
   width,
   () => {
-    handleResize();
+    if (chart) {
+      chart.resize();
+    }
   },
   { debounce: 0, maxWait: 200 },
 );
@@ -102,12 +104,6 @@ watchDebounced(
 onMounted(() => {
   initChart();
 });
-
-const handleResize = () => {
-  if (chart) {
-    chart.resize();
-  }
-};
 </script>
 
 <template>

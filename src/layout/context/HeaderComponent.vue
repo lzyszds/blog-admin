@@ -32,4 +32,10 @@ defineEmits(["toggle-collapse"]);
     display: flex;
   }
 }
+
+@media screen and (max-width: 568px) {
+  .ant-layout-header {
+    padding:0
+  }
+}
 </style>

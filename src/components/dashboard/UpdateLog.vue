@@ -1,5 +1,4 @@
 <script setup>
-import { ref } from "vue";
 import { getGithubFrontCommit } from "@/api/toolkit";
 import { setTimeAgoLocalMessages } from "@/utils/comment";
 
@@ -19,8 +18,7 @@ const stepsData = ref([]);
 stepsData.value = response.data.runInfoList.map((item) => {
   const description = useTimeAgo(item.createdAt, setTimeAgoLocalMessages).value;
   return {
-    title:
-      item.commitMessage + (item.conclusion === "success" ? "✅" : "❌"),
+    title: item.commitMessage + (item.conclusion === "success" ? "✅" : "❌"),
     description: description + " by " + item.commitAuthor,
   };
 });

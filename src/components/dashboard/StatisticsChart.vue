@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import * as echarts from "echarts";
-const echatsDom = ref(null);
 
+const echatsDom = ref(null);
 
 let chart: echarts.ECharts | null = null;
 
@@ -20,7 +20,9 @@ let barData: any[] = [];
 
 for (let i = 0; i < 20; i++) {
   let date = new Date((dottedBase += 3600 * 24 * 1000));
-  category.push([date.getFullYear(), date.getMonth() + 1, date.getDate()].join("-"));
+  category.push(
+    [date.getFullYear(), date.getMonth() + 1, date.getDate()].join("-"),
+  );
   let b = Math.random() * 200;
   let d = Math.random() * 200;
   barData.push(b);
@@ -28,17 +30,16 @@ for (let i = 0; i < 20; i++) {
 }
 
 const updateChartOption = () => {
-
   if (!chart) return;
 
   chart.setOption({
     backgroundColor: "#fff",
     grid: {
-        left: '3%',   // 减小左边距
-        right: '4%',  // 减小右边距
-        bottom: '3%', // 减小底边距
-        top: '10%',    // 减小顶边距，如果图例位置有影响，可能需要更大一点
-        containLabel: true // 确保轴标签不会超出图表区域
+      left: "3%", // 减小左边距
+      right: "4%", // 减小右边距
+      bottom: "3%", // 减小底边距
+      top: "10%", // 减小顶边距，如果图例位置有影响，可能需要更大一点
+      containLabel: true, // 确保轴标签不会超出图表区域
     },
     tooltip: {
       trigger: "axis",
@@ -122,6 +123,19 @@ const updateChartOption = () => {
     ],
   });
 };
+
+const { width } = useElementSize(echatsDom);
+
+watchDebounced(
+  width,
+  () => {
+    if (chart) {
+      chart.resize();
+    }
+  },
+  { debounce: 0, maxWait: 200 },
+);
+
 onMounted(() => {
   initChart();
 });
@@ -129,7 +143,11 @@ onMounted(() => {
 
 <template>
   <div class="card-wrapper">
-    <div ref="echatsDom" class="echarts" style="height: 360px; width: 100%"></div>
+    <div
+      ref="echatsDom"
+      class="echarts"
+      style="height: 360px; width: 100%"
+    ></div>
   </div>
 </template>
 

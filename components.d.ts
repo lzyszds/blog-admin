@@ -7,11 +7,13 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    AAvatar: typeof import('ant-design-vue/es')['Avatar']
     ABadge: typeof import('ant-design-vue/es')['Badge']
     ABreadcrumb: typeof import('ant-design-vue/es')['Breadcrumb']
     ABreadcrumbItem: typeof import('ant-design-vue/es')['BreadcrumbItem']
     AButton: typeof import('ant-design-vue/es')['Button']
     ACard: typeof import('ant-design-vue/es')['Card']
+    ACardMeta: typeof import('ant-design-vue/es')['CardMeta']
     ACheckbox: typeof import('ant-design-vue/es')['Checkbox']
     ACol: typeof import('ant-design-vue/es')['Col']
     AConfigProvider: typeof import('ant-design-vue/es')['ConfigProvider']
@@ -53,11 +55,14 @@ declare module 'vue' {
     ATabs: typeof import('ant-design-vue/es')['Tabs']
     ATag: typeof import('ant-design-vue/es')['Tag']
     ATextarea: typeof import('ant-design-vue/es')['Textarea']
+    ATimeline: typeof import('ant-design-vue/es')['Timeline']
+    ATimelineItem: typeof import('ant-design-vue/es')['TimelineItem']
     ATooltip: typeof import('ant-design-vue/es')['Tooltip']
     ATree: typeof import('ant-design-vue/es')['Tree']
     ATypographyLink: typeof import('ant-design-vue/es')['TypographyLink']
     AUploadDragger: typeof import('ant-design-vue/es')['UploadDragger']
     BetterScroll: typeof import('./src/components/BetterScroll.vue')['default']
+    Bulletin: typeof import('./src/components/dashboard/Bulletin.vue')['default']
     CkEditor: typeof import('./src/components/ckeditor/CkEditor.vue')['default']
     DraggableCard: typeof import('./src/components/DraggableCard.vue')['default']
     IncomeChart: typeof import('./src/components/dashboard/IncomeChart.vue')['default']
@@ -73,6 +78,7 @@ declare module 'vue' {
     TableHeaderOperation: typeof import('./src/components/TableHeaderOperation.vue')['default']
     TaskCard: typeof import('./src/components/TaskCard.vue')['default']
     UpdateLog: typeof import('./src/components/dashboard/UpdateLog.vue')['default']
+    UploadLogLeft: typeof import('./src/components/dashboard/UploadLogLeft.vue')['default']
     UserForm: typeof import('./src/components/form/UserForm.vue')['default']
   }
 }
