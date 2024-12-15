@@ -60,17 +60,6 @@ const routeItem: RouteItem[] = [
     },
   },
   {
-    path: "categories",
-    name: "categories",
-    component: () => import("@/views/root/Categories.vue"),
-    meta: {
-      key: 5,
-      name: "分类管理",
-      uicon: "hugeicons:dashboard-square-edit",
-      component: "categories",
-    },
-  },
-  {
     path: "plantask",
     name: "plantask",
     component: () => import("@/views/root/Plantask.vue"),

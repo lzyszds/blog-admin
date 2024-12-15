@@ -70,6 +70,7 @@ declare module 'vue' {
     PostsForm: typeof import('./src/components/form/PostsForm.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    SelectImageType: typeof import('./src/components/SelectImageType.vue')['default']
     SetAiKey: typeof import('./src/components/webSet/SetAiKey.vue')['default']
     SetFooterOrAi: typeof import('./src/components/webSet/SetFooterOrAi.vue')['default']
     SetLoadGif: typeof import('./src/components/webSet/SetLoadGif.vue')['default']

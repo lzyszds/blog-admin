@@ -4,13 +4,25 @@ import {
   deletePictureBedImage,
   getPictureBedImageList,
 } from "@/api/toolkit.ts";
-import { message, UploadChangeParam } from "ant-design-vue";
+import { message, Modal, UploadChangeParam } from "ant-design-vue";
 import { PictureBedType } from "@/typings/PictureBedType.ts";
+import { createVNode } from "vue";
+import { ExclamationCircleOutlined } from "@ant-design/icons-vue";
 
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 // 是否正在上传
 const uploading = ref(false);
+
+// 选择类型弹窗的显示状态
+const selectType = ref({
+  visible: false,
+  val: undefined as any,
+  isOk: false,
+});
+
+// 图片列表筛选
+const filterValue = ref("all");
 
 // 拖拽上传
 const handleDrop = () => {};
@@ -26,11 +38,33 @@ const handleChange = (info: UploadChangeParam) => {
   }
 };
 
+// 图片上传前的钩子，让用户选择的当前图片的类别
+const beforeUpload = () => {
+  // 这里可以让用户选择当前图片的类别
+  selectType.value.visible = true;
+  // 重置选择类型的状态
+  selectType.value.val = undefined;
+  selectType.value.isOk = false;
+
+  //任务延时，直到用户选择了图片的类型
+  return new Promise((resolve) => {
+    const timer = setInterval(() => {
+      if (selectType.value.isOk && selectType.value.val) {
+        clearInterval(timer);
+        resolve(true);
+      }
+    }, 100);
+  });
+};
+
 // 要展示的图片列表
 const imageList = ref<PictureBedType[]>([]);
 
+// 加载图片列表
 const getImageList = async () => {
-  const { data } = await getPictureBedImageList();
+  const { data } = await getPictureBedImageList({
+    type: filterValue.value,
+  }).send(true);
   imageList.value = data;
 };
 getImageList();
@@ -55,12 +89,33 @@ const openImage = (item: PictureBedType) => {
 // 右键菜单点击事件
 const onClick = async (item: PictureBedType, { key, domEvent }) => {
   console.log(key, domEvent);
+
   if (key == 1) {
+    // 打开预览
     openImage(item);
   } else if (key == 2) {
-    await deletePictureBedImage({ id: item.id });
-    await getImageList();
+    // 删除图片
+    Modal.confirm({
+      title: "你确定要删除这张图片吗？",
+      icon: createVNode(ExclamationCircleOutlined),
+      okText: "确定",
+      okType: "danger",
+      cancelText: "取消",
+      onOk() {
+        return new Promise(async (resolve, _reject) => {
+          await deletePictureBedImage({ id: item.id });
+          await getImageList();
+          resolve(true);
+          message.success("删除成功");
+        }).catch(() => console.log("Oops errors!"));
+      },
+
+      onCancel() {
+        console.log("Cancel");
+      },
+    });
   } else if (key == 3) {
+    // 复制图片地址
     const text = window.location.origin + item.url;
     //将文本通过 clipboard 传入剪切板
     navigator.clipboard.writeText(text).then(
@@ -72,13 +127,29 @@ const onClick = async (item: PictureBedType, { key, domEvent }) => {
         console.log("lzy ~ res", res);
       },
     );
-  }else if (key == 4) {
+  } else if (key == 4) {
+    // 下载图片
     const a = document.createElement("a");
     a.href = item.url;
     a.download = item.url;
     a.click();
   }
 };
+
+// 将图片类型提交至图片中一并提交
+const onOk = () => {
+  selectType.value.visible = false;
+  selectType.value.isOk = true;
+};
+
+// 图片分类列表
+const pictureTypeList = [
+  { label: "文章", value: "blog" },
+  { label: "头像", value: "head" },
+  { label: "懒加载图片", value: "loading" },
+  { label: "背景", value: "background" },
+  { label: "其他", value: "other" },
+];
 </script>
 
 <template>
@@ -88,10 +159,12 @@ const onClick = async (item: PictureBedType, { key, domEvent }) => {
       :body-style="{
         height: '100%',
         display: 'grid',
-        gridTemplateRows: '0 0 auto 1fr 0',
+        gridTemplateRows: '0 0 auto 30px 1fr 0',
         gap: '10px',
+        paddingTop: '0px',
       }"
     >
+      <!--   放大预览占位元素   -->
       <a-image
         :style="{ display: 'none' }"
         :preview="{
@@ -100,12 +173,16 @@ const onClick = async (item: PictureBedType, { key, domEvent }) => {
         }"
         :src="reserveSeat.url"
       />
+
+      <!--   图片上传功能元素   -->
       <a-upload-dragger
         :action="BASE_URL + '/api/toolkit/uploadImageToPictureBed'"
         name="upload-image"
         withCredentials
         :showUploadList="false"
         :multiple="true"
+        :data="{ type: selectType.val }"
+        :beforeUpload="beforeUpload"
         @change="handleChange"
         @drop="handleDrop"
         :disabled="uploading"
@@ -122,16 +199,37 @@ const onClick = async (item: PictureBedType, { key, domEvent }) => {
           支持单次或批量上传。严禁上传 公司数据或其他频段文件
         </p>
       </a-upload-dragger>
-
+      <!--   图片列表筛选   -->
+      <ASpace :size="20">
+        <a-select
+          v-model:value="filterValue"
+          style="width: 120px"
+          :options="[
+            {
+              label: '全部',
+              value: 'all',
+            },
+            ...pictureTypeList,
+          ]"
+          @change="getImageList"
+        >
+          <template #suffixIcon>
+            <LzyIcon size="20"  name="iconoir:filter-alt" />
+          </template>
+        </a-select>
+        <span>{{imageList.length}}张图片</span>
+      </ASpace>
+      <!--   图片列表   -->
       <div class="preview">
         <a-dropdown :trigger="['contextmenu']" v-for="item in imageList">
           <img
-            height="180px"
+            height="140px"
             :src="item.url"
             class="preview-item"
             onerror="this.src='error.png'"
             @click="openImage(item)"
             alt="右键操作图片"
+            :data-title="item.id"
           />
           <template #overlay>
             <a-menu @click="(arg) => onClick(item, arg)">
@@ -144,6 +242,31 @@ const onClick = async (item: PictureBedType, { key, domEvent }) => {
         </a-dropdown>
       </div>
     </ACard>
+    <a-modal v-model:open="selectType.visible" :closable="false" :footer="null">
+      <div style="display: flex; gap: 5px">
+        <ASelect
+          v-model:value="selectType.val"
+          style="width: 100%"
+          placeholder="选择图片要存放类型"
+        >
+          <ASelectOption
+            v-for="item in pictureTypeList"
+            :key="item.value"
+            :value="item.value"
+          >
+            {{ item.label }}
+          </ASelectOption>
+        </ASelect>
+        <AButton
+          type="primary"
+          :loading="uploading"
+          :disabled="!selectType.val"
+          @click="onOk"
+        >
+          确定
+        </AButton>
+      </div>
+    </a-modal>
   </div>
 </template>
 
@@ -170,11 +293,12 @@ const onClick = async (item: PictureBedType, { key, domEvent }) => {
 
   .preview {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    grid-template-rows: repeat(auto-fill, minmax(140px, 1fr));
     gap: 10px;
     height: 100%;
-    padding-top: 3px;
-    padding-right: 3px;
+    padding: 3px;
+
     overflow-y: auto;
     border-radius: 10px;
 
@@ -183,9 +307,9 @@ const onClick = async (item: PictureBedType, { key, domEvent }) => {
       box-shadow: 0 0 3px rgba(0, 0, 0, 0.5);
       object-fit: cover;
       background: var(--themeColor);
-      width: 100%;
       cursor: pointer;
       transition: 0.3s;
+      width: 100%;
 
       &:hover {
         filter: brightness(0.8);
