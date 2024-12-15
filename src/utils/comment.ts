@@ -232,3 +232,128 @@ export function removeInlineStyles(htmlString) {
   if (!htmlString) return "";
   return htmlString.replace(/<style[^>]*>[\s\S]*?<\/style>/gi, "");
 }
+
+/**
+ * 将执行时间数组转换为 Cron 表达式字符串
+ * @param {Array} execute_time - 包含频率、日期、小时和分钟的数组
+ * @returns {string} Cron 表达式字符串
+ */
+export function convertToCronString(execute_time: any) {
+  const { frequency, dayValue: dayOfWeekOrMonth, hour, minute } = execute_time;
+
+  // 验证输入
+  if (!["day", "week", "month"].includes(frequency)) {
+    throw new Error("频率值无效。预期的“日”、“周”或“月”。");
+  }
+  if (hour < 0 || hour > 23 || minute < 0 || minute > 59) {
+    throw new Error("小时或分钟值无效。");
+  }
+
+  let cronParts = ["0", minute.toString(), hour.toString()];
+
+  switch (frequency) {
+    case "day":
+      cronParts.push("*", "*", "*");
+      break;
+    case "week":
+      if (dayOfWeekOrMonth < 1 || dayOfWeekOrMonth > 7) {
+        throw new Error("星期几无效。预计1-7。");
+      }
+      cronParts.push("*", "*", dayOfWeekOrMonth.toString());
+      break;
+    case "month":
+      if (dayOfWeekOrMonth < 1 || dayOfWeekOrMonth > 31) {
+        throw new Error("无效的日数。预计1-31。");
+      }
+      cronParts.push(dayOfWeekOrMonth.toString(), "*", "*");
+      break;
+  }
+
+  return cronParts.join(" ");
+}
+
+//将Cron 的字符串转换成周期中文字面意思
+export function convertCronToChinese(cronExpression) {
+  const [_second, minute, hour, dayOfMonth, _month, dayOfWeek] =
+    cronExpression.split(" ");
+
+  let description = "每";
+
+  if (dayOfWeek !== "*") {
+    const daysOfWeek = {
+      "0": "周日",
+      "1": "周一",
+      "2": "周二",
+      "3": "周三",
+      "4": "周四",
+      "5": "周五",
+      "6": "周六",
+      "7": "周日", // 0 和 7 都代表周日
+    };
+    description += daysOfWeek[dayOfWeek];
+  } else if (dayOfMonth !== "*") {
+    description += `月${dayOfMonth}日`;
+  } else {
+    description += "天";
+  }
+
+  if (hour !== "*") {
+    description += `${hour}点`;
+  } else {
+    description += "的每小时";
+  }
+
+  if (minute !== "*") {
+    description += `${minute}分`;
+  } else {
+    description += "的每分钟";
+  }
+
+  return description;
+}
+
+/**
+ * 将 Cron 表达式转换为执行时间数组
+ * @param {string} cronString - Cron 表达式字符串
+ * @returns {Array} 包含频率、日期、小时和分钟的数组
+ */
+export function convertCronToArray(cronString) {
+  const parts = cronString.split(" ");
+
+  if (parts.length !== 6) {
+    throw new Error("Invalid Cron string format. Expected 6 parts.");
+  }
+
+  const [second, minute, hour, dayOfMonth, month, dayOfWeek] = parts;
+
+  // 检查秒是否为0，我们只处理不包含秒的情况
+  if (second !== "0") {
+    throw new Error(
+      "This function only supports Cron expressions with 0 as the second field.",
+    );
+  }
+
+  let frequency, dayValue;
+
+  if (dayOfMonth === "*" && month === "*" && dayOfWeek === "*") {
+    frequency = "day";
+    dayValue = 0; // 对于每天执行的任务，日期值不重要，设为0
+  } else if (dayOfMonth === "*" && month === "*" && dayOfWeek !== "*") {
+    frequency = "week";
+    dayValue = parseInt(dayOfWeek);
+  } else if (dayOfMonth !== "*" && month === "*" && dayOfWeek === "*") {
+    frequency = "month";
+    dayValue = parseInt(dayOfMonth);
+  } else {
+    throw new Error(
+      "Unsupported Cron format. Only daily, weekly, and monthly frequencies are supported.",
+    );
+  }
+
+  return {
+    frequency,
+    dayValue,
+    hour: parseInt(hour),
+    minute: parseInt(minute),
+  };
+}

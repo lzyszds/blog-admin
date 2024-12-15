@@ -20,12 +20,20 @@ import { createVNode } from "vue";
 import { useDateFormat } from "@vueuse/shared";
 import { Swiper, SwiperSlide } from "swiper/vue";
 
-import { removeInlineStyles } from "@/utils/comment.ts";
+import {convertCronToArray, convertToCronString, removeInlineStyles} from "@/utils/comment.ts";
 
 const { width } = useWindowSize();
 const taskData = ref<any>([]);
 
 const { data: params } = await getTaskParams();
+
+//执行时间
+const execute_time = ref({
+  frequency: "day",
+  dayValue: 1,
+  hour: 0,
+  minute: 0,
+});
 
 //获取任务列表
 const getTaskData = async () => {
@@ -176,6 +184,7 @@ const saveEdit = async () => {
   try {
     const taskData = { ...currentEditTask.value };
     taskData.paramsBody = JSON.stringify(taskData.paramsBody);
+    taskData.cronExpression = convertToCronString(execute_time.value);
     const result = await updateTask(taskData);
     if (result.code === 200) {
       message.success("修改成功");
@@ -191,6 +200,7 @@ const saveAdd = async () => {
   try {
     const taskData = { ...currentEditTask.value };
     taskData.paramsBody = JSON.stringify(taskData.paramsBody);
+    taskData.cronExpression = convertToCronString(execute_time.value);
     const result = await createTask(taskData);
     if (result.code === 200) {
       message.success("添加成功");
@@ -230,6 +240,18 @@ watchEffect(() => {
   currentEditTask.value.paramsBody = Object.fromEntries(
     params[currentEditTask.value.type].map((item) => [item, ""]),
   );
+});
+
+watch(editTaskDrawer, (val) => {
+  console.log(val, currentEditTask.value.id);
+  if (val) {
+    if (currentEditTask.value.id) {
+      execute_time.value = convertCronToArray(
+        currentEditTask.value.cronExpression,
+      );
+      console.log(execute_time.value);
+    }
+  }
 });
 </script>
 
@@ -279,20 +301,22 @@ watchEffect(() => {
       :width="width < 960 ? '100%' : '50%'"
     >
       <template #extra>
-        <a-button v-if="!!currentEditTask.id" type="primary" @click="saveEdit">保存修改</a-button>
+        <a-button v-if="!!currentEditTask.id" type="primary" @click="saveEdit">
+          保存修改
+        </a-button>
         <a-button v-else type="primary" @click="saveAdd">保存任务</a-button>
       </template>
-      <a-form
+      <AForm
         ref="formRef"
         :model="currentEditTask"
         :wrapper-col="{ span: 20 }"
         :label-col="{ span: 6 }"
         style="width: 100%"
       >
-        <a-form-item ref="name" label="任务名" name="name">
+        <AFormItem ref="name" label="任务名" name="name">
           <a-input v-model:value="currentEditTask.name" />
-        </a-form-item>
-        <a-form-item label="任务函数" name="type">
+        </AFormItem>
+        <AFormItem label="任务函数" name="type">
           <a-select
             v-model:value="currentEditTask.type"
             :disabled="!!currentEditTask.id"
@@ -305,12 +329,67 @@ watchEffect(() => {
               {{ index }}
             </a-select-option>
           </a-select>
-        </a-form-item>
-        <a-form-item label="计划执行时间" required name="cronExpression">
-          <a-input v-model:value="currentEditTask.cronExpression" />
-        </a-form-item>
+        </AFormItem>
+        <AFormItem label="计划执行时间" required name="cronExpression">
+          <div class="execute_cycle">
+            <ASelect
+              v-model:value="execute_time.frequency"
+              :options="[
+                { label: '每天', value: 'day' },
+                { label: '每周', value: 'week' },
+                { label: '每月', value: 'month' },
+              ]"
+            >
+            </ASelect>
+            <AFormItemRest>
+              <AInput
+                type="number"
+                max="7"
+                min="1"
+                v-model:value="execute_time.dayValue"
+                v-if="execute_time.frequency == 'week'"
+              >
+                <template #suffix>星期</template>
+              </AInput>
+            </AFormItemRest>
+            <AFormItemRest>
+              <AInput
+                type="number"
+                max="31"
+                min="1"
+                v-model:value="execute_time.dayValue"
+                v-if="execute_time.frequency == 'month'"
+              >
+                <template #suffix>日</template>
+              </AInput>
+            </AFormItemRest>
 
-        <a-form-item
+            <AFormItemRest>
+              <AInput
+                type="number"
+                v-model:value="execute_time.hour"
+                max="24"
+                min="0"
+              >
+                <template #suffix>小时</template>
+              </AInput>
+            </AFormItemRest>
+            <AFormItemRest>
+              <AInput
+                type="number"
+                v-model:value="execute_time.minute"
+                max="60"
+                min="0"
+              >
+                <template #suffix>分钟</template>
+              </AInput>
+            </AFormItemRest>
+          </div>
+
+          <!--          <a-input v-model:value="currentEditTask.cronExpression" />-->
+        </AFormItem>
+
+        <AFormItem
           v-for="(_item, key) in currentEditTask.paramsBody"
           :label="key"
           :name="key"
@@ -324,8 +403,8 @@ watchEffect(() => {
             v-else
             :auto-size="{ minRows: 2, maxRows: 5 }"
           />
-        </a-form-item>
-      </a-form>
+        </AFormItem>
+      </AForm>
     </a-drawer>
 
     <!-- 日志 -->
@@ -477,6 +556,12 @@ watchEffect(() => {
     section {
     }
   }
+}
+
+.execute_cycle {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  gap: 10px;
 }
 
 @media screen and (max-width: 960px) {
