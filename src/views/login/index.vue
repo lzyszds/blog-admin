@@ -7,6 +7,8 @@ import { useTabsState } from "@/store/useTabsStore.ts"; // const baseURL = impor
 const isTransition = ref(false);
 const router = useRouter();
 const tabsState = useTabsState();
+const openSliderVerificationCode = ref(false); // 验证码弹窗
+
 //进入页面先判断是否登陆着,localStorage.getItem('token')是登陆时候存的token
 if (TokenService.isAuthenticated()) {
   //路由重定向
@@ -16,12 +18,13 @@ if (TokenService.isAuthenticated()) {
 const { loading, throttledRequest } = useRequest(
   login,
   {
-    success: (data) => {
-      TokenService.setToken(data);
+    success: (token: string) => {
+      // console.log(res);
+      TokenService.setToken(token);
       router.replace("/" + tabsState.tabsKeyArr[tabsState.activeKey].path);
     },
   },
-  500,
+  500
 );
 
 // 账号密码数据，用于提交
@@ -44,6 +47,12 @@ const rules = reactive({
   ],
 });
 
+const isPassed = (value) => {
+  if (!value) return;
+  openSliderVerificationCode.value = false;
+  throttledRequest(ruleForm);
+};
+
 onMounted(() => {
   isTransition.value = true;
 });
@@ -60,7 +69,7 @@ onMounted(() => {
             :label-col="{ span: 8 }"
             :wrapper-col="{ span: 16 }"
             autocomplete="off"
-            @finish="throttledRequest"
+            @finish="openSliderVerificationCode = true"
           >
             <p class="title">如约而至</p>
 
@@ -83,9 +92,7 @@ onMounted(() => {
             </AFormItem>
 
             <AFormItem name="remember">
-              <ACheckbox v-model:checked="ruleForm.remember"
-                >记住密码
-              </ACheckbox>
+              <ACheckbox v-model:checked="ruleForm.remember">记住密码 </ACheckbox>
             </AFormItem>
 
             <AFormItem>
@@ -108,6 +115,15 @@ onMounted(() => {
         </div>
       </div>
     </Transition>
+    <a-modal
+      v-model:open="openSliderVerificationCode"
+      :closable="false"
+      width="600px"
+      :body-style="{ height: '300px', display: 'flex', justifyContent: 'right' }"
+    >
+      <SliderVerificationCode @isPassed="isPassed" />
+      <template #footer> </template>
+    </a-modal>
   </div>
 </template>
 
@@ -158,8 +174,7 @@ onMounted(() => {
     border: 10px solid #000;
 
     &:focus-within {
-      box-shadow:
-        0 10px 10px rgba(0, 0, 0, 0.1),
+      box-shadow: 0 10px 10px rgba(0, 0, 0, 0.1),
         0px -30px 4px -10px rgba(255, 255, 255, 0.3),
         0px -60px 4px -20px rgba(255, 255, 255, 0.2),
         0px -90px 4px -30px rgba(255, 255, 255, 0.1);
