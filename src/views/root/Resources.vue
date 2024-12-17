@@ -1,13 +1,21 @@
 <script setup lang="ts">
 import LzyIcon from "@/components/LzyIcon.vue";
-import {
-  deletePictureBedImage,
-  getPictureBedImageList,
-} from "@/api/toolkit.ts";
+import { deletePictureBedImage, getPictureBedImageList } from "@/api/toolkit.ts";
 import { message, Modal, UploadChangeParam } from "ant-design-vue";
 import { PictureBedType } from "@/typings/PictureBedType.ts";
 import { createVNode } from "vue";
 import { ExclamationCircleOutlined } from "@ant-design/icons-vue";
+
+interface Props {
+  type?: string;
+  isSelector?: boolean;
+}
+const props = withDefaults(defineProps<Props>(), {
+  type: "all",
+  isSelector: false,
+});
+
+const emit = defineEmits(["select"]);
 
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
@@ -22,7 +30,7 @@ const selectType = ref({
 });
 
 // 图片列表筛选
-const filterValue = ref("all");
+const filterValue = ref(props.type);
 
 // 拖拽上传
 const handleDrop = () => {};
@@ -88,7 +96,6 @@ const openImage = (item: PictureBedType) => {
 
 // 右键菜单点击事件
 const onClick = async (item: PictureBedType, { key, domEvent }) => {
-  console.log(key, domEvent);
 
   if (key == 1) {
     // 打开预览
@@ -125,7 +132,7 @@ const onClick = async (item: PictureBedType, { key, domEvent }) => {
       },
       function (res) {
         console.log("lzy ~ res", res);
-      },
+      }
     );
   } else if (key == 4) {
     // 下载图片
@@ -133,6 +140,9 @@ const onClick = async (item: PictureBedType, { key, domEvent }) => {
     a.href = item.url;
     a.download = item.url;
     a.click();
+  } else if (key == 5) {
+    //选中当前图片
+    emit("select", item.url);
   }
 };
 
@@ -195,9 +205,7 @@ const pictureTypeList = [
           </template>
         </p>
         <p class="ant-upload-text">单击或拖动文件到此区域进行上传</p>
-        <p class="ant-upload-hint">
-          支持单次或批量上传。严禁上传 公司数据或其他频段文件
-        </p>
+        <p class="ant-upload-hint">支持单次或批量上传。严禁上传 公司数据或其他频段文件</p>
       </a-upload-dragger>
       <!--   图片列表筛选   -->
       <ASpace :size="20">
@@ -214,10 +222,10 @@ const pictureTypeList = [
           @change="getImageList"
         >
           <template #suffixIcon>
-            <LzyIcon size="20"  name="iconoir:filter-alt" />
+            <LzyIcon size="20" name="iconoir:filter-alt" />
           </template>
         </a-select>
-        <span>{{imageList.length}}张图片</span>
+        <span>{{ imageList.length }}张图片</span>
       </ASpace>
       <!--   图片列表   -->
       <div class="preview">
@@ -237,6 +245,7 @@ const pictureTypeList = [
               <a-menu-item key="2">删除图片</a-menu-item>
               <a-menu-item key="3">复制图片地址</a-menu-item>
               <a-menu-item key="4">下载图片</a-menu-item>
+              <a-menu-item key="5" v-if="props.isSelector">使用图片</a-menu-item>
             </a-menu>
           </template>
         </a-dropdown>

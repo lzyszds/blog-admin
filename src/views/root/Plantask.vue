@@ -20,7 +20,11 @@ import { createVNode } from "vue";
 import { useDateFormat } from "@vueuse/shared";
 import { Swiper, SwiperSlide } from "swiper/vue";
 
-import {convertCronToArray, convertToCronString, removeInlineStyles} from "@/utils/comment.ts";
+import {
+  convertCronToArray,
+  convertToCronString,
+  removeInlineStyles,
+} from "@/utils/comment.ts";
 
 const { width } = useWindowSize();
 const taskData = ref<any>([]);
@@ -36,11 +40,11 @@ const execute_time = ref({
 });
 
 //获取任务列表
-const getTaskData = async () => {
-  const { data } = await getAllTask();
+const getTaskData = async (isRefresh: boolean = true) => {
+  const { data } = await getAllTask().send(isRefresh);
   taskData.value = [...data, {}];
 };
-getTaskData();
+getTaskData(false);
 
 //所有指令栈
 const stackInstruction = ref({});
@@ -85,13 +89,10 @@ const menuData = (item: Task): MenuData[] => [
       Modal.confirm({
         title: item.isEnabled == 0 ? "启用任务" : "暂停任务",
         icon: createVNode(ExclamationCircleOutlined),
-        content:
-          "你确定要" + (item.isEnabled == 0 ? "启用" : "暂停") + "该任务吗?",
+        content: "你确定要" + (item.isEnabled == 0 ? "启用" : "暂停") + "该任务吗?",
         onOk: async () => {
           const result =
-            item.isEnabled == 0
-              ? await enableTask(item.id)
-              : await disableTask(item.id);
+            item.isEnabled == 0 ? await enableTask(item.id) : await disableTask(item.id);
           if (result.code === 200) {
             message.success("操作成功");
             //重新获取任务列表
@@ -238,7 +239,7 @@ watchEffect(() => {
   if (!currentEditTask.value.type || currentEditTask.value.id) return;
   // 将当前编辑任务的类型对应的参数转换为对象，并赋值给当前编辑任务的paramsBody
   currentEditTask.value.paramsBody = Object.fromEntries(
-    params[currentEditTask.value.type].map((item) => [item, ""]),
+    params[currentEditTask.value.type].map((item) => [item, ""])
   );
 });
 
@@ -246,9 +247,7 @@ watch(editTaskDrawer, (val) => {
   console.log(val, currentEditTask.value.id);
   if (val) {
     if (currentEditTask.value.id) {
-      execute_time.value = convertCronToArray(
-        currentEditTask.value.cronExpression,
-      );
+      execute_time.value = convertCronToArray(currentEditTask.value.cronExpression);
       console.log(execute_time.value);
     }
   }
@@ -317,15 +316,8 @@ watch(editTaskDrawer, (val) => {
           <a-input v-model:value="currentEditTask.name" />
         </AFormItem>
         <AFormItem label="任务函数" name="type">
-          <a-select
-            v-model:value="currentEditTask.type"
-            :disabled="!!currentEditTask.id"
-          >
-            <a-select-option
-              v-for="(_item, index) in params"
-              :key="index"
-              :value="index"
-            >
+          <a-select v-model:value="currentEditTask.type" :disabled="!!currentEditTask.id">
+            <a-select-option v-for="(_item, index) in params" :key="index" :value="index">
               {{ index }}
             </a-select-option>
           </a-select>
@@ -365,22 +357,12 @@ watch(editTaskDrawer, (val) => {
             </AFormItemRest>
 
             <AFormItemRest>
-              <AInput
-                type="number"
-                v-model:value="execute_time.hour"
-                max="24"
-                min="0"
-              >
+              <AInput type="number" v-model:value="execute_time.hour" max="24" min="0">
                 <template #suffix>小时</template>
               </AInput>
             </AFormItemRest>
             <AFormItemRest>
-              <AInput
-                type="number"
-                v-model:value="execute_time.minute"
-                max="60"
-                min="0"
-              >
+              <AInput type="number" v-model:value="execute_time.minute" max="60" min="0">
                 <template #suffix>分钟</template>
               </AInput>
             </AFormItemRest>
@@ -450,7 +432,7 @@ watch(editTaskDrawer, (val) => {
             {{
               useDateFormat(
                 logModal.data[logModal.page - 1].executedAt,
-                "YYYY-MM-DD HH:mm:ss",
+                "YYYY-MM-DD HH:mm:ss"
               )
             }}
           </span>

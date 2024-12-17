@@ -14,9 +14,7 @@ export const updateEmailTaskConfig = (data: object) => {
 
 //获取所有任务
 export const getAllTask = () => {
-  return Alova.createGet("/plantask/tasks", {
-    cacheFor: 0,
-  });
+  return Alova.createGet("/plantask/tasks");
 };
 
 //获取可添加的任务参数

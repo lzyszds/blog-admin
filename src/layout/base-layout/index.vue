@@ -26,12 +26,18 @@ const pushRouter = (item) => {
   if (typeof item == "number") {
     item = tabsState.getKeyArr(item);
   }
+
+  if (router.hasRoute(item.name)) {
+    router.push({ name: item.name });
+  } else {
+    console.error("Invalid route name:", item.name);
+    // 处理路由不存在的情况，例如跳转到 404 页面
+    router.push({ name: "NotFound" }); // 假设你有一个名为 NotFound 的路由
+  }
+
   selectedKeys.value = [item.meta.key]; // 更新选中的菜单键
   selected.value = item; // 更新当前选中的菜单项
   tabsState.setKeyArr(item); // 更新标签页状态
-
-  /* 实现脱离动画 */
-  if (item.name) router.push({ name: item.name }); // 路由跳转到对应的组件
 };
 
 // 处理响应式布局断点

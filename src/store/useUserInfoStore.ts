@@ -35,6 +35,9 @@ export const useUserInfoState = defineStore('useUserInfoState', () => {
   const logout = async () => {
     TokenService.removeToken()
     router.push('/login')
+    setTimeout(() => {
+      router.go(0);
+    }, 0);
   }
 
   /* 前往个人中心 */

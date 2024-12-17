@@ -1,10 +1,15 @@
 //index.js
+import { TokenService } from "@/hook/useTokenService";
 import { createAlova, Method } from "alova";
 
 // v3.0
 import adapterFetch from "alova/fetch";
 import VueHook from "alova/vue";
 import { message } from "ant-design-vue";
+import { useRouter } from "vue-router";
+
+const router = useRouter();
+
 
 export const AlovaInstance = createAlova({
   baseURL: import.meta.env.VITE_BASE_URL + '/api',
@@ -13,22 +18,36 @@ export const AlovaInstance = createAlova({
   requestAdapter: adapterFetch(),
 
   // 设置全局的请求拦截器，与axios相似
-  beforeRequest() {
-
+  beforeRequest: (method) => {
+    method.config.headers = {
+      "x-real-ip": import.meta.env.VITE_IP_ADDRESS,
+      'Content-Type': 'application/json',
+      // ... 其他全局请求头
+    };
   },
   responded: {
     // 请求成功的拦截器
     // 当使用GlobalFetch请求适配器时，第一个参数接收Response对象
     // 第二个参数为当前请求的method实例，你可以用它同步请求前后的配置信息
     onSuccess: async (response, _method: Method) => {
+
+      if (response.status === 401) {
+        // 处理 token 失效的情况
+        TokenService.removeToken();
+        router.push("/login");
+        message.error("登录状态已过期，请重新登录");
+      }
+
       if (response.status >= 400) {
+        message.error(response.statusText);
         throw new Error(response.statusText);
       }
+
       const json = await response.json();
       if (json.code !== 200) {
         // 抛出错误或返回reject状态的Promise实例时，此请求将抛出错误
         console.log(json);
-        
+
         message.error(json.msg);
         throw new Error(json.msg);
       }
