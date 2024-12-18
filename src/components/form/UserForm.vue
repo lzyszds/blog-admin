@@ -40,7 +40,6 @@ formState.value.whetherUse = !formState.value.whetherUse;
 const isEdit = !!formState.value.uid;
 
 onMounted(() => {
-  
   // 表单初始化设置
   if (!Object.keys(modalParams.params).length) {
     resetForm();
@@ -103,7 +102,7 @@ const setRomdomPwd = () => {
 };
 
 /* 获取文件系统访问权限 */
-const { file, fileSize, open } = useFileSystemAccess();
+const { file } = useFileSystemAccess();
 
 /* 上传头像触发事件 */
 const selectImage = (value) => {

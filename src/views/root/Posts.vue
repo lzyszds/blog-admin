@@ -44,11 +44,10 @@ const modalParams = ref<any>({
   },
 });
 
-
-
 //这里不能封装hook，否则效果不好使
 const loading = ref(false);
 const tableData = ref<RequestResult["data"]>();
+
 const send = async (force: boolean = false) => {
   loading.value = true;
   const { data } = await articleList(searchCondition).send(force);
