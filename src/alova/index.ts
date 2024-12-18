@@ -1,18 +1,14 @@
 //index.js
-import { TokenService } from "@/hook/useTokenService";
 import { createAlova, Method } from "alova";
 
-// v3.0
 import adapterFetch from "alova/fetch";
 import VueHook from "alova/vue";
 import { message } from "ant-design-vue";
-import { useRouter } from "vue-router";
-
-const router = useRouter();
-
+import { TokenService } from "@/hook/useTokenService.ts";
+import { router } from "@/router";
 
 export const AlovaInstance = createAlova({
-  baseURL: import.meta.env.VITE_BASE_URL + '/api',
+  baseURL: import.meta.env.VITE_BASE_URL + "/api",
   statesHook: VueHook,
   // 请求适配器，这里我们使用fetch请求适配器
   requestAdapter: adapterFetch(),
@@ -21,7 +17,7 @@ export const AlovaInstance = createAlova({
   beforeRequest: (method) => {
     method.config.headers = {
       "x-real-ip": import.meta.env.VITE_IP_ADDRESS,
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
       // ... 其他全局请求头
     };
   },
@@ -30,12 +26,20 @@ export const AlovaInstance = createAlova({
     // 当使用GlobalFetch请求适配器时，第一个参数接收Response对象
     // 第二个参数为当前请求的method实例，你可以用它同步请求前后的配置信息
     onSuccess: async (response, _method: Method) => {
-
       if (response.status === 401) {
         // 处理 token 失效的情况
         TokenService.removeToken();
-        router.push("/login");
-        message.error("登录状态已过期，请重新登录");
+
+        await router.push("/login");
+        setTimeout(() => {
+          message.error({
+            content: "登录状态已过期，请重新登录",
+            duration: 2.5,
+            key: "login",
+          });
+        }, 1000);
+
+        return Promise.reject("登录状态已过期，请重新登录");
       }
 
       if (response.status >= 400) {

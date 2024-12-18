@@ -24,8 +24,7 @@ interface UseRequestReturn {
 
 /**
  * @param apiRequest 请求函数
- * @param requestAfterCall 请求成功或失败后的回调
- * @param throttleDelay 节流延迟时间
+ * @param option
  * @returns 返回一个包含 loading、data、error 和 throttledRequest 的对象
  */
 

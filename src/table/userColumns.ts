@@ -14,7 +14,6 @@ import { useUserOnlineStore } from "@/store/useUserOnline.ts";
 const userOnlineStore = useUserOnlineStore();
 
 export const getUserColumns = (params: Params) => {
-  console.log(params);
 
   let columns: TableProps["columns"] = [
     {
