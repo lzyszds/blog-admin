@@ -1,5 +1,10 @@
 <script setup lang="ts">
-import { articleAdd, articleDelete, articleEditor, articleList } from "@/api/posts";
+import {
+  articleAdd,
+  articleDelete,
+  articleEditor,
+  articleList,
+} from "@/api/posts";
 import useResetRefState from "@/hook/useResetRefState";
 import { getTableStore } from "@/store/useTableStore";
 import { useScrollY } from "@/hook/useTableConfig";
@@ -11,7 +16,9 @@ import { getArticleColumns } from "@/table/postsColumns";
 import { ArticleDataType } from "@/typings/Posts.ts";
 import { RequestResult } from "@/typings/Request";
 
-const PostsForm = defineAsyncComponent(() => import("@/components/form/PostsForm.vue"));
+const PostsForm = defineAsyncComponent(
+  () => import("@/components/form/PostsForm.vue"),
+);
 
 /* 获取表格滚动条高度 */
 const { scrollConfig } = useScrollY();
@@ -19,9 +26,9 @@ const { scrollConfig } = useScrollY();
 const { state: searchCondition, reset } = useResetRefState({
   pages: 1,
   limit: 10,
-  name: "",
+  aid: "",
+  title: "",
   username: "",
-  power: "",
 });
 
 /* 表格选中项 */
@@ -128,14 +135,24 @@ const multipleDel = () => {
 </script>
 
 <template>
-  <section style="display: flex; flex-direction: column; gap: 20px; height: 100%">
+  <section
+    style="display: flex; flex-direction: column; gap: 20px; height: 100%"
+  >
     <ACard title="搜索工具" :bordered="false">
       <main class="searchCard">
+        <section>
+          <span>文章ID：</span>
+          <AInput
+            @pressEnter="send"
+            v-model:value="searchCondition.aid"
+            placeholder="请输入文章ID"
+          />
+        </section>
         <section>
           <span>文章名：</span>
           <AInput
             @pressEnter="send"
-            v-model:value="searchCondition.name"
+            v-model:value="searchCondition.title"
             placeholder="请输入文章名称"
           />
         </section>
@@ -148,13 +165,6 @@ const multipleDel = () => {
           />
         </section>
 
-        <section>
-          <span>文章权限：</span>
-          <ASelect v-model:value="searchCondition.power" style="width: 160px" allowClear>
-            <ASelectOption value="0">超级管理员</ASelectOption>
-            <ASelectOption value="1">普通文章</ASelectOption>
-          </ASelect>
-        </section>
         <section style="display: flex; gap: 10px">
           <AButton @click="reset" style="flex: 1">
             <LzyIcon name="hugeicons:exchange-01" />
