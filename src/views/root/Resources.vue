@@ -19,6 +19,8 @@ const emit = defineEmits(["select"]);
 
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
+const selectImageResult = ref<string>("");
+
 // 是否正在上传
 const uploading = ref(false);
 
@@ -90,13 +92,17 @@ const setVisible = (value): void => {
 
 // 打开图片
 const openImage = (item: PictureBedType) => {
-  reserveSeat.value.url = item.url;
-  reserveSeat.value.visible = true;
+  if (!props.isSelector) {
+    reserveSeat.value.url = item.url;
+    reserveSeat.value.visible = true;
+  } else {
+    // emit("select", item.url);
+    selectImageResult.value = item.url;
+  }
 };
 
 // 右键菜单点击事件
 const onClick = async (item: PictureBedType, { key, domEvent }) => {
-
   if (key == 1) {
     // 打开预览
     openImage(item);
@@ -230,15 +236,19 @@ const pictureTypeList = [
       <!--   图片列表   -->
       <div class="preview">
         <a-dropdown :trigger="['contextmenu']" v-for="item in imageList">
-          <img
-            height="140px"
-            :src="item.url"
-            class="preview-item"
-            onerror="this.src='error.png'"
+          <div
+            :class="{ active: item.url === selectImageResult }"
             @click="openImage(item)"
-            alt="右键操作图片"
-            :data-title="item.id"
-          />
+          >
+            <img
+              height="140px"
+              class="preview-item"
+              :src="item.url"
+              onerror="this.src='error.png'"
+              alt="右键操作图片"
+              :data-title="item.id"
+            />
+          </div>
           <template #overlay>
             <a-menu @click="(arg) => onClick(item, arg)">
               <a-menu-item key="1">打开预览</a-menu-item>
@@ -310,6 +320,25 @@ const pictureTypeList = [
 
     overflow-y: auto;
     border-radius: 10px;
+
+    .active {
+      position: relative;
+      height: 140px;
+      &::before {
+        content: "√";
+        position: absolute;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: #00ff77;
+        font-size: 40px;
+        font-family: cursive;
+        inset: 0;
+        border-radius: 8px;
+        z-index: 1;
+        box-shadow: inset 1px 0px 38px 10px #31ff91;
+      }
+    }
 
     .preview-item {
       border-radius: 8px;
