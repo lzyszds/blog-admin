@@ -9,7 +9,6 @@ import TableHeaderOperation from "@/components/TableHeaderOperation.vue";
 import { TableProps } from "ant-design-vue";
 import { getArticleColumns } from "@/table/postsColumns";
 import { ArticleDataType } from "@/typings/Posts.ts";
-import { useRequest } from "@/hook/useRequest";
 import { RequestResult } from "@/typings/Request";
 
 const PostsForm = defineAsyncComponent(() => import("@/components/form/PostsForm.vue"));

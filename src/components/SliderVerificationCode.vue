@@ -14,7 +14,7 @@ onMounted(() => {
 
   captcha.style.setProperty("--puzzle-offset-y", `${y}px`);
 
-  button.addEventListener("mousedown", (e) => {
+  button.addEventListener("mousedown", (_e) => {
     shouldMove = true;
   });
 

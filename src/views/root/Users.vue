@@ -10,7 +10,6 @@ import {
 import UserForm from "@/components/form/UserForm.vue";
 import useResetRefState from "@/hook/useResetRefState";
 import { getTableStore } from "@/store/useTableStore";
-import { useRequest } from "alova/client";
 import { useScrollY } from "@/hook/useTableConfig";
 import { multDelData } from "@/utils/tableHandles.ts";
 import { Key } from "ant-design-vue/es/_util/type";

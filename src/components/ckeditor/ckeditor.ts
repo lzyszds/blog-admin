@@ -36,7 +36,6 @@ import {
 } from "ckeditor5";
 import coreTranslations from "ckeditor5/translations/zh-cn.js";
 import premiumFeaturesTranslations from "ckeditor5-premium-features/translations/zh-cn.js";
-import { icons } from 'ckeditor5';
 
 import "ckeditor5/ckeditor5.css";
 import "ckeditor5-premium-features/ckeditor5-premium-features.css";

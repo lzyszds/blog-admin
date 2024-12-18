@@ -62,7 +62,7 @@ const getTable = getTableStore();
 
 /* 设置表格列表数据的回调方法 */
 getTable.setCallbackArr({
-  getData: () => send(),
+  refreshData: () => send(),
   delData: ({ commentId }) => deleteComment({ commentId }),
   columns: getcommentColumns,
 });
