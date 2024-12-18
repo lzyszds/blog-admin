@@ -100,7 +100,7 @@ export const getcommentColumns = (params: Params) => {
                 const result: any = await params.delData(record);
                 if (result.data) {
                   message.success(result.data);
-                  params.getData();
+                  params.refreshData();
                 }
               },
             },
