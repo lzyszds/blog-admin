@@ -9,7 +9,7 @@ export interface Column {
 }
 
 export interface Params {
-  getData: any;
+  refreshData: any;
   delData: any;
   openModal?: any;
   columns: any;

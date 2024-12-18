@@ -17,6 +17,7 @@ import { Key } from "ant-design-vue/es/_util/type";
 import TableHeaderOperation from "@/components/TableHeaderOperation.vue";
 import { TableProps } from "ant-design-vue";
 import { getUserColumns } from "@/table/userColumns";
+import { RequestResult } from "@/typings/Request";
 
 /* 获取表格滚动条高度 */
 const { scrollConfig } = useScrollY();
@@ -45,14 +46,24 @@ const modalParams = ref({
   sureCallback: {
     uploadHeadImg,
     callback: addUser,
-    refreshData: () => send(),
+    refreshData: (force: boolean = false) => send(force),
   },
 });
 
-// 请求数据 自带防抖监听
-const { loading, data, send } = useRequest(getUsersList(searchCondition), {
-  immediate: true,
-});
+// // 请求数据 自带防抖监听
+// const { loading, data, send } = useRequest(, {
+//   immediate: true,
+// });
+const loading = ref(false);
+const data = ref<RequestResult["data"]>();
+
+const send = async (force: boolean = false) => {
+  loading.value = true;
+  const dataRes = await getUsersList(searchCondition).send(force);
+  data.value = dataRes;
+  loading.value = false;
+};
+send();
 
 // 表格数据
 const tableData = computed(() => data.value?.data);
@@ -78,7 +89,7 @@ const getTable = getTableStore();
 
 /* 设置表格列表数据的回调方法 */
 getTable.setCallbackArr({
-  getData: () => send(),
+  refreshData: () => send(),
   delData: ({ uid }) => delUser({ uid }),
   openModal: (params) => setUserModal(params),
   columns: getUserColumns,
@@ -95,7 +106,7 @@ const columns = computed(() => {
 
 const handleTableChange: TableProps["onChange"] = (pagination) => {
   searchCondition.value.pages = pagination.current;
-  send();
+  send(); // 强制发送请求，忽略缓存
 };
 
 /* 获取所有可用头像 */
@@ -132,9 +143,7 @@ const multipleDel = () => {
 </script>
 
 <template>
-  <section
-    style="display: flex; flex-direction: column; gap: 20px; height: 100%"
-  >
+  <section style="display: flex; flex-direction: column; gap: 20px; height: 100%">
     <ACard title="搜索工具" :bordered="false">
       <main class="searchCard">
         <section>
@@ -156,11 +165,7 @@ const multipleDel = () => {
 
         <section>
           <span>用户权限：</span>
-          <ASelect
-            v-model:value="searchCondition.power"
-            style="width: 160px"
-            allowClear
-          >
+          <ASelect v-model:value="searchCondition.power" style="width: 160px" allowClear>
             <ASelectOption value="0">超级管理员</ASelectOption>
             <ASelectOption value="1">普通用户</ASelectOption>
           </ASelect>

@@ -37,7 +37,7 @@ export const getUserColumns = (params: Params) => {
         //@ts-ignore
         return h(Badge, { status: status, dot: true, color }, () =>
           h(Avatar, {
-            src: import.meta.env.VITE_BASE_URL + text,
+            src: text,
             shape: "square",
           }),
         );
@@ -171,7 +171,7 @@ export const getUserColumns = (params: Params) => {
                 const result: any = await params.delData(record);
                 if (result.data) {
                   message.success(result.data);
-                  params.getData();
+                  params.refreshData(true)
                 }
               },
             },

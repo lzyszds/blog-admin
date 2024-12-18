@@ -1,3 +1,4 @@
+import { Method } from "alova";
 import { ref } from "vue";
 
 interface RequestAfterCall {
@@ -5,53 +6,57 @@ interface RequestAfterCall {
   fail?: (data: any) => void;
 }
 
+interface useRequestParams {
+  apiRequest: Method
+  option: {
+    throttleDelay?: number;
+    requestAfterCall?: RequestAfterCall;
+    immediate?: boolean;
+  }
+}
+
 interface UseRequestReturn {
   data: any;
   loading: boolean | Ref<boolean>;
   error: any;
-  throttledRequest: (...args: any[]) => Promise<void>;
+  send: (force?: boolean) => Promise<void>;
 }
 
 /**
- * @param apiFunction 请求函数
+ * @param apiRequest 请求函数
  * @param requestAfterCall 请求成功或失败后的回调
  * @param throttleDelay 节流延迟时间
  * @returns 返回一个包含 loading、data、error 和 throttledRequest 的对象
  */
 
 export function useRequest(
-  apiFunction: (...args: any[]) => Promise<any>,
-  requestAfterCall: RequestAfterCall = {},
-  throttleDelay = 1000,
+  apiRequest: useRequestParams['apiRequest'],
+  option: useRequestParams['option'] = { immediate: false }
 ): UseRequestReturn {
-  const loading = ref<boolean>(false); /* 加载状态 */
-  const error = ref<any>(null); /* 错误信息 */
-  const data = ref<any>(null); /* 请求结果 */
-
-  /*  节流函数 */
-  const throttledRequest = useThrottleFn(async (...args: any[]) => {
+  const loading = ref<boolean>(false);
+  const error = ref<any>(null);
+  const data = ref<any>(null);
+  const { requestAfterCall = {}, immediate } = option;
+  const send = async (force: boolean = false) => {
     loading.value = true;
     error.value = null;
 
     try {
-      /* 执行请求 */
-      const result = (await apiFunction(...args)).data;
-      data.value = result;
-      requestAfterCall.success?.(data.value); // 使用可选链调用
+      const result = await apiRequest.send(force);
+      data.value = result.data;
+      requestAfterCall.success?.(data.value);
     } catch (err: any) {
-      /* 请求失败 */
       error.value = err;
-      // message.error(err.message + " 请稍后重试");
-      console.error(err, apiFunction);
-      /* 请求失败，调用失败回调函数 */
-      requestAfterCall.fail?.(err); // 使用可选链调用
+      console.error(err, apiRequest);
+      requestAfterCall.fail?.(err);
     } finally {
-      /* 请求完成，重置加载状态 */
       loading.value = false;
     }
+  };
 
-  }, throttleDelay);
+  if (immediate) {
+    send(false);
+  }
 
-
-  return { data, loading, error, throttledRequest };
+  return { data, loading, error, send };
 }

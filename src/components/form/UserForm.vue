@@ -40,8 +40,9 @@ formState.value.whetherUse = !formState.value.whetherUse;
 const isEdit = !!formState.value.uid;
 
 onMounted(() => {
+  
   // 表单初始化设置
-  if (!modalParams.params) {
+  if (!Object.keys(modalParams.params).length) {
     resetForm();
   } else {
     formState.value.password = "";
@@ -120,7 +121,6 @@ const onSubmit = async () => {
   await formRef.value!.validateFields();
 
   const { uploadHeadImg, callback, refreshData } = modalParams.sureCallback;
-  debugger;
   /* 提交保存用户信息 并触发以下事件 */
   const nextCallback = () => {
     //处理禁用开关的值 0为禁用 1为启用
@@ -138,7 +138,7 @@ const onSubmit = async () => {
     }
     callback(formState).then(() => {
       message.success("用户信息保存成功！");
-      refreshData(); // 刷新数据
+      refreshData(true); // 刷新数据
       resetForm(); // 重置表单
       onClose(); //关闭modal
     });

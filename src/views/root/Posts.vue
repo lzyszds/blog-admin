@@ -9,7 +9,8 @@ import TableHeaderOperation from "@/components/TableHeaderOperation.vue";
 import { TableProps } from "ant-design-vue";
 import { getArticleColumns } from "@/table/postsColumns";
 import { ArticleDataType } from "@/typings/Posts.ts";
-import { useRequest } from "alova/client";
+import { useRequest } from "@/hook/useRequest";
+import { RequestResult } from "@/typings/Request";
 
 const PostsForm = defineAsyncComponent(() => import("@/components/form/PostsForm.vue"));
 
@@ -39,17 +40,22 @@ const modalParams = ref<any>({
   headimgs: [],
   sureCallback: {
     callback: articleAdd,
-    refreshData: () => send,
+    refreshData: (force: boolean = false) => send(force),
   },
 });
 
-// 请求数据 自带防抖监听
-const { loading, data, send } = useRequest(articleList(searchCondition), {
-  immediate: true,
-});
 
-// 表格数据
-const tableData = computed(() => data.value?.data);
+
+//这里不能封装hook，否则效果不好使
+const loading = ref(false);
+const tableData = ref<RequestResult["data"]>();
+const send = async (force: boolean = false) => {
+  loading.value = true;
+  const { data } = await articleList(searchCondition).send(force);
+  tableData.value = data;
+  loading.value = false;
+};
+send();
 
 /* 分页参数 */
 const pagination = computed(() => {
@@ -73,7 +79,7 @@ const usersTableData = getTableStore();
 
 /* 设置表格列表数据的回调方法 */
 usersTableData.setCallbackArr({
-  getData: () => send(),
+  refreshData: send,
   delData: ({ aid }) => articleDelete({ id: aid }),
   openModal: (params) => setUserModal(params),
   columns: getArticleColumns,
@@ -89,6 +95,7 @@ const columns = computed(() => {
 });
 const handleTableChange: TableProps["onChange"] = (pagination) => {
   searchCondition.value.pages = pagination.current;
+  send();
 };
 
 /* 添加/编辑弹窗 */
@@ -117,7 +124,7 @@ watchEffect(async () => {
 const multipleDel = () => {
   multDelData(selectedRowKeys.value, articleDelete, () => {
     selectedRowKeys.value = [];
-    send();
+    send(true);
   });
 };
 </script>

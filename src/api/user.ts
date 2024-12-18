@@ -5,7 +5,7 @@ import { Alova } from "@/alova/api.ts"; /* 根据id获取用户信息 */
 /* 根据id获取用户信息 */
 export const getUserInfo = (params: any) => {
   if (isRef(params)) params = unref(params);
-  return Alova.createGet(`/users/getUserInfo`, params);
+  return Alova.createGet(`/users/getUserInfo`, {params});
 };
 
 /* 根据token获取用户信息 */
@@ -17,7 +17,7 @@ export const getUserInfoToken = () => {
 export const getUsersList = (params: any) => {
   if (isRef(params)) params = unref(params);
   params.pages = params.pages;
-  return Alova.createGet(`/users/getUserList`, params);
+  return Alova.createGet(`/users/getUserList`, {params});
 };
 
 /* 添加用户 */

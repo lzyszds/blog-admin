@@ -4,7 +4,7 @@ import { defineStore } from "pinia";
 export const getTableStore = defineStore("getTableStore", () => {
 
   let params = ref<Params>({
-    getData: () => { },
+    refreshData: () => { },
     delData: (_item: any) => { },
     openModal: (_item: any) => { },
     columns: () => { },

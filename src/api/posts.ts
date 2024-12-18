@@ -5,14 +5,14 @@ import { convertKeysToSnakeCase } from "@/utils/comment.ts";
 export const articleList = (params) => {
   if (isRef(params)) params = unref(params);
   params.pages = params.pages;
-  return Alova.createGet("/article/getArticleList", params);
+  return Alova.createGet("/article/getArticleList", {params});
 };
 
 //获取文章详情页
 export const articleDetail = (params) => {
   if (isRef(params)) params = unref(params);
   params.pages = params.pages;
-  return Alova.createGet("/article/getArticleDetail", params);
+  return Alova.createGet("/article/getArticleDetail", {params});
 };
 
 // 发表文章

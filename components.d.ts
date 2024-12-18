@@ -59,6 +59,7 @@ declare module 'vue' {
     ATooltip: typeof import('ant-design-vue/es')['Tooltip']
     ATree: typeof import('ant-design-vue/es')['Tree']
     ATypographyLink: typeof import('ant-design-vue/es')['TypographyLink']
+    AUpload: typeof import('ant-design-vue/es')['Upload']
     AUploadDragger: typeof import('ant-design-vue/es')['UploadDragger']
     BetterScroll: typeof import('./src/components/BetterScroll.vue')['default']
     Bulletin: typeof import('./src/components/dashboard/Bulletin.vue')['default']

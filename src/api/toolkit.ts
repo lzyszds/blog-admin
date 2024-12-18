@@ -17,8 +17,8 @@ export const getGithubFrontCommit = () => {
 };
 
 //获取已存进图库中的图片
-export const getPictureBedImageList = (data: any) => {
-  return Alova.createGet("/toolkit/getPictureBedImageList", { params: data });
+export const getPictureBedImageList = (params: any) => {
+  return Alova.createGet("/toolkit/getPictureBedImageList", { params });
 };
 
 //将图片上传至图库

@@ -38,7 +38,6 @@ const information = ref<ArticleDataType>({ ...modalParams.params });
 /*  文章编辑器原始数据 */
 const protoInformation = toProxys({ ...modalParams.params });
 
-console.log(modalParams, "modalParams");
 
 /* 封面文件上传状态 */
 const coverUpLoad = ref(false);
