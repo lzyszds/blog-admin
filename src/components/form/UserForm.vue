@@ -3,7 +3,7 @@ import type { FormInstance, Rule } from "ant-design-vue/es/form";
 import { UserAdmin } from "@/typings/User";
 import LzyIcon from "../LzyIcon.vue";
 import { message } from "ant-design-vue";
-import { getBase64, optimizeImage, randomPassword } from "@/utils/comment";
+import { optimizeImage, randomPassword } from "@/utils/comment";
 import Resources from "@/views/root/Resources.vue";
 
 type ModalParamsType = {

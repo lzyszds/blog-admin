@@ -96,13 +96,13 @@ const openImage = (item: PictureBedType) => {
     reserveSeat.value.url = item.url;
     reserveSeat.value.visible = true;
   } else {
-    // emit("select", item.url);
     selectImageResult.value = item.url;
+    emit("select", item.url);
   }
 };
 
 // 右键菜单点击事件
-const onClick = async (item: PictureBedType, { key, domEvent }) => {
+const onClick = async (item: PictureBedType, { key }) => {
   if (key == 1) {
     // 打开预览
     openImage(item);

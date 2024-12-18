@@ -136,6 +136,13 @@ const editor = ClassicEditor;
         }
       }
     }
+    &.ck-image-insert-form {
+      border-radius: 10px;
+      
+    }
+    .ck-splitbutton__arrow::after{
+      display: none;
+    }
   }
 
   .ck.ck-editor__editable {

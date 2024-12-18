@@ -10,7 +10,13 @@ import {
   Font,
   Heading,
   HorizontalLine,
-  Image,
+  ImageBlock,
+  ImageCaption,
+  ImageInsert,
+  ImageInsertViaUrl,
+  ImageResize,
+  ImageStyle,
+  ImageTextAlternative,
   ImageToolbar,
   ImageUpload,
   Italic,
@@ -30,6 +36,7 @@ import {
 } from "ckeditor5";
 import coreTranslations from "ckeditor5/translations/zh-cn.js";
 import premiumFeaturesTranslations from "ckeditor5-premium-features/translations/zh-cn.js";
+import { icons } from 'ckeditor5';
 
 import "ckeditor5/ckeditor5.css";
 import "ckeditor5-premium-features/ckeditor5-premium-features.css";
@@ -52,6 +59,13 @@ export const editorConfig: any = {
     Image, // 图片
     ImageToolbar, // 图片工具栏
     ImageUpload, // 图片上传
+    ImageInsertViaUrl,//图片插入链接
+    ImageBlock,
+    ImageCaption,
+    ImageInsert,
+    ImageResize,
+    ImageStyle,
+    ImageTextAlternative,
     // Base64UploadAdapter, // 图片上传
     Italic, // 斜体
     Link, // 链接
@@ -101,7 +115,7 @@ export const editorConfig: any = {
     "todoList",
     "|",
     "link",
-    "uploadImage",
+    'insertImage',
     "insertTable",
     "blockQuote",
     "codeBlock",
@@ -171,8 +185,21 @@ export const editorConfig: any = {
     ],
   },
   image: {
-    toolbar: ["imageTextAlternative"],
+    toolbar: [
+      'toggleImageCaption',
+      'imageTextAlternative',
+      '|',
+      'imageStyle:alignBlockLeft',
+      'imageStyle:block',
+      'imageStyle:alignBlockRight',
+      '|',
+      'resizeImage'
+    ],
+    styles: {
+      options: ['alignBlockLeft', 'block', 'alignBlockRight']
+    }
   },
+
   table: {
     contentToolbar: ["tableColumn", "tableRow", "mergeTableCells"],
   },

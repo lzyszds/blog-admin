@@ -8,8 +8,7 @@ import { createVNode } from "vue";
 import { ExclamationCircleOutlined } from "@ant-design/icons-vue";
 import { uploadImageToPictureBed } from "@/api/toolkit.ts";
 import Editor from "@/components/ckeditor/CkEditor.vue";
-
-const BASE_URL = import.meta.env.VITE_BASE_URL;
+import Resources from "@/views/root/Resources.vue";
 
 type ModalParamsType = {
   modalParams: {
@@ -28,19 +27,21 @@ type ModalParamsType = {
 /* 模态框参数 */
 const { modalParams } = defineProps<ModalParamsType>();
 
+//资源管理弹窗控制
+const resourceModal = ref(false);
+//当前选中的图片
+const selectImage = ref("");
+
 /* 表单缓存数据 */
 const formState = useStorage("formState", {});
 
+//当前表单数据
 const currentFormData = formState.value[modalParams.params.aid || "add"];
 
 /* 文章数据 */
 const information = ref<ArticleDataType>({ ...modalParams.params });
 /*  文章编辑器原始数据 */
 const protoInformation = toProxys({ ...modalParams.params });
-
-
-/* 封面文件上传状态 */
-const coverUpLoad = ref(false);
 
 //当前选中的标签数据
 const tagData: any = ref(information.value?.tags || modalParams.params?.tags || []);
@@ -115,18 +116,6 @@ const submitForm = async () => {
   });
 };
 
-/* 上传封面变化 */
-const handleChange = ({ file }) => {
-  // 是否正在上传
-  coverUpLoad.value = file.status === "coverUpLoad";
-  if (file.status === "done") {
-    information.value.coverImg = file.response.data;
-    message.success(`${file.name} 文件上传成功`);
-  } else if (file.status === "error") {
-    message.error(`${file.name} 文件上传失败。`);
-  }
-};
-
 /* 文章内部图片上传事件 */
 const handleUploadImage = async ([insertImage, files]) => {
   console.log(insertImage, files);
@@ -145,6 +134,13 @@ const handleUploadImage = async ([insertImage, files]) => {
     console.error("图片上传或插入过程中出现错误:", e);
     // 可以在这里添加错误处理逻辑，例如重试上传或通知用户
   }
+};
+
+//取出当前选中的图片
+const getSelectImage = () => {
+  information.value.coverImg = selectImage.value + "";
+  resourceModal.value = false;
+  console.log(information.value.coverImg);
 };
 
 /**
@@ -267,16 +263,7 @@ onMounted(() => {
         <ACard ref="infoCard" class="edit-infomation" :bordered="false">
           <a-divider>文章封面</a-divider>
           <!--  :before-upload="coverUpdate" -->
-          <a-upload
-            :action="BASE_URL + '/api/toolkit/uploadImageToPictureBed'"
-            name="upload-image"
-            withCredentials
-            :showUploadList="false"
-            :multiple="false"
-            @change="handleChange"
-            :disabled="coverUpLoad"
-            body-style="display: block;"
-          >
+          <div class="ant-upload" @click="resourceModal = true">
             <img
               v-if="information.coverImg"
               :src="information.coverImg"
@@ -286,24 +273,14 @@ onMounted(() => {
             />
 
             <template v-else>
-              <template v-if="!coverUpLoad">
-                <LzyIcon
-                  size="25"
-                  name="hugeicons:image-01"
-                  style="vertical-align: middle"
-                />
-                <div>上传图片</div>
-              </template>
-              <template v-else>
-                <LzyIcon
-                  size="18"
-                  name="line-md:uploading-loop"
-                  style="vertical-align: middle"
-                />
-                <span>上传中...</span>
-              </template>
+              <LzyIcon
+                size="25"
+                name="hugeicons:image-01"
+                style="vertical-align: middle"
+              />
+              <div>上传图片</div>
             </template>
-          </a-upload>
+          </div>
           <a-divider>文章标题</a-divider>
           <AInput v-model:value="information.title" placeholder="必填 | 请输入文章标题" />
           <a-divider>文章分类</a-divider>
@@ -390,6 +367,15 @@ onMounted(() => {
       </div>
     </template>
   </ADrawer>
+  <AModal v-model:open="resourceModal" width="100%" wrap-class-name="resource-modal">
+    <Resources type="blog" :is-selector="true" @select="(val) => (selectImage = val)" />
+    <template #footer>
+      <div class="resource-footer">
+        <a-button @click="resourceModal = false">取消</a-button>
+        <a-button type="primary" @click="getSelectImage">确定</a-button>
+      </div>
+    </template>
+  </AModal>
 </template>
 
 <style>
@@ -411,7 +397,7 @@ onMounted(() => {
   border-radius: 12px;
   overflow-y: auto;
 
-  :deep(.ant-upload) {
+  .ant-upload {
     width: 100% !important;
     height: 150px !important;
     overflow: hidden;
