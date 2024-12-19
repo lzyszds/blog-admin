@@ -9,10 +9,12 @@ import { ExclamationCircleOutlined } from "@ant-design/icons-vue";
 interface Props {
   type?: string;
   isSelector?: boolean;
+  previewStyle?: any;
 }
 const props = withDefaults(defineProps<Props>(), {
   type: "all",
   isSelector: false,
+  previewStyle: {},
 });
 
 const emit = defineEmits(["select"]);
@@ -234,7 +236,7 @@ const pictureTypeList = [
         <span>{{ imageList.length }}张图片</span>
       </ASpace>
       <!--   图片列表   -->
-      <div class="preview">
+      <div class="preview" :style="previewStyle">
         <a-dropdown :trigger="['contextmenu']" v-for="item in imageList">
           <div
             :class="{ active: item.url === selectImageResult }"

@@ -4,8 +4,11 @@ import { Ckeditor } from "@ckeditor/ckeditor5-vue";
 import "ckeditor5/ckeditor5.css";
 import "ckeditor5-premium-features/ckeditor5-premium-features.css";
 import { editorConfig } from "./ckeditor";
+import Resources from "@/views/root/Resources.vue";
 
 import("shiki/themes/one-dark-pro.mjs");
+
+const infoCard: any = inject("infoCard");
 
 // Markdown输入内容的模型定义
 const editorData = defineModel({
@@ -16,10 +19,70 @@ const editorData = defineModel({
 const editor = ClassicEditor;
 
 // const { saveForm } = defineProps(["saveForm"]);
+
+/**
+ * 资源弹窗
+ * @param {boolean} modal - 是否显示资源弹窗
+ * @param {string} selectImage - 选中的图片地址
+ * @param {string} confirmImage - 确认选择后的图片地址（以这个来进行添加）
+ */
+const resource = useSessionStorage<{
+  modal: boolean;
+  selectImage: string;
+  confirmImage: string;
+}>("resourceModal", { modal: false, selectImage: "", confirmImage: "" });
+
+//确认选中图片
+const confirm = () => {
+  resource.value.confirmImage = resource.value.selectImage;
+  resource.value.modal = false;
+};
+
+// 获取编辑器实例
+const markdownEditor = templateRef("markdownEditor");
+// 获取左侧文章主题的宽度
+const { width } = useElementSize(infoCard);
+// 编辑器即将计算的宽度
+const editorSizeWidth = ref(width.value + 30);
+// 窗口宽度
+const { width: windWidth } = useWindowSize();
+// 根据窗口宽度动态计算编辑器宽度
+watchEffect(() => {
+  if (windWidth.value <= 768) {
+    editorSizeWidth.value = -25;
+  } else {
+    editorSizeWidth.value = -(width.value + 30);
+  }
+});
+
+onBeforeUnmount(() => {
+  resource.value = { modal: false, selectImage: "", confirmImage: "" };
+});
 </script>
 
 <template>
-  <div class="markdown-editor" id="markdown-editor">
+  <div
+    class="markdown-editor"
+    id="markdown-editor"
+    ref="markdownEditor"
+    :style="{
+      width: `calc(100vw + ${editorSizeWidth}px)`,
+    }"
+  >
+    <AModal v-model:open="resource.modal" width="100%" wrap-class-name="resource-modal">
+      <Resources
+        type="blog"
+        :is-selector="true"
+        @select="(val) => (resource.selectImage = val)"
+        :preview-style="{ maxHeight: '300px' }"
+      />
+      <template #footer>
+        <div class="resource-footer">
+          <a-button @click="resource.modal = false">取消</a-button>
+          <a-button type="primary" @click="confirm">确定</a-button>
+        </div>
+      </template>
+    </AModal>
     <Ckeditor v-model="editorData" :editor="editor" :config="editorConfig" />
   </div>
 </template>
@@ -40,8 +103,10 @@ const editor = ClassicEditor;
   flex-direction: column;
 
   .ck {
-    background-color: var(--color-bg);
-    color: var(--color-text);
+    &:not(.ck-reset_all) {
+      background-color: var(--color-bg);
+      color: var(--color-text);
+    }
 
     .ck-sticky-panel__content {
       border: none;
@@ -138,9 +203,8 @@ const editor = ClassicEditor;
     }
     &.ck-image-insert-form {
       border-radius: 10px;
-      
     }
-    .ck-splitbutton__arrow::after{
+    .ck-splitbutton__arrow::after {
       display: none;
     }
   }

@@ -58,9 +58,10 @@ const tagList = ref<TagDataType[]>();
 
 // 获取标签列表
 try {
-  const result = await getArticleCategory();
-  tagList.value = result.data.data.map((res) => {
-    return { value: res.name };
+  getArticleCategory().then((result) => {
+    tagList.value = result.data.data.map((res) => {
+      return { value: res.name };
+    });
   });
 } catch (e) {
   console.log(e);
@@ -246,6 +247,7 @@ onMounted(() => {
     },
   });
 });
+provide("infoCard", infoCard);
 </script>
 
 <template>
@@ -392,6 +394,7 @@ onMounted(() => {
 
 .edit-infomation {
   height: calc(100vh - 65px - 48px);
+  min-width: 350px;
   flex: 3;
   background-color: var(--color-bg);
   border-radius: 12px;
