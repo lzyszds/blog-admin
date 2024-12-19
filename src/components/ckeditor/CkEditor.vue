@@ -37,9 +37,6 @@ const confirm = () => {
   resource.value.confirmImage = resource.value.selectImage;
   resource.value.modal = false;
 };
-
-// 获取编辑器实例
-const markdownEditor = templateRef("markdownEditor");
 // 获取左侧文章主题的宽度
 const { width } = useElementSize(infoCard);
 // 编辑器即将计算的宽度
@@ -64,7 +61,6 @@ onBeforeUnmount(() => {
   <div
     class="markdown-editor"
     id="markdown-editor"
-    ref="markdownEditor"
     :style="{
       width: `calc(100vw + ${editorSizeWidth}px)`,
     }"
