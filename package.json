@@ -14,7 +14,6 @@
     "@ckeditor/ckeditor5-build-classic": "^43.3.1",
     "@ckeditor/ckeditor5-markdown-gfm": "^43.3.1",
     "@ckeditor/ckeditor5-vue": "^7.3.0",
-    "@fancyapps/ui": "^5.0.36",
     "@shikijs/markdown-it": "^1.22.2",
     "@vueuse/core": "^11.3.0",
     "@vueuse/integrations": "^11.3.0",
@@ -24,7 +23,6 @@
     "axios": "^1.7.7",
     "chart.js": "^4.4.7",
     "ckeditor5": "^43.3.1",
-    "ckeditor5-premium-features": "^43.3.1",
     "echarts": "^5.4.2",
     "lodash-es": "^4.17.21",
     "markdown-it": "^13.0.1",
@@ -39,15 +37,11 @@
     "nprogress": "^0.2.0",
     "pinia": "^2.2.4",
     "pinia-plugin-persistedstate": "^4.1.2",
-    "postcss": "^8.4.47",
-    "qs": "^6.13.0",
     "shiki": "^1.24.0",
     "swiper": "^11.1.15",
     "universal-cookie": "^7.2.2",
     "unplugin-auto-import": "^0.18.3",
     "vue": "^3.5.12",
-    "vue-chartjs": "^5.3.2",
-    "vue-data-ui": "^2.4.26",
     "vue-draggable-plus": "^0.5.6",
     "vue-router": "^4.4.5"
   },
@@ -70,6 +64,8 @@
     "vite-plugin-image-optimizer": "^1.1.8",
     "vite-plugin-svg-icons": "^2.0.1",
     "vite-plugin-vue-devtools": "^7.4.6",
-    "vue-tsc": "^2.1.10"
+    "vue-tsc": "^2.1.10",
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.4.47"
   }
 }
