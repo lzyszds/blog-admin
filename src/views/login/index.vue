@@ -91,18 +91,18 @@ onMounted(() => {
             </AFormItem>
 
             <AFormItem name="remember">
-              <ACheckbox v-model:checked="ruleForm.remember">
-                记住密码
-              </ACheckbox>
+              <ACheckbox v-model:checked="ruleForm.remember"> 记住密码 </ACheckbox>
             </AFormItem>
 
             <AFormItem>
               <AButton type="primary" html-type="submit">
-                <LzyIcon
-                  name="majesticons:scan-fingerprint-line"
-                  style="margin-right: 5px"
-                  size="18px"
-                ></LzyIcon>
+                <Transition>
+                  <LzyIcon
+                    name="majesticons:scan-fingerprint-line"
+                    style="margin-right: 5px"
+                    size="18px"
+                  ></LzyIcon>
+                </Transition>
                 立即登陆
               </AButton>
             </AFormItem>
@@ -179,8 +179,7 @@ onMounted(() => {
     border: 10px solid #000;
 
     &:focus-within {
-      box-shadow:
-        0 10px 10px rgba(0, 0, 0, 0.1),
+      box-shadow: 0 10px 10px rgba(0, 0, 0, 0.1),
         0px -30px 4px -10px rgba(255, 255, 255, 0.3),
         0px -60px 4px -20px rgba(255, 255, 255, 0.2),
         0px -90px 4px -30px rgba(255, 255, 255, 0.1);
@@ -216,10 +215,10 @@ onMounted(() => {
           left: 0;
           height: 8px;
           width: 100%;
-          background: #3fefef;
+          background: content-box radial-gradient(#5161ce, #3fefef);
           border-radius: 8px;
-          filter: drop-shadow(0 0 20px #3fefef) drop-shadow(0 0 60px #3fefef);
-          animation: animate_line 2s ease-in-out infinite;
+          filter: drop-shadow(0 0 20px #3fefef) drop-shadow(0 0 100px #3fefef);
+          animation: animate_line 3s ease-in-out infinite;
         }
       }
 
@@ -272,6 +271,20 @@ onMounted(() => {
         }
       }
     }
+  }
+}
+
+@keyframes animate_line {
+  0% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(100vh);
+  }
+
+  100% {
+    transform: translateY(0);
   }
 }
 
