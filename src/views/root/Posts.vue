@@ -189,7 +189,7 @@ const multipleDel = () => {
           :selectedRowKeys="selectedRowKeys"
           :addModal="setUserModal"
           :loading="loading"
-          @refresh="send"
+          @refresh="send(true)"
           @multipleDel="multipleDel"
           :usersTableData="usersTableData"
         />
