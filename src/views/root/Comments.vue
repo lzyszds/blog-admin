@@ -2,7 +2,6 @@
 import { getCommentList, deleteComment } from "@/api/comment";
 import useResetRefState from "@/hook/useResetRefState";
 import { getTableStore } from "@/store/useTableStore";
-import { useRequest } from "alova/client";
 import { useScrollY } from "@/hook/useTableConfig";
 import { multDelData } from "@/utils/tableHandles.ts";
 import { Key } from "ant-design-vue/es/_util/type";
@@ -10,6 +9,7 @@ import TableHeaderOperation from "@/components/TableHeaderOperation.vue";
 import { TableProps } from "ant-design-vue";
 import { getcommentColumns } from "@/table/commentColumns";
 import dayjs from "dayjs";
+import { RequestResult } from "@/typings/Request";
 
 /* 获取表格滚动条高度 */
 const { scrollConfig } = useScrollY();
@@ -31,13 +31,18 @@ const onSelectChange = (keys: Key[]) => {
   selectedRowKeys.value = keys;
 };
 
-// 请求数据 自带防抖监听
-const { loading, data, send } = useRequest(getCommentList(searchCondition), {
-  immediate: true,
-});
 
-// 表格数据
-const tableData = computed(() => data.value?.data);
+//这里不能封装hook，否则效果不好使
+const loading = ref(false);
+const tableData = ref<RequestResult["data"]>();
+
+const send = async (force: boolean = false) => {
+  loading.value = true;
+  const { data } = await getCommentList(searchCondition).send(force);
+  tableData.value = data;
+  loading.value = false;
+};
+send();
 
 /* 分页参数 */
 const pagination = computed(() => {
@@ -148,7 +153,7 @@ const multipleDel = () => {
         <TableHeaderOperation
           :selectedRowKeys="selectedRowKeys"
           :loading="loading"
-          @refresh="send()"
+          @refresh="send(true)"
           @multipleDel="multipleDel"
         />
       </template>
