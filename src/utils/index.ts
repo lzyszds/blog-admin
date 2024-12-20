@@ -1,4 +1,7 @@
-/* 生成随机密码(难度指数 1-5) 函数 */
+/**
+ *  生成随机密码(难度指数 1-5) 函数
+ *  @param difficulty 难度指数 1-5
+ *  */
 export function randomPassword(difficulty: number) {
   const chars =
     "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";

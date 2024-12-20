@@ -1,6 +1,6 @@
 // 获取文章列表
 import { Alova } from "@/alova/api.ts";
-import { convertKeysToSnakeCase } from "@/utils/comment.ts";
+import { convertKeysToSnakeCase } from "@/utils";
 
 export const articleList = (params) => {
   if (isRef(params)) params = unref(params);

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { getGithubFrontCommit } from "@/api/toolkit";
-import { setTimeAgoLocalMessages } from "@/utils/comment";
+import { setTimeAgoLocalMessages } from "@/utils";
 
 type StepData = {
   title: string;

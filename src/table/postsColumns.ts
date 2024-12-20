@@ -7,7 +7,7 @@ import {
   Tag,
 } from "ant-design-vue";
 import { Params } from "@/typings/Column";
-import { setTimeAgoLocalMessages } from "@/utils/comment";
+import { setTimeAgoLocalMessages } from "@/utils";
 
 export const getArticleColumns = (params: Params) => {
   let columns: TableProps["columns"] = [

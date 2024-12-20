@@ -1,5 +1,5 @@
 import { Task } from "@/typings/Plantask.ts";
-import { convertKeysToSnakeCase } from "@/utils/comment.ts";
+import { convertKeysToSnakeCase } from "@/utils";
 import { Alova } from "@/alova/api.ts"; // 获取邮箱任务配置
 
 // 获取邮箱任务配置

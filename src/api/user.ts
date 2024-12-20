@@ -1,4 +1,4 @@
-import { convertKeysToSnakeCase } from "@/utils/comment";
+import { convertKeysToSnakeCase } from "@/utils";
 import { Alova } from "@/alova/api.ts"; /* 根据id获取用户信息 */
 
 

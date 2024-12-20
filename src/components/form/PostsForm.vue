@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { addArticleCategory, getArticleCategory } from "@/api/posts";
 import { ArticleDataType, TagDataType } from "@/typings/Posts";
-import { isEqual, toProxys } from "@/utils/comment";
+import { isEqual, toProxys } from "@/utils";
 import { message, Modal } from "ant-design-vue";
 import LzyIcon from "../LzyIcon.vue";
 import { createVNode } from "vue";

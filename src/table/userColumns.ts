@@ -8,7 +8,7 @@ import {
   Tag,
 } from "ant-design-vue";
 import { Params } from "@/typings/Column";
-import { setTimeAgoLocalMessages } from "@/utils/comment";
+import { setTimeAgoLocalMessages } from "@/utils";
 import { useUserOnlineStore } from "@/store/useUserOnline.ts";
 
 const userOnlineStore = useUserOnlineStore();

@@ -24,7 +24,7 @@ import {
   convertCronToArray,
   convertToCronString,
   removeInlineStyles,
-} from "@/utils/comment.ts";
+} from "@/utils";
 
 const { width } = useWindowSize();
 const taskData = ref<any>([]);
