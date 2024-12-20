@@ -36,6 +36,7 @@ const timeName = () => {
     <div class="item">
       <a-avatar
         :size="64"
+        width="100%"
         src="/pictureBedImage/OQli-X5pRicN9w9cAhUfgLRSFdNs0Zl76hzKIXdyoxg0gAA"
       >
       </a-avatar>
@@ -46,7 +47,7 @@ const timeName = () => {
       <p>
         {{ weather.province + weather.city }} 今日 {{ weather.weather }}
         {{ weather.windpower }}级{{ weather.winddirection }}风
-        {{ weather.temperature }} °C
+        {{ weather.temperature }} °C 🎉持续学习，不断进步
       </p>
     </div>
   </ACard>

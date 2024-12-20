@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import UpdateLog from "@/components/dashboard/IncomeChart.vue";
 import UpdateLogLeft from "@/components/dashboard/UploadLogLeft.vue";
-import IncomeChart from "@/components/dashboard/UpdateLog.vue";
 import StatisticsChart from "@/components/dashboard/StatisticsChart.vue";
 import { getAdminHomeData } from "@/api/toolkit";
 import LzyIcon from "@/components/LzyIcon.vue";
 import Bulletin from "@/components/dashboard/Bulletin.vue";
+import OnliveUser from "@/components/dashboard/OnliveUser.vue";
+import IncomeChart from "@/components/dashboard/IncomeChart.vue";
 
 const stats = ref([
   {
@@ -79,18 +79,18 @@ getAdminHomeData().then((res) => {
         <StatisticsChart />
       </ACol>
       <ACol :span="24" :lg="10">
-        <UpdateLog />
+        <IncomeChart />
       </ACol>
     </ARow>
     <ARow :gutter="[16, 16]" style="margin-top: 16px">
       <ACol :span="24" :lg="14">
-        <ACard title="更新日志">
+        <ACard title="更新日志 ">
           <UpdateLogLeft />
         </ACard>
       </ACol>
       <ACol :span="24" :lg="10">
-        <ACard title="更新日志" :body-style="{ maxHeight: '385px', overflowY: 'auto' }">
-          <IncomeChart />
+        <ACard title="在线用户 ">
+          <OnliveUser />
         </ACard>
       </ACol>
     </ARow>

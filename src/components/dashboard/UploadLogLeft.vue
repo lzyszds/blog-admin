@@ -10,17 +10,8 @@ type StepData = {
 };
 const response = await getGithubFrontCommit();
 
-// const dataset = ref([]);
 const stepsData = ref<StepData[]>([]);
 
-// dataset.value = response.data.typeMap.map((item) => {
-//   return {
-//     name: item.title,
-//     value: item.value,
-//     color: item.color,
-//   };
-// });
-//
 stepsData.value = response.data.runInfoList.map((item) => {
   const description = useTimeAgo(item.createdAt, setTimeAgoLocalMessages).value;
   return {
@@ -30,10 +21,26 @@ stepsData.value = response.data.runInfoList.map((item) => {
     id: item.id,
   };
 });
+
+const { list, containerProps, wrapperProps } = useVirtualList(stepsData.value, {
+  // Keep `itemHeight` in sync with the item's row.
+  itemHeight: 22,
+});
 </script>
 
 <template>
-  <a-timeline>
+  <div v-bind="containerProps" style="height: 400px">
+    <a-timeline v-bind="wrapperProps">
+      <a-timeline-item
+        v-for="item in list"
+        :key="item.data.id"
+        :color="item.data.conclusion == 'success' ? '#5161ce' : 'red'"
+      >
+        {{ item.data.title }}
+      </a-timeline-item>
+    </a-timeline>
+  </div>
+  <!-- <a-timeline>
     <a-timeline-item
       v-for="item in stepsData"
       :key="item.id"
@@ -44,13 +51,23 @@ stepsData.value = response.data.runInfoList.map((item) => {
         <span>{{ item.description }}</span>
       </p>
     </a-timeline-item>
-  </a-timeline>
+  </a-timeline> -->
 </template>
 
 <style scoped>
+.scroller {
+  height: 100%;
+}
+
+.user {
+  height: 32%;
+  padding: 0 12px;
+  display: flex;
+  align-items: center;
+}
+
 .ant-timeline {
   height: 337.5px;
-  overflow-y: auto;
   padding: 10px 0 0 0;
 
   p {

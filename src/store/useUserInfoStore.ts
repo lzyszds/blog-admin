@@ -4,6 +4,9 @@ import { UserAdmin } from "@/typings/User";
 import { useTabsState } from "@/store/useTabsStore";
 import routeItem from "@/router/config";
 import { TokenService } from "@/hook/useTokenService";
+import { useUserOnlineStore } from "@/store/useUserOnline.ts";
+
+const userOnlineStore = useUserOnlineStore();
 
 const tabsState = useTabsState();
 
@@ -25,6 +28,35 @@ export const useUserInfoState = defineStore("useUserInfoState", () => {
       isAdmin.value = res.data.role === "admin";
       isEditor.value = res.data.role === "editor";
       isUser.value = res.data.role === "user";
+
+
+      const url = import.meta.env.VITE_BASE_URL.replace("http", "ws").replace(
+        "https",
+        "wss",
+      );
+      //发送在线长连接
+      const socket = new WebSocket(url + "/websocket");
+
+      socket.addEventListener("open", () => {
+        console.log("已连接到服务器");
+
+        // 登录，发送 userId 给服务器
+        const userId = userInfo.value.uid; // 假设这是用户的唯一标识，你需要根据你的实际情况生成或获取
+        socket.send(
+          JSON.stringify({ type: "在线", userId, token: TokenService.getToken() }),
+        );
+      });
+
+      socket.addEventListener("message", (event) => {
+        const data = JSON.parse(event.data);
+        
+        if (data.type === "onlineUsers") {
+          console.log("Online users:", userOnlineStore.onlinePeople);
+          // 在这里更新页面上的在线用户列表
+          userOnlineStore.setUserOnline(data.data);
+        }
+      });
+
     } else {
       await router.push("/login");
     }

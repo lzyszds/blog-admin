@@ -29,9 +29,10 @@ export const getUserColumns = (params: Params) => {
       width: "80px",
       // 可用于显示图片或设置渲染方法
       customRender: ({ text, record }) => {
-        const isOnline = userOnlineStore.userOnline.includes(record.uid);
-        const color = isOnline ? "green" : "red";
-        const status = isOnline ? "processing" : "Error";
+        const isOnline = userOnlineStore.userOnline.find(res => res.uid == record.uid) 
+        
+        const color = !!isOnline ? "green" : "red";
+        const status = !!isOnline ? "processing" : "Error";
 
         //@ts-ignore
         return h(Badge, { status: status, dot: true, color }, () =>

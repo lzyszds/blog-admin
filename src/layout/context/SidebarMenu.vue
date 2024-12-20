@@ -46,6 +46,7 @@ let routeItems = routeItem.filter((item) => !item.meta.isHide);
       <!--  萌萌计数器  https://count.getloli.com/ -->
       <img
         class="moeCounter"
+        width="100%"
         src="https://count.getloli.com/@blogWb16?name=blogWb16&theme=asoul&padding=7&offset=0&align=top&scale=1&pixelated=1&darkmode=auto&num="
       />
     </div>
