@@ -2,7 +2,6 @@
 import { ClassicEditor } from "ckeditor5";
 import { Ckeditor } from "@ckeditor/ckeditor5-vue";
 import "ckeditor5/ckeditor5.css";
-import "ckeditor5-premium-features/ckeditor5-premium-features.css";
 import { editorConfig } from "./ckeditor";
 import Resources from "@/views/root/Resources.vue";
 
