@@ -3,10 +3,10 @@ import {
   AutoImage,
   AutoLink,
   Autosave,
+  Autoformat,
   BalloonToolbar,
   BlockQuote,
   Bold,
-  CloudServices,
   Code,
   CodeBlock,
   Essentials,
@@ -61,6 +61,7 @@ import {
   TableToolbar,
   TodoList,
   Underline,
+  Markdown,
   WordCount,
 } from "ckeditor5";
 import coreTranslations from "ckeditor5/translations/zh-cn.js";
@@ -76,11 +77,11 @@ export const editorConfig: any = {
     Alignment, // 文本对齐：允许用户调整文本的对齐方式，如左对齐、居中对齐、右对齐和两端对齐。
     AutoImage, // 自动图片：自动将粘贴的图片 URL 转换为上传的图片（需要配置图片上传适配器）。
     AutoLink, // 自动链接：自动将粘贴的 URL 转换为可点击的链接。
+    Autoformat, // 自动格式化
     Autosave, // 自动保存：定期将编辑器内容自动保存到本地存储（localStorage）或其他后端存储，防止意外数据丢失。
     BalloonToolbar, // 浮动工具栏：当用户选择文本时，在选区上方显示一个包含常用格式选项的浮动工具栏。
     BlockQuote, // 块引用：允许用户创建和编辑块引用内容。
     Bold, // 加粗：允许用户将文本设置为粗体。
-    CloudServices, // 云服务：提供 CKEditor 云服务集成，例如实时协作和拼写检查等功能（需要 CKEditor Cloud Services 账户）。
     Code, // 代码：允许用户将选定文本标记为行内代码样式。
     CodeBlock, // 代码块：允许用户插入和编辑多行代码块，并支持语法高亮（需要配置相应的语法高亮库）。
     Essentials, // 必需插件：这是一组 CKEditor 5 正常运行所必需的核心插件，通常不需要手动配置，除非进行非常底层的自定义构建。
@@ -135,7 +136,7 @@ export const editorConfig: any = {
     TodoList, // 待办事项列表：允许用户创建和编辑待办事项列表（复选框列表）。
     Underline, // 下划线：允许用户为文本添加下划线。
     WordCount, // 字数统计：显示编辑器内容的字数和字符数。
-
+    Markdown, // Markdown：允许用户在编辑器中使用 Markdown 语法。
     FileManagerDiy,
   ],
   toolbar: [

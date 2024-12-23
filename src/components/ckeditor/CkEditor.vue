@@ -122,7 +122,7 @@ onBeforeUnmount(() => {
 
     .ck-editor__main {
       overflow: auto;
-      height: calc(100vh - 65px - 50px - 40px);
+      height: calc(100vh - 65px - 50px - 70px);
     }
 
     .ck-button__label {
