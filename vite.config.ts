@@ -23,7 +23,9 @@ export default ({ mode }: any) => {
   return defineConfig({
     plugins: [
       vue(),
-      VueDevTools(),
+      VueDevTools({
+        launchEditor: "webstorm",
+      }),
       Components({
         resolvers: [
           AntDesignVueResolver({
