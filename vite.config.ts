@@ -59,6 +59,8 @@ export default ({ mode }: any) => {
       ViteImageOptimizer(),
     ],
     build: {
+      //如果你的目标浏览器都支持顶层 await (例如 Chrome >= 89, Firefox >= 89, Safari >= 15)
+      target: 'esnext',//或者设置为支持 Top-level await 的特定版本，例如 'chrome89'
       rollupOptions: {
         output: {
           chunkFileNames: "js/[name]-[hash].js", // 引入文件名的名称
