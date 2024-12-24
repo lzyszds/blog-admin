@@ -1,9 +1,9 @@
 <script lang="ts" setup>
-import type { FormInstance, Rule } from "ant-design-vue/es/form";
-import { UserAdmin } from "@/typings/User";
+import type {FormInstance, Rule} from "ant-design-vue/es/form";
+import {UserAdmin} from "@/typings/User";
 import LzyIcon from "../LzyIcon.vue";
-import { message } from "ant-design-vue";
-import { optimizeImage, randomPassword } from "@/utils";
+import {message} from "ant-design-vue";
+import {optimizeImage, randomPassword} from "@/utils";
 import Resources from "@/views/root/Resources.vue";
 
 type ModalParamsType = {
@@ -20,16 +20,16 @@ type ModalParamsType = {
   };
 };
 
-const { modalParams } = defineProps<ModalParamsType>();
+const {modalParams} = defineProps<ModalParamsType>();
 
 const formItemLayout = {
-  labelCol: { span: 6 },
-  wrapperCol: { span: 14 },
+  labelCol: {span: 6},
+  wrapperCol: {span: 14},
 };
 // 表单Ref dom
 const formRef = ref<FormInstance>();
 // 表单数据
-const formState = ref<UserAdmin>({ ...modalParams.params });
+const formState = ref<UserAdmin>({...modalParams.params});
 
 //资源管理弹窗控制
 const resourceModal = ref(false);
@@ -52,7 +52,7 @@ onMounted(() => {
       console.log(formState.value.headImg);
 
       if (formState.value.headImg)
-        modalParams.headimgs.push({ url: formState.value.headImg });
+        modalParams.headimgs.push({url: formState.value.headImg});
     }
   }
 });
@@ -60,16 +60,16 @@ onMounted(() => {
 // 表单验证规则
 const rules: Record<string, Rule[]> = {
   uname: [
-    { required: true, message: "请输入用户昵称", trigger: "blur" },
-    { min: 3, max: 16, message: "长度在 3 到 16 个字符", trigger: "blur" },
+    {required: true, message: "请输入用户昵称", trigger: "blur"},
+    {min: 3, max: 16, message: "长度在 3 到 16 个字符", trigger: "blur"},
   ],
   username: [
-    { required: true, message: "请输入账号", trigger: "blur" },
-    { min: 3, max: 16, message: "长度在 3 到 16 个字符", trigger: "blur" },
+    {required: true, message: "请输入账号", trigger: "blur"},
+    {min: 3, max: 16, message: "长度在 3 到 16 个字符", trigger: "blur"},
   ],
   password: [
-    { required: !isEdit, message: "请输入密码", trigger: "blur" },
-    { min: 6, max: 16, message: "长度在 6 到 16 个字符", trigger: "blur" },
+    {required: !isEdit, message: "请输入密码", trigger: "blur"},
+    {min: 6, max: 16, message: "长度在 6 到 16 个字符", trigger: "blur"},
   ],
 };
 
@@ -92,8 +92,9 @@ function resetForm() {
   file.value = undefined;
   //@ts-ignore 删除背景图片样式
   document.querySelector(".upload-headimg .ant-radio-button").style.backgroundImage =
-    "none";
+      "none";
 }
+
 /* 生成随机密码触发事件 */
 const setRomdomPwd = () => {
   /* 生成12-16随机的数字 */
@@ -102,7 +103,7 @@ const setRomdomPwd = () => {
 };
 
 /* 获取文件系统访问权限 */
-const { file } = useFileSystemAccess();
+const {file} = useFileSystemAccess();
 
 /* 上传头像触发事件 */
 const selectImage = (value) => {
@@ -119,7 +120,7 @@ const onSubmit = async () => {
   /* 先验证表单 */
   await formRef.value!.validateFields();
 
-  const { uploadHeadImg, callback, refreshData } = modalParams.sureCallback;
+  const {uploadHeadImg, callback, refreshData} = modalParams.sureCallback;
   /* 提交保存用户信息 并触发以下事件 */
   const nextCallback = () => {
     //处理禁用开关的值 0为禁用 1为启用
@@ -149,7 +150,7 @@ const onSubmit = async () => {
     // 如果文件大小小于300kb，不进行压缩，按比例压缩
     const scale = file.value.size < 300 * 1024 ? 1 : 0.5;
     /* 压缩图片 */
-    const { fileCompress } = await optimizeImage(file.value, scale);
+    const {fileCompress} = await optimizeImage(file.value, scale);
     /* 将头像上传 */
     uploadHeadImg(fileCompress).then((res) => {
       message.success("头像上传成功 即将保存用户信息！");
@@ -167,36 +168,36 @@ const onSubmit = async () => {
 
 <template>
   <ADrawer
-    :title="modalParams.title"
-    :width="720"
-    :open="modalParams.isOpen"
-    :body-style="{ paddingBottom: '80px' }"
-    @close="onClose"
-    destroyOnClose
+      :title="modalParams.title"
+      :width="720"
+      :open="modalParams.isOpen"
+      :body-style="{ paddingBottom: '80px' }"
+      @close="onClose"
+      destroyOnClose
   >
     <a-form
-      ref="formRef"
-      :model="formState"
-      name="validate_other"
-      v-bind="formItemLayout"
+        ref="formRef"
+        :model="formState"
+        name="validate_other"
+        v-bind="formItemLayout"
     >
       <a-form-item label="选择头像">
         <a-radio-group
-          id="headimgRadio"
-          v-model:value="formState.headImg"
-          button-style="solid"
+            id="headimgRadio"
+            v-model:value="formState.headImg"
+            button-style="solid"
         >
           <a-radio-button
-            v-for="item in modalParams.headimgs"
-            :value="item.url"
-            :style="{ backgroundImage: `url(${item.url})` }"
+              v-for="item in modalParams.headimgs"
+              :value="item.url"
+              :style="{ backgroundImage: `url(${item.url})` }"
           >
             <Transition name="fade">
               <LzyIcon
-                size="18"
-                name="iconoir:check"
-                v-if="item.url === formState.headImg"
-                style="
+                  size="18"
+                  name="iconoir:check"
+                  v-if="item.url === formState.headImg"
+                  style="
                   color: #fff;
                   background: var(--themeGreen);
                   border-radius: 10%;
@@ -206,23 +207,23 @@ const onSubmit = async () => {
             </Transition>
           </a-radio-button>
           <a-radio-button
-            value="none"
-            @click="resourceModal = true"
-            class="upload-headimg ant-radio-button-wrapper-checked"
-            id="newUploadHeadImg"
+              value="none"
+              @click="resourceModal = true"
+              class="upload-headimg ant-radio-button-wrapper-checked"
+              id="newUploadHeadImg"
           >
-            <LzyIcon size="20" name="iconoir:plus" />
+            <LzyIcon size="20" name="iconoir:plus"/>
             <p>上传头像</p>
           </a-radio-button>
         </a-radio-group>
       </a-form-item>
 
       <a-form-item name="uname" label="昵称" has-feedback :rules="rules.uname">
-        <a-input v-model:value="formState.uname" />
+        <a-input v-model:value="formState.uname"/>
       </a-form-item>
 
       <a-form-item name="username" label="账号" has-feedback :rules="rules.username">
-        <a-input v-model:value="formState.username" />
+        <a-input v-model:value="formState.username"/>
       </a-form-item>
 
       <a-form-item name="password" label="密码" has-feedback :rules="rules.password">
@@ -230,7 +231,7 @@ const onSubmit = async () => {
           <template #addonAfter>
             <ATooltip placement="right">
               <template #title>生成随机密码</template>
-              <span @click="setRomdomPwd"><LzyIcon name="iconoir:refresh-circle" /></span>
+              <span @click="setRomdomPwd"><LzyIcon name="iconoir:refresh-circle"/></span>
             </ATooltip>
           </template>
         </a-input>
@@ -244,15 +245,15 @@ const onSubmit = async () => {
       </a-form-item>
 
       <a-form-item name="whetherUse" label="禁用">
-        <a-switch v-model:checked="formState.whetherUse" />
+        <a-switch v-model:checked="formState.whetherUse"/>
       </a-form-item>
 
       <a-form-item name="signature" label="签名">
         <a-textarea
-          v-model:value="formState.signature"
-          max-length="5"
-          allow-clear
-          :autoSize="{ minRows: 2, maxRows: 6 }"
+            v-model:value="formState.signature"
+            max-length="5"
+            allow-clear
+            :autoSize="{ minRows: 2, maxRows: 6 }"
         />
       </a-form-item>
     </a-form>
@@ -266,8 +267,8 @@ const onSubmit = async () => {
     </template>
   </ADrawer>
 
-  <AModal v-model:open="resourceModal" width="100%" wrap-class-name="resource-modal">
-    <Resources type="head" :is-selector="true" @select="selectImage" />
+  <AModal v-model:open="resourceModal" width="100%">
+    <Resources type="head" :is-selector="true" @select="selectImage" :preview-style="{ maxHeight: '300px' }"/>
   </AModal>
 </template>
 
@@ -291,7 +292,8 @@ const onSubmit = async () => {
     align-items: end;
     justify-content: right;
     box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05), 0 1px 6px -1px rgba(0, 0, 0, 0.05),
-      0 2px 4px 0 rgba(0, 0, 0, 0.05);
+    0 2px 4px 0 rgba(0, 0, 0, 0.05);
+
     & > :deep(span) {
       display: flex;
       flex-direction: column;
@@ -302,6 +304,7 @@ const onSubmit = async () => {
       background-repeat: no-repeat;
       font-family: "dindin";
       color: #888;
+
       p {
         margin: 0;
       }
@@ -311,36 +314,44 @@ const onSubmit = async () => {
       background-color: #fafafa;
       border-color: var(--themeColor);
     }
+
     &:hover {
       border-color: var(--themeColor);
+
       &.upload-headimg.ant-radio-button-wrapper-checked {
         border-color: var(--themeColor);
       }
     }
+
     &.upload-headimg.ant-radio-button-wrapper-checked {
       border-color: #aaa;
       align-items: center;
       justify-content: center;
       border-style: dashed;
     }
+
     &.upload-headimg :hover {
       border-color: #aaa;
     }
   }
 }
+
 :deep(.pushImage) {
   .ant-tooltip {
     display: none;
   }
 }
+
 :deep(.ant-input-group-addon) {
   padding: 0;
   width: 35px;
+
   svg {
     cursor: pointer;
     outline: none !important;
   }
 }
+
 .fade-enter-active,
 .fade-leave-active {
   transition: 0.23s ease;
@@ -361,11 +372,13 @@ const onSubmit = async () => {
     padding-bottom: 0;
     margin: 0;
   }
+
   .ant-modal-content {
     display: flex;
     flex-direction: column;
     height: calc(100vh);
   }
+
   .ant-modal-body {
     flex: 1;
     overflow: auto;

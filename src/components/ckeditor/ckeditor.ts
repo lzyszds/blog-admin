@@ -2,7 +2,6 @@ import {
   Alignment,
   AutoImage,
   AutoLink,
-  Autosave,
   Autoformat,
   BalloonToolbar,
   BlockQuote,
@@ -78,7 +77,6 @@ export const editorConfig: any = {
     AutoImage, // 自动图片：自动将粘贴的图片 URL 转换为上传的图片（需要配置图片上传适配器）。
     AutoLink, // 自动链接：自动将粘贴的 URL 转换为可点击的链接。
     Autoformat, // 自动格式化
-    Autosave, // 自动保存：定期将编辑器内容自动保存到本地存储（localStorage）或其他后端存储，防止意外数据丢失。
     BalloonToolbar, // 浮动工具栏：当用户选择文本时，在选区上方显示一个包含常用格式选项的浮动工具栏。
     BlockQuote, // 块引用：允许用户创建和编辑块引用内容。
     Bold, // 加粗：允许用户将文本设置为粗体。

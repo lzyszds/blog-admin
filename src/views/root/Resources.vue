@@ -1,16 +1,17 @@
 <script setup lang="ts">
 import LzyIcon from "@/components/LzyIcon.vue";
-import { deletePictureBedImage, getPictureBedImageList } from "@/api/toolkit.ts";
-import { message, Modal, UploadChangeParam } from "ant-design-vue";
-import { PictureBedType } from "@/typings/PictureBedType.ts";
-import { createVNode } from "vue";
-import { ExclamationCircleOutlined } from "@ant-design/icons-vue";
+import {deletePictureBedImage, getPictureBedImageList} from "@/api/toolkit.ts";
+import {message, Modal, UploadChangeParam} from "ant-design-vue";
+import {PictureBedType} from "@/typings/PictureBedType.ts";
+import {createVNode} from "vue";
+import {ExclamationCircleOutlined} from "@ant-design/icons-vue";
 
 interface Props {
   type?: string;
   isSelector?: boolean;
   previewStyle?: any;
 }
+
 const props = withDefaults(defineProps<Props>(), {
   type: "all",
   isSelector: false,
@@ -37,12 +38,18 @@ const selectType = ref({
 const filterValue = ref(props.type);
 
 // 拖拽上传
-const handleDrop = () => {};
+const handleDrop = () => {
+};
 
 const handleChange = (info: UploadChangeParam) => {
   // 是否正在上传
   uploading.value = info.file.status === "uploading";
   if (info.file.status === "done") {
+    if (info.file.response.code == "500") {
+      message.error("文件上传失败");
+      return;
+    }
+
     message.success(`${info.file.name} 文件上传成功`);
     getImageList();
   } else if (info.file.status === "error") {
@@ -52,6 +59,11 @@ const handleChange = (info: UploadChangeParam) => {
 
 // 图片上传前的钩子，让用户选择的当前图片的类别
 const beforeUpload = () => {
+  if (props.type !== "all") {
+    selectType.value.val = props.type;
+    selectType.value.isOk = true;
+    return true;
+  }
   // 这里可以让用户选择当前图片的类别
   selectType.value.visible = true;
   // 重置选择类型的状态
@@ -74,7 +86,7 @@ const imageList = ref<PictureBedType[]>([]);
 
 // 加载图片列表
 const getImageList = async () => {
-  const { data } = await getPictureBedImageList({
+  const {data} = await getPictureBedImageList({
     type: filterValue.value,
   }).send(true);
   imageList.value = data;
@@ -104,7 +116,7 @@ const openImage = (item: PictureBedType) => {
 };
 
 // 右键菜单点击事件
-const onClick = async (item: PictureBedType, { key }) => {
+const onClick = async (item: PictureBedType, {key}) => {
   if (key == 1) {
     // 打开预览
     openImage(item);
@@ -118,7 +130,7 @@ const onClick = async (item: PictureBedType, { key }) => {
       cancelText: "取消",
       onOk() {
         return new Promise(async (resolve, _reject) => {
-          await deletePictureBedImage({ id: item.id });
+          await deletePictureBedImage({id: item.id});
           await getImageList();
           resolve(true);
           message.success("删除成功");
@@ -134,13 +146,13 @@ const onClick = async (item: PictureBedType, { key }) => {
     const text = window.location.origin + item.url;
     //将文本通过 clipboard 传入剪切板
     navigator.clipboard.writeText(text).then(
-      () => {
-        if (!text) return message.error("复制失败，图片地址为空");
-        message.success("图片地址已复制到剪切板");
-      },
-      function (res) {
-        console.log("lzy ~ res", res);
-      }
+        () => {
+          if (!text) return message.error("复制失败，图片地址为空");
+          message.success("图片地址已复制到剪切板");
+        },
+        function (res) {
+          console.log("lzy ~ res", res);
+        }
     );
   } else if (key == 4) {
     // 下载图片
@@ -162,19 +174,19 @@ const onOk = () => {
 
 // 图片分类列表
 const pictureTypeList = [
-  { label: "文章", value: "blog" },
-  { label: "头像", value: "head" },
-  { label: "懒加载图片", value: "loading" },
-  { label: "背景", value: "background" },
-  { label: "其他", value: "other" },
+  {label: "文章", value: "blog"},
+  {label: "头像", value: "head"},
+  {label: "懒加载图片", value: "loading"},
+  {label: "背景", value: "background"},
+  {label: "其他", value: "other"},
 ];
 </script>
 
 <template>
   <div style="height: 100%">
     <ACard
-      class="resources"
-      :body-style="{
+        class="resources"
+        :body-style="{
         height: '100%',
         display: 'grid',
         gridTemplateRows: '0 0 auto 30px 1fr 0',
@@ -184,31 +196,31 @@ const pictureTypeList = [
     >
       <!--   放大预览占位元素   -->
       <a-image
-        :style="{ display: 'none' }"
-        :preview="{
+          :style="{ display: 'none' }"
+          :preview="{
           visible: reserveSeat.visible,
           onVisibleChange: setVisible,
         }"
-        :src="reserveSeat.url"
+          :src="reserveSeat.url"
       />
 
       <!--   图片上传功能元素   -->
       <a-upload-dragger
-        :action="BASE_URL + '/api/toolkit/uploadImageToPictureBed'"
-        name="upload-image"
-        withCredentials
-        :showUploadList="false"
-        :multiple="true"
-        :data="{ type: selectType.val }"
-        :beforeUpload="beforeUpload"
-        @change="handleChange"
-        @drop="handleDrop"
-        :disabled="uploading"
+          :action="BASE_URL + '/api/toolkit/uploadImageToPictureBed'"
+          name="upload-image"
+          withCredentials
+          :showUploadList="false"
+          :multiple="true"
+          :data="{ type: selectType.val }"
+          :beforeUpload="beforeUpload"
+          @change="handleChange"
+          @drop="handleDrop"
+          :disabled="uploading"
       >
         <p class="ant-upload-drag-icon">
-          <LzyIcon v-if="!uploading" size="50" name="hugeicons:image-01" />
+          <LzyIcon v-if="!uploading" size="50" name="hugeicons:image-01"/>
           <template v-else>
-            <LzyIcon size="50" name="line-md:uploading-loop" />
+            <LzyIcon size="50" name="line-md:uploading-loop"/>
             <span>上传中...</span>
           </template>
         </p>
@@ -218,19 +230,19 @@ const pictureTypeList = [
       <!--   图片列表筛选   -->
       <ASpace :size="20">
         <a-select
-          v-model:value="filterValue"
-          style="width: 120px"
-          :options="[
+            v-model:value="filterValue"
+            style="width: 120px"
+            :options="[
             {
               label: '全部',
               value: 'all',
             },
             ...pictureTypeList,
           ]"
-          @change="getImageList"
+            @change="getImageList"
         >
           <template #suffixIcon>
-            <LzyIcon size="20" name="iconoir:filter-alt" />
+            <LzyIcon size="20" name="iconoir:filter-alt"/>
           </template>
         </a-select>
         <span>{{ imageList.length }}张图片</span>
@@ -239,16 +251,16 @@ const pictureTypeList = [
       <div class="preview" :style="previewStyle">
         <a-dropdown :trigger="['contextmenu']" v-for="item in imageList">
           <div
-            :class="{ active: item.url === selectImageResult }"
-            @click="openImage(item)"
+              :class="{ active: item.url === selectImageResult }"
+              @click="openImage(item)"
           >
             <img
-              height="140px"
-              class="preview-item"
-              :src="item.url"
-              onerror="this.src='error.png'"
-              alt="右键操作图片"
-              :data-title="item.id"
+                height="140px"
+                class="preview-item"
+                :src="item.url"
+                onerror="this.src='error.png'"
+                alt="右键操作图片"
+                :data-title="item.id"
             />
           </div>
           <template #overlay>
@@ -266,23 +278,23 @@ const pictureTypeList = [
     <a-modal v-model:open="selectType.visible" :closable="false" :footer="null">
       <div style="display: flex; gap: 5px">
         <ASelect
-          v-model:value="selectType.val"
-          style="width: 100%"
-          placeholder="选择图片要存放类型"
+            v-model:value="selectType.val"
+            style="width: 100%"
+            placeholder="选择图片要存放类型"
         >
           <ASelectOption
-            v-for="item in pictureTypeList"
-            :key="item.value"
-            :value="item.value"
+              v-for="item in pictureTypeList"
+              :key="item.value"
+              :value="item.value"
           >
             {{ item.label }}
           </ASelectOption>
         </ASelect>
         <AButton
-          type="primary"
-          :loading="uploading"
-          :disabled="!selectType.val"
-          @click="onOk"
+            type="primary"
+            :loading="uploading"
+            :disabled="!selectType.val"
+            @click="onOk"
         >
           确定
         </AButton>
@@ -326,6 +338,7 @@ const pictureTypeList = [
     .active {
       position: relative;
       height: 140px;
+
       &::before {
         content: "√";
         position: absolute;

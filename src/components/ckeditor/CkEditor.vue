@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { ClassicEditor } from "ckeditor5";
-import { Ckeditor } from "@ckeditor/ckeditor5-vue";
+//@ts-ignore
+import {ClassicEditor} from "ckeditor5";
+import {Ckeditor} from "@ckeditor/ckeditor5-vue";
 import "ckeditor5/ckeditor5.css";
-import { editorConfig } from "./ckeditor";
+import {editorConfig} from "./ckeditor";
 import Resources from "@/views/root/Resources.vue";
 
 import("shiki/themes/one-dark-pro.mjs");
@@ -29,7 +30,7 @@ const resource = useSessionStorage<{
   modal: boolean;
   selectImage: string;
   confirmImage: string;
-}>("resourceModal", { modal: false, selectImage: "", confirmImage: "" });
+}>("resourceModal", {modal: false, selectImage: "", confirmImage: ""});
 
 //确认选中图片
 const confirm = () => {
@@ -37,11 +38,11 @@ const confirm = () => {
   resource.value.modal = false;
 };
 // 获取左侧文章主题的宽度
-const { width } = useElementSize(infoCard);
+const {width} = useElementSize(infoCard);
 // 编辑器即将计算的宽度
 const editorSizeWidth = ref(width.value + 30);
 // 窗口宽度
-const { width: windWidth } = useWindowSize();
+const {width: windWidth} = useWindowSize();
 // 根据窗口宽度动态计算编辑器宽度
 watchEffect(() => {
   if (windWidth.value <= 768) {
@@ -52,24 +53,24 @@ watchEffect(() => {
 });
 
 onBeforeUnmount(() => {
-  resource.value = { modal: false, selectImage: "", confirmImage: "" };
+  resource.value = {modal: false, selectImage: "", confirmImage: ""};
 });
 </script>
 
 <template>
   <div
-    class="markdown-editor"
-    id="markdown-editor"
-    :style="{
+      class="markdown-editor"
+      id="markdown-editor"
+      :style="{
       width: `calc(100vw + ${editorSizeWidth}px)`,
     }"
   >
-    <AModal v-model:open="resource.modal" width="100%" wrap-class-name="resource-modal">
+    <AModal v-model:open="resource.modal" width="100%">
       <Resources
-        type="blog"
-        :is-selector="true"
-        @select="(val) => (resource.selectImage = val)"
-        :preview-style="{ maxHeight: '300px' }"
+          type="blog"
+          :is-selector="true"
+          @select="(val) => (resource.selectImage = val)"
+          :preview-style="{ maxHeight: '300px' }"
       />
       <template #footer>
         <div class="resource-footer">
@@ -78,7 +79,7 @@ onBeforeUnmount(() => {
         </div>
       </template>
     </AModal>
-    <Ckeditor v-model="editorData" :editor="editor" :config="editorConfig" />
+    <Ckeditor v-model="editorData" :editor="editor" :config="editorConfig"/>
   </div>
 </template>
 
@@ -106,8 +107,8 @@ onBeforeUnmount(() => {
     .ck-sticky-panel__content {
       border: none;
 
-      .ck-button:focus,
-      .ck-button:active {
+      .ck-button:not(.ck-insert-table-dropdown-grid-box):focus,
+      .ck-button:not(.ck-insert-table-dropdown-grid-box):active {
         outline: none;
         border-color: transparent;
         box-shadow: none;
@@ -151,6 +152,7 @@ onBeforeUnmount(() => {
         line-height: 20px;
         transition: 0.12s;
       }
+
       p {
         white-space: normal;
       }
@@ -196,9 +198,11 @@ onBeforeUnmount(() => {
         }
       }
     }
+
     &.ck-image-insert-form {
       border-radius: 10px;
     }
+
     .ck-splitbutton__arrow::after {
       display: none;
     }
@@ -213,6 +217,23 @@ onBeforeUnmount(() => {
 
     &.ck-focused {
       border: none;
+    }
+  }
+
+  .ck-toolbar__items, .ck-list-styles-list, .ck-list-properties {
+    border-radius: 0.5rem;
+
+    button {
+      border-radius: 0.5rem;
+    }
+  }
+
+  button.ck-insert-table-dropdown-grid-box {
+    border-radius: 3px !important;
+    border-color: var(--themeColor);
+
+    &.ck-on {
+      background: rgba(var(--themeColorRgb), 0.3);
     }
   }
 }

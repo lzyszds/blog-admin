@@ -38,8 +38,11 @@ const formState = useStorage("formState", {});
 //当前表单数据
 const currentFormData = formState.value[modalParams.params.aid || "add"];
 
+
 /* 文章数据 */
 const information = ref<ArticleDataType>({ ...modalParams.params });
+
+
 /*  文章编辑器原始数据 */
 const protoInformation = toProxys({ ...modalParams.params });
 
@@ -141,6 +144,7 @@ const handleUploadImage = async ([insertImage, files]) => {
 const getSelectImage = () => {
   information.value.coverImg = selectImage.value + "";
   resourceModal.value = false;
+
   console.log(information.value.coverImg);
 };
 
@@ -312,7 +316,7 @@ provide("infoCard", infoCard);
           </a-select>
           <a-divider>文章介绍</a-divider>
           <ATextarea
-            v-model="information.partialContent"
+            v-model:value="information.partialContent"
             placeholder="选填 | 为空则将自动设置为文章开头第一段"
             :auto-size="{ minRows: 10, maxRows: 10 }"
           />
