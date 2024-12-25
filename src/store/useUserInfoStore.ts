@@ -35,7 +35,7 @@ export const useUserInfoState = defineStore("useUserInfoState", () => {
         "wss",
       );
       //发送在线长连接
-      const socket = new WebSocket(url + "/websocket");
+      const socket = new WebSocket(url + "/websocket/onlineUsers");
 
       socket.addEventListener("open", () => {
         console.log("已连接到服务器");
