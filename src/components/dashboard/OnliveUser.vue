@@ -9,9 +9,13 @@ const userOnlineStore = useUserOnlineStore();
       <template #title>
         <span>{{ item.uname }}{{ item.lastLoginIp }}</span>
       </template>
-      <ACard :body-style="{padding:'13px'}">
-        <ABadge status="processing" color="green" :dot="true">
-          <AAvatar :src="item.headImg" :size="45"/>
+      <ACard style="display: flex;align-items: center;justify-content: center;"
+             :body-style="{padding:'0'}">
+        <ABadge status="processing" color="green" :dot="true" :offset="[-2,'100%']" :numberStyle="{
+          width: '8px',
+          height: '8px',
+        }">
+          <AAvatar :src="item.headImg" :size="50"/>
         </ABadge>
       </ACard>
     </a-tooltip>

@@ -49,8 +49,8 @@ export const deleteTask = (taskId: string) => {
 };
 
 //根据任务id获取任务日志
-export const getTaskLog = (taskId: string) => {
-  return Alova.createGet(`/plantask/tasks/${taskId}/logs`);
+export const getTaskLog = (taskId: string,limit:number = 99999) => {
+  return Alova.createGet(`/plantask/tasks/${taskId}/logs?limit=${limit}`);
 };
 
 //创建任务

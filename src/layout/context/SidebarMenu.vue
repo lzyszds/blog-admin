@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import routeItem from "@/router/config";
 
-const { isFixed, selectedKeys, collapsed } = inject<any>("paramsRef");
+const {isFixed, selectedKeys, collapsed} = inject<any>("paramsRef");
 
 const emit = defineEmits(["breakpoint", "push-router"]);
 
@@ -10,18 +10,18 @@ let routeItems = routeItem.filter((item) => !item.meta.isHide);
 
 <template>
   <ALayoutSider
-    v-model:collapsed="collapsed"
-    :trigger="null"
-    collapsible
-    :collapsed-width="!isFixed ? 80 : 0"
-    breakpoint="sm"
-    :class="{ fixed: isFixed, menu: true }"
-    @breakpoint="emit('breakpoint', $event)"
+      v-model:collapsed="collapsed"
+      :trigger="null"
+      collapsible
+      :collapsed-width="!isFixed ? 80 : 0"
+      breakpoint="sm"
+      :class="{ fixed: isFixed, menu: true }"
+      @breakpoint="emit('breakpoint', $event)"
   >
     <div class="ant-layout-sider-children-item">
       <div
-        :class="{ collapsed: collapsed, logo: true }"
-        @click="emit('push-router', routeItems[0])"
+          :class="{ collapsed: collapsed, logo: true }"
+          @click="emit('push-router', routeItems[0])"
       >
         <span>Jz</span>
         <h2>博客管理系统</h2>
@@ -29,15 +29,15 @@ let routeItems = routeItem.filter((item) => !item.meta.isHide);
 
       <AMenu v-model:selectedKeys="selectedKeys" mode="inline">
         <AMenu-item
-          v-for="item in routeItems"
-          :key="item.meta.key"
-          @click="emit('push-router', item)"
-          class="menuitem"
-          style="display: flex;align-items: center"
+            v-for="item in routeItems"
+            :key="item.meta.key"
+            @click="emit('push-router', item)"
+            class="menuitem"
+            style="display: flex;align-items: center"
         >
           {{ item.meta.isHide }}
           <span class="anticon">
-            <LzyIcon :name="item.meta.uicon" style="font-weight: 600" size="20" />
+            <LzyIcon :name="item.meta.uicon" style="font-weight: 600" size="16"/>
           </span>
           <span class="menu-title-item">{{ item.meta.name }}</span>
         </AMenu-item>
@@ -45,10 +45,11 @@ let routeItems = routeItem.filter((item) => !item.meta.isHide);
 
       <!--  萌萌计数器  https://count.getloli.com/ -->
       <img
-        class="moeCounter"
-        width="100%"
-        src="https://count.getloli.com/@blogWb16?name=blogWb16&theme=asoul&padding=7&offset=0&align=top&scale=1&pixelated=1&darkmode=auto&num="
-      />
+          class="moeCounter"
+          width="315"
+          height="100"
+          src="https://count.getloli.com/@blogWb16?name=blogWb16&theme=asoul&padding=7&offset=0&align=top&scale=1&pixelated=1&darkmode=auto&num="
+          alt=""/>
     </div>
   </ALayoutSider>
 </template>
@@ -61,7 +62,6 @@ let routeItems = routeItem.filter((item) => !item.meta.isHide);
   overflow-x: hidden;
 
 
-  
   .ant-layout-sider-children-item {
     height: 100%;
     display: flex;
@@ -123,9 +123,20 @@ let routeItems = routeItem.filter((item) => !item.meta.isHide);
     display: none !important;
   }
 }
+
 .menuitem {
   display: flex;
   align-items: center;
+
+  svg {
+    transition: .13s;
+  }
+
+  &:hover {
+    svg {
+      transform: scale(1.15);
+    }
+  }
 
   span:nth-child(1) {
     display: flex;

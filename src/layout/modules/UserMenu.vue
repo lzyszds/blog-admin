@@ -42,8 +42,6 @@ const handleMenuList = [
           <LzyIcon size="18" :name="item.icon"/>
           <span style="text-align: center;margin-left: 8px">{{ item.title }}</span>
         </AMenu-item>
-        <AMenu-divider/>
-
       </AMenu>
     </template>
   </ADropdown>

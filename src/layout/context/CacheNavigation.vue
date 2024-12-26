@@ -77,7 +77,7 @@ const refreshSrcoll = () => {
 /* Keep the relevant styles from the original component */
 .icon-btn {
   display: grid;
-  grid-template-columns: 15px 1fr 12px;
+  grid-template-columns: 15px 60px 20px;
   justify-content: space-around;
   align-items: center;
   gap: 5px;
