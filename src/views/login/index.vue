@@ -28,7 +28,7 @@ const { loading, send } = useRequest(login(ruleForm), {
   requestAfterCall: {
     success: (token: string) => {
       // console.log(res);
-      TokenService.setToken(token);
+      TokenService.setToken(token,ruleForm.remember);
       router.replace("/" + tabsState.tabsKeyArr[tabsState.activeKey].path);
     },
   },

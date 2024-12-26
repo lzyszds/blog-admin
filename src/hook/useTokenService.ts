@@ -4,10 +4,10 @@ import { useCookies } from "@vueuse/integrations/useCookies";
 export const cookies = useCookies();
 
 export const TokenService = {
-  setToken(token: string) {
+  setToken(token: string, remember: boolean) {
     cookies.set("lzytkn", token, {
-      expires: new Date(Date.now() + 24 * 60 * 60 * 1000 * 2),
-      domain: import.meta.env.VITE_COOKIE_DOMAIN
+      expires: new Date(Date.now() + 24 * 60 * 60 * 1000 * (remember ? 7 : 2)),
+      domain: import.meta.env.VITE_COOKIE_DOMAIN,
     });
   },
 
@@ -17,7 +17,7 @@ export const TokenService = {
 
   removeToken() {
     cookies.remove("lzytkn", {
-      domain: import.meta.env.VITE_COOKIE_DOMAIN
+      domain: import.meta.env.VITE_COOKIE_DOMAIN,
     });
   },
 
