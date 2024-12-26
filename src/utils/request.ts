@@ -4,8 +4,6 @@ import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios";
 import { merge } from "lodash";
 import { TokenService } from "@/hook/useTokenService";
 
-
-
 interface AxiosConfig extends AxiosRequestConfig {
   baseURL?: string;
   timeout?: number;
@@ -61,7 +59,7 @@ export default function makeRequest<T = any>({
       },
       (error) => {
         // 处理其他错误情况
-        throw error;
+        return Promise.reject(error);
       },
     );
 
@@ -82,7 +80,7 @@ export default function makeRequest<T = any>({
         resolve(response); // 确保在这里 resolve 数据
       } else {
         const errorMsg = (response as any).msg || "请求失败";
-        throw new Error(errorMsg); // 抛出错误，让 catch 块捕获
+        message.error(errorMsg);
       }
     } catch (error: any) {
       const err = error as AxiosError;
@@ -90,15 +88,17 @@ export default function makeRequest<T = any>({
 
       if (err.status === 401) {
         // 处理 token 失效的情况
-        msg = "登录状态已过期，请重新登录";
         TokenService.removeToken();
-        router.push("/login");
+        message.error("登录状态已过期，请重新登录 2秒后跳转到登录页面");
+        setTimeout(() => {
+          router.push("/login");
+        }, 2000);
       } else {
         // 处理请求失败的情况
         console.error("Request failed:", error);
+        message.error(msg);
       }
 
-      message.error(msg);
       reject(error); // 确保这里 reject 异常
     }
   });
