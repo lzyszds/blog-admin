@@ -1,28 +1,65 @@
 <script lang="ts" setup>
-import { useToggle, useVirtualList } from "@vueuse/core";
-import { computed } from "vue";
 
-const [isEven, toggle] = useToggle();
-const allItems = Array.from(Array.from({ length: 99999 }).keys());
-const filteredList = computed(() =>
-  allItems.filter((i) => (isEven.value ? i % 2 === 0 : i % 2 === 1))
-);
+import {getSystemLog} from "@/api/system.ts";
 
-const { list, containerProps, wrapperProps } = useVirtualList(filteredList, {
-  itemHeight: 22,
-});
+const {data: errorData} = await getSystemLog({
+  page: 1,
+  limit: 5,
+  type: 'error',
+  date: '2024-12-27'
+})
+
+const {data: infoData} = await getSystemLog({
+  page: 1,
+  limit: 5,
+  type: 'info',
+  date: '2024-12-27'
+})
+
+const infoActiveKey = ref('')
+const errorActiveKey = ref('')
+
+const handleData = (data: any) => {
+  try {
+    return JSON.parse(data)
+  } catch (e) {
+    return data
+  }
+}
+
+const isObject = (data: any) => {
+  return typeof data === 'object'
+}
+
 </script>
 
 <template>
-  <div>
-    <p>Showing {{ isEven ? "even" : "odd" }} items</p>
-    <AButton @click="toggle">Toggle Even/Odd</AButton>
-    <div v-bind="containerProps" style="height: 300px">
-      <div v-bind="wrapperProps">
-        <div v-for="item in list" :key="item.index" style="height: 22px">
-          Row: {{ item.data }}
-        </div>
-      </div>
-    </div>
-  </div>
+  <main>
+    <a-card title="错误日志" :bordered="false">
+      <a-collapse v-model:activeKey="infoActiveKey">
+        <a-collapse-panel v-for="(item,index) in errorData" :key="index" :header="item.time">
+          <span v-if="!isObject(handleData(item.message))">{{ handleData(item.message) }}</span>
+          <section v-else>
+            <p style="margin: 0" v-for="(value,key) in handleData(item.message)" :key="key">
+              {{ key }}:{{ value }}
+            </p>
+          </section>
+        </a-collapse-panel>
+
+      </a-collapse>
+    </a-card>
+    <a-card title="正常日志" :bordered="false" style="margin-top: 10px">
+      <a-collapse v-model:activeKey="errorActiveKey">
+        <a-collapse-panel v-for="(item,index) in infoData" :key="index" :header="item.time">
+          <span v-if="!isObject(handleData(item.message))">{{ handleData(item.message) }}</span>
+          <section v-else>
+            <p style="margin: 0" v-for="(value,key) in handleData(item.message)" :key="key">
+              {{ key }}:{{ value }}
+            </p>
+          </section>
+        </a-collapse-panel>
+
+      </a-collapse>
+    </a-card>
+  </main>
 </template>

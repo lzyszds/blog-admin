@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { useUserInfoState } from "@/store/useUserInfoStore.ts";
-import { getWeather } from "@/api/toolkit.ts";
+import {useUserInfoState} from "@/store/useUserInfoStore.ts";
+import {getWeather} from "@/api/toolkit.ts";
 
 const userState = useUserInfoState();
 
 //获取天气
-const { data: weather } = await getWeather();
+let {data: weather} = await getWeather();
 
 //早上好，下午好，晚上好
 const timeName = () => {
@@ -33,11 +33,11 @@ const timeName = () => {
 
 <template>
   <ACard>
-    <div class="item">
+    <div class="item" v-if="weather">
       <a-avatar
-        :size="64"
-        width="100%"
-        src="/pictureBedImage/OQli-X5pRicN9w9cAhUfgLRSFdNs0Zl76hzKIXdyoxg0gAA"
+          :size="64"
+          width="100%"
+          src="/pictureBedImage/OQli-X5pRicN9w9cAhUfgLRSFdNs0Zl76hzKIXdyoxg0gAA"
       >
       </a-avatar>
 
@@ -79,7 +79,7 @@ const timeName = () => {
       font-size: clamp(10px, 2vw, 12px);
       color: #666;
       grid-area: weather;
-      font-family: var(--font);
+      font-family: var(--font),serif;
     }
   }
 }

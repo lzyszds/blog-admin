@@ -53,7 +53,7 @@ export const AlovaInstance = createAlova({
         console.log(json);
 
         message.error(json.msg);
-        throw new Error(json.msg);
+        // throw new Error(json.msg);
       }
       // 解析的响应数据将传给method实例的transformData钩子函数，这些函数将在后续讲解
       return json;
