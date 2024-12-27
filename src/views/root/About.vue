@@ -5,8 +5,6 @@ import {getTaskLog} from "@/api/plantask.ts";
 const {data} = await getTaskLog('e4b4b7bd-cee7-49b7-b1ae-15458e454427', 1)
 
 const result = JSON.parse(data[0].content)
-console.log(result)
-const activeKey = ref('')
 </script>
 
 <template>
