@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import UpdateLogLeft from "@/components/dashboard/UploadLogLeft.vue";
+import UpdateLogLeft from "@/components/dashboard/UploadLog.vue";
 import StatisticsChart from "@/components/dashboard/StatisticsChart.vue";
 import { getAdminHomeData } from "@/api/toolkit";
 import LzyIcon from "@/components/LzyIcon.vue";

@@ -26,6 +26,10 @@ const { list, containerProps, wrapperProps } = useVirtualList(stepsData.value, {
   // Keep `itemHeight` in sync with the item's row.
   itemHeight: 22,
 });
+
+const titleHandler = (title: string) => {
+  return title.replaceAll("- ", "<br/>- ");
+};
 </script>
 
 <template>
@@ -36,22 +40,13 @@ const { list, containerProps, wrapperProps } = useVirtualList(stepsData.value, {
         :key="item.data.id"
         :color="item.data.conclusion == 'success' ? '#5161ce' : 'red'"
       >
-        {{ item.data.title }}
+        <span v-html="titleHandler(item.data.title)"></span>
+        <!--        <span :title="item.data.title">-->
+        <!--          {{ item.data.title.split("\n")[0] }}-->
+        <!--        </span>-->
       </a-timeline-item>
     </a-timeline>
   </div>
-  <!-- <a-timeline>
-    <a-timeline-item
-      v-for="item in stepsData"
-      :key="item.id"
-      :color="item.conclusion == 'success' ? '#5161ce' : 'red'"
-    >
-      <p class="item">
-        <span>{{ item.title }}</span>
-        <span>{{ item.description }}</span>
-      </p>
-    </a-timeline-item>
-  </a-timeline> -->
 </template>
 
 <style scoped>

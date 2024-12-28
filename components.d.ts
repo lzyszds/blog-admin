@@ -79,7 +79,9 @@ declare module 'vue' {
     StatisticsChart: typeof import('./src/components/dashboard/StatisticsChart.vue')['default']
     TableHeaderOperation: typeof import('./src/components/TableHeaderOperation.vue')['default']
     TaskCard: typeof import('./src/components/TaskCard.vue')['default']
+    Tooltip: typeof import('./src/components/Tooltip.vue')['default']
     UpdateLog: typeof import('./src/components/dashboard/UpdateLog.vue')['default']
+    UploadLog: typeof import('./src/components/dashboard/UploadLog.vue')['default']
     UploadLogLeft: typeof import('./src/components/dashboard/UploadLogLeft.vue')['default']
     UserForm: typeof import('./src/components/form/UserForm.vue')['default']
   }
