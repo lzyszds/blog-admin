@@ -1,10 +1,9 @@
 <script setup lang="ts">
+import { getTaskLog } from "@/api/plantask.ts";
 
-import {getTaskLog} from "@/api/plantask.ts";
+const { data } = await getTaskLog("e4b4b7bd-cee7-49b7-b1ae-15458e454427", 1);
 
-const {data} = await getTaskLog('e4b4b7bd-cee7-49b7-b1ae-15458e454427', 1)
-
-const result = JSON.parse(data[0].content)
+const result = JSON.parse(data[0].content);
 </script>
 
 <template>
@@ -15,11 +14,14 @@ const result = JSON.parse(data[0].content)
     </a-card>
     <a-card title="生产环境依赖" :bordered="false" style="margin-top: 10px">
       <div class="devCardList">
-
-        <div class="cardItem" v-for="(item,index) in result.dependencies" :key="index" :data-des="item.description">
+        <div
+          class="cardItem"
+          v-for="(item, index) in result.dependencies"
+          :key="index"
+          :data-des="item.description"
+        >
           <span>{{ index }}</span> <span>{{ item.version }}</span>
         </div>
-
       </div>
 
       <!--      <a-collapse v-model:activeKey="activeKey" accordion>-->
@@ -31,11 +33,14 @@ const result = JSON.parse(data[0].content)
     </a-card>
     <a-card title="开发环境依赖" :bordered="false" style="margin-top: 10px">
       <div class="devCardList">
-
-        <div class="cardItem" v-for="(item,index) in result.devDependencies" :key="index" :data-des="item.description">
+        <div
+          class="cardItem"
+          v-for="(item, index) in result.devDependencies"
+          :key="index"
+          :data-des="item.description"
+        >
           <span>{{ index }}</span> <span>{{ item.version }}</span>
         </div>
-
       </div>
     </a-card>
   </main>
@@ -51,23 +56,19 @@ p {
   flex-wrap: wrap;
   gap: 10px;
 
-
   .cardItem {
     width: calc(50% - 10px);
     display: flex;
     justify-content: space-between;
     padding: 10px;
-    background-color: #f0f0f0;;
+    background-color: #f0f0f0;
     border-radius: 5px;
     position: relative;
 
     &:before {
       content: attr(data-des);
       position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
+      inset: 0;
       opacity: 0;
       background-color: rgba(0, 0, 0, 0.5);
       color: #fff;
@@ -78,6 +79,8 @@ p {
       transition: opacity 0.3s;
       z-index: 1;
       backdrop-filter: blur(5px);
+      text-wrap: nowrap;
+      font-size: clamp(9px, 1vw, 16px);
     }
 
     &:hover {
@@ -90,6 +93,14 @@ p {
 
     &:last-child {
       border-right: none;
+    }
+  }
+}
+
+@media screen and (max-width: 576px) {
+  .devCardList {
+    .cardItem {
+      width: 100%;
     }
   }
 }
