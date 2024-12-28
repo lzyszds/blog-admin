@@ -66,6 +66,8 @@ declare module 'vue' {
     CkEditor: typeof import('./src/components/ckeditor/CkEditor.vue')['default']
     DraggableCard: typeof import('./src/components/DraggableCard.vue')['default']
     IncomeChart: typeof import('./src/components/dashboard/IncomeChart.vue')['default']
+    JsonViewerItem: typeof import('./src/components/JsonViewerItem.vue')['default']
+    JsonVisualization: typeof import('./src/components/JsonVisualization.vue')['default']
     LzyIcon: typeof import('./src/components/LzyIcon.vue')['default']
     OnliveUser: typeof import('./src/components/dashboard/OnliveUser.vue')['default']
     PostsForm: typeof import('./src/components/form/PostsForm.vue')['default']

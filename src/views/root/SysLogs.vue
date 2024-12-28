@@ -1,47 +1,63 @@
 <script lang="ts" setup>
-import { getSystemLog } from "@/api/system.ts";
-import dayjs from "dayjs";
-import { LogRequestResult } from "@/typings/LogType.ts";
+import { getSystemLog } from "@/api/system.ts"; // 引入获取系统日志的 API 方法
+import dayjs from "dayjs"; // 引入 dayjs 用于日期处理
+import { LogRequestResult } from "@/typings/LogType.ts"; // 引入日志请求结果的类型定义
+import { computed, reactive, ref, watch } from "vue";
+import JsonViewerItem from "@/components/JsonViewerItem.vue"; // 明确引入需要的 Vue API
 
-const searchForm = reactive({
-  page: 1,
-  limit: 10,
-  date: dayjs().format("YYYY-MM-DD"),
-  type: "error",
+// 使用接口定义 searchForm 的类型，提高代码可读性和可维护性
+interface SearchForm {
+  page: number;
+  limit: number;
+  date: string;
+  type: "error" | "info"; // 限定 type 的可选值
+}
+
+// 定义搜索表单的响应式数据
+const searchForm = reactive<SearchForm>({
+  page: 1, // 当前页码，默认为 1
+  limit: 10, // 每页显示条数，默认为 10
+  date: dayjs().format("YYYY-MM-DD"), // 日期，默认为今天的日期，格式为 YYYY-MM-DD
+  type: "error", // 日志类型，默认为 "error" (错误日志)
 });
 
+// 定义日志数据的响应式引用
 const logData = ref<LogRequestResult>({
-  data: [],
-  total: 0,
+  data: [], // 日志数据数组，初始为空
+  total: 0, // 日志总条数，初始为 0
 });
 
+// 定义当前激活的折叠面板的 key，用于控制日志详情的展开
 const infoActiveKey = ref("");
 
-const handleData = (data: any) => {
-  try {
-    return JSON.parse(data);
-  } catch (e) {
-    return data;
-  }
-};
+// 使用计算属性来决定是否显示日志数据区域，避免不必要的渲染
+const hasLogData = computed(() => logData.value.total > 0);
 
-const isObject = (data: any) => {
-  return typeof data === "object";
-};
 
+// 禁用日期选择器中未来的日期
 const disabledDate = (current: any) => {
-  return current && current > dayjs().endOf("day");
+  return current && current > dayjs().endOf("day"); // 禁用当前日期之后的所有日期
+};
+
+// 定义一个异步函数来获取日志数据，方便复用和清晰逻辑
+const fetchLogData = async () => {
+  try {
+    const { data } = await getSystemLog(searchForm); // 调用 API 获取系统日志
+    logData.value = data; // 更新日志数据
+  } catch (error) {
+    console.error("Error fetching system log:", error); // 捕获 API 请求错误
+    // 可以添加错误提示给用户，例如使用 message 组件
+  }
 };
 
 watch(
   searchForm,
-  async () => {
-    const { data } = await getSystemLog(searchForm);
-    logData.value = data;
+  () => {
+    fetchLogData();
   },
   {
-    deep: true,
-    immediate: true,
+    deep: true, // 深度监听 searchForm 对象内部属性的变化
+    immediate: true, // 初始化时立即执行一次
   },
 );
 </script>
@@ -59,7 +75,8 @@ watch(
             style="width: 100%"
             value-format="YYYY-MM-DD"
             :disabled-date="disabledDate"
-          ></a-date-picker>
+          >
+          </a-date-picker>
         </section>
         <section>
           日志类型：
@@ -77,7 +94,6 @@ watch(
 
     <a-card title="系统日志" :bordered="false" style="margin-top: 10px">
       <template #extra>
-        <!-- 分页  -->
         <a-pagination
           v-model:current="searchForm.page"
           v-model:pageSize="searchForm.limit"
@@ -87,7 +103,7 @@ watch(
           show-size-changer
         />
       </template>
-      <section v-if="logData.total">
+      <section v-if="hasLogData">
         <a-collapse v-model:activeKey="infoActiveKey">
           <a-collapse-panel
             v-for="(item, index) in logData.data"
@@ -103,18 +119,19 @@ watch(
               </a-space>
             </template>
 
-            <span v-if="!isObject(handleData(item.message))">
-              {{ handleData(item.message) }}
-            </span>
-            <section v-else>
-              <p
-                style="margin: 0"
-                v-for="(value, key) in handleData(item.message)"
-                :key="key"
-              >
-                {{ key }}:{{ value }}
-              </p>
-            </section>
+            <div class="json-viewer">
+              <template v-for="(value, key) in item" :key="key">
+                <JsonViewerItem :key-name="key" :value="value" :indent="0" />
+              </template>
+            </div>
+
+            <!--            <p class="jsonColumns" v-for="(value, key) in item" :key="key">-->
+            <!--              <span class="key">{{ key }}</span>-->
+            <!--              <span class="colon">&nbsp;:&nbsp;</span>-->
+            <!--              <span class="value">-->
+            <!--                {{ value }}-->
+            <!--              </span>-->
+            <!--            </p>-->
           </a-collapse-panel>
         </a-collapse>
       </section>
@@ -126,6 +143,7 @@ watch(
     </a-card>
   </main>
 </template>
+
 <style scoped>
 .searchCard {
   display: flex;

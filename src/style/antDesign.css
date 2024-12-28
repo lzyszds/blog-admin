@@ -23,7 +23,7 @@
 :root[data-theme='dark'] {
     --theme-bg-color: #141414;
     /* 基础颜色 */
-    --color-primary: #177ddc;
+    --color-primary: rgba(131, 139, 203, 0.56);
     --color-bg: #141414;
     --color-bg-light: #0f0f0f;
     --color-bg-light-hover: #1a1a1a;
