@@ -12,14 +12,14 @@ import {getUserColumns} from '@/table/userColumns';
 import {RequestResult} from '@/typings/Request';
 
 /* 获取表格滚动条高度 */
-const { scrollConfig } = useScrollY();
+const {scrollConfig} = useScrollY();
 /* 搜索条件 */
-const { state: searchCondition, reset } = useResetRefState({
+const {state: searchCondition, reset} = useResetRefState({
   pages: 1,
   limit: 10,
-  name: "",
-  username: "",
-  power: "",
+  name: '',
+  username: '',
+  power: '',
 });
 
 /* 表格选中项 */
@@ -32,7 +32,7 @@ const onSelectChange = (keys: Key[]) => {
 /* 弹窗参数 */
 const modalParams = ref({
   isOpen: false,
-  title: "添加用户",
+  title: '添加用户',
   params: {},
   headimgs: [],
   sureCallback: {
@@ -47,7 +47,7 @@ const modalParams = ref({
 //   immediate: true,
 // });
 const loading = ref(false);
-const data = ref<RequestResult["data"]>();
+const data = ref<RequestResult['data']>();
 
 const send = async (force: boolean = false) => {
   loading.value = true;
@@ -66,7 +66,7 @@ const pagination = computed(() => {
     current: searchCondition.value.pages,
     pageSize: searchCondition.value.limit,
     showSizeChanger: true,
-    pageSizeOptions: ["5", "8", "10", "15", "20"],
+    pageSizeOptions: ['5', '8', '10', '15', '20'],
     onShowSizeChange: (current, pageSize) => {
       searchCondition.value.pages = current;
       searchCondition.value.limit = pageSize;
@@ -81,7 +81,7 @@ const getTable = getTableStore();
 /* 设置表格列表数据的回调方法 */
 getTable.setCallbackArr({
   refreshData: () => send(),
-  delData: ({ uid }) => delUser({ uid }),
+  delData: ({uid}) => delUser({uid}),
   openModal: (params) => setUserModal(params),
   columns: getUserColumns,
 });
@@ -95,13 +95,13 @@ const columns = computed(() => {
   }
 });
 
-const handleTableChange: TableProps["onChange"] = (pagination) => {
+const handleTableChange: TableProps['onChange'] = (pagination) => {
   searchCondition.value.pages = pagination.current;
   send(); // 强制发送请求，忽略缓存
 };
 
 /* 获取所有可用头像 */
-getAllHeadImg().then(({ data }) => {
+getAllHeadImg().then(({data}) => {
   modalParams.value.headimgs = data;
 });
 /* 添加/编辑弹窗 */
@@ -110,14 +110,14 @@ const setUserModal = async (params) => {
 
   modalParams.value.params = isEdit ? params : {};
   modalParams.value.isOpen = true;
-  modalParams.value.title = isEdit ? "修改用户" : "添加用户";
+  modalParams.value.title = isEdit ? '修改用户' : '添加用户';
   modalParams.value.sureCallback.callback = isEdit ? editUser : addUser;
 };
 
 // 动画控制 为了解决模态框关闭时 动画直接被if销毁
 const userFormHide = ref(false);
 watchEffect(async () => {
-  const { isOpen } = modalParams.value;
+  const {isOpen} = modalParams.value;
   if (!isOpen) {
     await new Promise((resolve) => setTimeout(resolve, 300));
   }
@@ -134,23 +134,23 @@ const multipleDel = () => {
 </script>
 
 <template>
-  <section style="display: flex; flex-direction: column; gap: 20px; height: 100%">
+  <section style="display: flex; flex-direction: column; gap: 10px; height: 100%">
     <ACard title="搜索工具" :bordered="false">
       <main class="searchCard">
         <section>
           <span>用户名：</span>
           <AInput
-            @pressEnter="send()"
-            v-model:value="searchCondition.name"
-            placeholder="请输入用户名称"
+              @pressEnter="send()"
+              v-model:value="searchCondition.name"
+              placeholder="请输入用户名称"
           />
         </section>
         <section>
           <span>用户账号：</span>
           <AInput
-            @pressEnter="send()"
-            v-model:value="searchCondition.username"
-            placeholder="请输入用户账号"
+              @pressEnter="send()"
+              v-model:value="searchCondition.username"
+              placeholder="请输入用户账号"
           />
         </section>
 
@@ -163,11 +163,11 @@ const multipleDel = () => {
         </section>
         <section style="display: flex; gap: 10px">
           <AButton @click="reset" style="flex: 1">
-            <LzyIcon name="hugeicons:exchange-01" />
+            <LzyIcon name="hugeicons:exchange-01"/>
             重置
           </AButton>
           <AButton @click="send()" style="flex: 1">
-            <LzyIcon name="hugeicons:search-area" />
+            <LzyIcon name="hugeicons:search-area"/>
             搜索
           </AButton>
         </section>
@@ -175,37 +175,37 @@ const multipleDel = () => {
     </ACard>
 
     <ACard
-      title="角色列表"
-      :bordered="false"
-      :body-style="{ flex: 1, overflow: 'hidden', paddingBottom: '0' }"
-      style="height: calc(100% - 20px)"
+        title="角色列表"
+        :bordered="false"
+        :body-style="{ flex: 1, overflow: 'hidden', paddingBottom: '0' }"
+        style="height: calc(100% - 20px)"
     >
       <template #extra>
         <TableHeaderOperation
-          :selectedRowKeys="selectedRowKeys"
-          :addModal="setUserModal"
-          :loading="loading"
-          @refresh="send()"
-          @multipleDel="multipleDel"
+            :selectedRowKeys="selectedRowKeys"
+            :addModal="setUserModal"
+            :loading="loading"
+            @refresh="send()"
+            @multipleDel="multipleDel"
         />
       </template>
 
       <main class="contentCard">
         <ATable
-          ref="tableWrapperRef"
-          :row-selection="{ selectedRowKeys, onChange: onSelectChange }"
-          :columns="columns"
-          :data-source="tableData ? tableData.data : []"
-          :scroll="scrollConfig"
-          :loading="loading"
-          :pagination="pagination"
-          size="small"
-          row-key="uid"
-          @change="handleTableChange"
+            ref="tableWrapperRef"
+            :row-selection="{ selectedRowKeys, onChange: onSelectChange }"
+            :columns="columns"
+            :data-source="tableData ? tableData.data : []"
+            :scroll="scrollConfig"
+            :loading="loading"
+            :pagination="pagination"
+            size="small"
+            row-key="uid"
+            @change="handleTableChange"
         />
       </main>
     </ACard>
-    <UserForm :modalParams="modalParams" v-if="userFormHide" />
+    <UserForm :modalParams="modalParams" v-if="userFormHide"/>
   </section>
 </template>
 

@@ -136,7 +136,7 @@ const multipleDel = () => {
 
 <template>
   <section
-    style="display: flex; flex-direction: column; gap: 20px; height: 100%"
+    style="display: flex; flex-direction: column; gap: 10px; height: 100%"
   >
     <ACard title="搜索工具" :bordered="false">
       <main class="searchCard">

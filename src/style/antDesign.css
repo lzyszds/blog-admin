@@ -1,5 +1,8 @@
 :root {
     --theme-bg-color: var(--themeColor);
+
+    --ant-padding: 24px;
+
     /* 基础颜色 */
     --color-primary: var(--themeColor);
     --color-primary-Rgb: var(--themeColorRgb);
@@ -39,6 +42,16 @@
     --color-input-border: var(--color-border);
     --color-table-header-bg: #1d1d1d;
     --color-table-row-hover-bg: #262626;
+}
+
+@media screen and (max-width: 768px) {
+    :root {
+        --ant-padding: 16px 24px;
+    }
+
+    .ant-card .ant-card-body {
+        padding: var(--ant-padding);
+    }
 }
 
 .app-container {

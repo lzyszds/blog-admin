@@ -1,94 +1,94 @@
 *[class^="ant-layout"] {
-  box-sizing: none;
+    box-sizing: unset;
 }
 
 :deep(.searchCard) {
-  display: flex;
-  gap: 20px;
-  flex-wrap: wrap;
+    display: flex;
+    gap: var(--ant-padding);
+    flex-wrap: wrap;
 
-  section {
-    display: grid;
-    align-items: center;
-    grid-template-columns: 65px 1fr;
-    justify-content: space-between;
-    width: 240px;
-    gap: 10px;
-    
-    span {
-      text-wrap: nowrap;
-      user-select: none;
+    section {
+        display: grid;
+        align-items: center;
+        grid-template-columns: 65px 1fr;
+        justify-content: space-between;
+        width: 240px;
+        gap: 10px;
+
+        span {
+            text-wrap: nowrap;
+            user-select: none;
+        }
+
+        button {
+            letter-spacing: 3px;
+
+            svg {
+                font-size: 16px;
+                margin-right: 5px;
+            }
+        }
     }
 
-    button {
-      letter-spacing: 3px;
-
-      svg {
-        font-size: 16px;
-        margin-right: 5px;
-      }
+    .ant-select-selector {
+        min-width: 120px;
     }
-  }
-
-  .ant-select-selector {
-    min-width: 120px;
-  }
 }
 
 :deep(.ant-table-body) {
-  overflow-y: auto;
+    overflow-y: auto;
 }
 
 .actionBtn {
-  display: flex;
-  gap: 10px;
+    display: flex;
+    gap: 10px;
 
-  svg {
-    margin-right: 4px;
-  }
+    svg {
+        margin-right: 4px;
+    }
 }
 
 @keyframes custom-fade {
-  0% {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
+    0% {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
 
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 
 @media (max-width: 1280px) {
-  :deep(.searchCard) {
-    flex-wrap: wrap;
-  }
+    :deep(.searchCard) {
+        flex-wrap: wrap;
+    }
 }
 
 @media (max-width: 655px) {
-  :deep(.searchCard) {
-    section {
-      width: 100%;
+    :deep(.searchCard) {
+        section {
+            width: 100%;
 
-      .ant-select {
-        width: 100% !important;
-      }
+            .ant-select {
+                width: 100% !important;
+            }
+        }
     }
-  }
 
-  :deep(.actionBtn) {
-    button {
-      padding: 4px 15px !important;
+    :deep(.actionBtn) {
+        button {
+            padding: 4px 15px !important;
 
-      span {
-        display: none;
-      }
+            span {
+                display: none;
+            }
 
-      svg {
-        margin-right: 0;
-      }
+            svg {
+                margin-right: 0;
+            }
+        }
     }
-  }
 }
