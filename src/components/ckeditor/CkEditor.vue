@@ -1,19 +1,19 @@
 <script setup lang="ts">
 //@ts-ignore
-import {ClassicEditor} from "ckeditor5";
-import {Ckeditor} from "@ckeditor/ckeditor5-vue";
-import "ckeditor5/ckeditor5.css";
-import {editorConfig} from "./ckeditor";
-import Resources from "@/views/root/Resources.vue";
+import {ClassicEditor} from 'ckeditor5';
+import {Ckeditor} from '@ckeditor/ckeditor5-vue';
+import 'ckeditor5/ckeditor5.css';
+import {editorConfig} from './ckeditor';
+import Resources from '@/views/root/Resources.vue';
 
-import("shiki/themes/one-dark-pro.mjs");
+import('shiki/themes/one-dark-pro.mjs');
 
-const infoCard: any = inject("infoCard");
+const infoCard: any = inject('infoCard');
 
 // Markdown输入内容的模型定义
 const editorData = defineModel({
   type: String,
-  default: "",
+  default: '',
 });
 
 const editor = ClassicEditor;
@@ -30,7 +30,9 @@ const resource = useSessionStorage<{
   modal: boolean;
   selectImage: string;
   confirmImage: string;
-}>("resourceModal", {modal: false, selectImage: "", confirmImage: ""});
+}>('resourceModal', {modal: false, selectImage: '', confirmImage: ''});
+//避免刷新页面后，因缓存导致的资源弹窗还在显示
+resource.value.modal = false;
 
 //确认选中图片
 const confirm = () => {
@@ -53,7 +55,7 @@ watchEffect(() => {
 });
 
 onBeforeUnmount(() => {
-  resource.value = {modal: false, selectImage: "", confirmImage: ""};
+  resource.value = {modal: false, selectImage: '', confirmImage: ''};
 });
 </script>
 
@@ -65,12 +67,11 @@ onBeforeUnmount(() => {
       width: `calc(100vw + ${editorSizeWidth}px)`,
     }"
   >
-    <AModal v-model:open="resource.modal" width="100%">
+    <AModal v-model:open="resource.modal" width="100%" wrap-class-name="resource-modal">
       <Resources
           type="blog"
           :is-selector="true"
           @select="(val) => (resource.selectImage = val)"
-          :preview-style="{ maxHeight: '300px' }"
       />
       <template #footer>
         <div class="resource-footer">

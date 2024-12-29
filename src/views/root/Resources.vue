@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import LzyIcon from "@/components/LzyIcon.vue";
-import {deletePictureBedImage, getPictureBedImageList} from "@/api/toolkit.ts";
-import {message, Modal, UploadChangeParam} from "ant-design-vue";
-import {PictureBedType} from "@/typings/PictureBedType.ts";
-import {createVNode} from "vue";
-import {ExclamationCircleOutlined} from "@ant-design/icons-vue";
+import LzyIcon from '@/components/LzyIcon.vue';
+import {deletePictureBedImage, getPictureBedImageList} from '@/api/toolkit.ts';
+import {message, Modal, UploadChangeParam} from 'ant-design-vue';
+import {PictureBedType} from '@/typings/PictureBedType.ts';
+import {createVNode} from 'vue';
+import {ExclamationCircleOutlined} from '@ant-design/icons-vue';
 
 interface Props {
   type?: string;
@@ -13,16 +13,16 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  type: "all",
+  type: 'all',
   isSelector: false,
   previewStyle: {},
 });
 
-const emit = defineEmits(["select"]);
+const emit = defineEmits(['select']);
 
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
-const selectImageResult = ref<string>("");
+const selectImageResult = ref<string>('');
 
 // 是否正在上传
 const uploading = ref(false);
@@ -43,23 +43,23 @@ const handleDrop = () => {
 
 const handleChange = (info: UploadChangeParam) => {
   // 是否正在上传
-  uploading.value = info.file.status === "uploading";
-  if (info.file.status === "done") {
-    if (info.file.response.code == "500") {
-      message.error("文件上传失败");
+  uploading.value = info.file.status === 'uploading';
+  if (info.file.status === 'done') {
+    if (info.file.response.code == '500') {
+      message.error('文件上传失败');
       return;
     }
 
     message.success(`${info.file.name} 文件上传成功`);
     getImageList();
-  } else if (info.file.status === "error") {
+  } else if (info.file.status === 'error') {
     message.error(`${info.file.name} 文件上传失败。`);
   }
 };
 
 // 图片上传前的钩子，让用户选择的当前图片的类别
 const beforeUpload = () => {
-  if (props.type !== "all") {
+  if (props.type !== 'all') {
     selectType.value.val = props.type;
     selectType.value.isOk = true;
     return true;
@@ -96,7 +96,7 @@ getImageList();
 // 预览图片
 const reserveSeat = ref({
   visible: false,
-  url: "",
+  url: '',
 });
 
 // 设置预览图片的显示状态
@@ -111,7 +111,7 @@ const openImage = (item: PictureBedType) => {
     reserveSeat.value.visible = true;
   } else {
     selectImageResult.value = item.url;
-    emit("select", item.url);
+    emit('select', item.url);
   }
 };
 
@@ -123,22 +123,22 @@ const onClick = async (item: PictureBedType, {key}) => {
   } else if (key == 2) {
     // 删除图片
     Modal.confirm({
-      title: "你确定要删除这张图片吗？",
+      title: '你确定要删除这张图片吗？',
       icon: createVNode(ExclamationCircleOutlined),
-      okText: "确定",
-      okType: "danger",
-      cancelText: "取消",
+      okText: '确定',
+      okType: 'danger',
+      cancelText: '取消',
       onOk() {
         return new Promise(async (resolve, _reject) => {
           await deletePictureBedImage({id: item.id});
           await getImageList();
           resolve(true);
-          message.success("删除成功");
-        }).catch(() => console.log("Oops errors!"));
+          message.success('删除成功');
+        }).catch(() => console.log('Oops errors!'));
       },
 
       onCancel() {
-        console.log("Cancel");
+        console.log('Cancel');
       },
     });
   } else if (key == 3) {
@@ -147,22 +147,22 @@ const onClick = async (item: PictureBedType, {key}) => {
     //将文本通过 clipboard 传入剪切板
     navigator.clipboard.writeText(text).then(
         () => {
-          if (!text) return message.error("复制失败，图片地址为空");
-          message.success("图片地址已复制到剪切板");
+          if (!text) return message.error('复制失败，图片地址为空');
+          message.success('图片地址已复制到剪切板');
         },
         function (res) {
-          console.log("lzy ~ res", res);
+          console.log('lzy ~ res', res);
         }
     );
   } else if (key == 4) {
     // 下载图片
-    const a = document.createElement("a");
+    const a = document.createElement('a');
     a.href = item.url;
     a.download = item.url;
     a.click();
   } else if (key == 5) {
     //选中当前图片
-    emit("select", item.url);
+    emit('select', item.url);
   }
 };
 
@@ -174,11 +174,11 @@ const onOk = () => {
 
 // 图片分类列表
 const pictureTypeList = [
-  {label: "文章", value: "blog"},
-  {label: "头像", value: "head"},
-  {label: "懒加载图片", value: "loading"},
-  {label: "背景", value: "background"},
-  {label: "其他", value: "other"},
+  {label: '文章', value: 'blog'},
+  {label: '头像', value: 'head'},
+  {label: '懒加载图片', value: 'loading'},
+  {label: '背景', value: 'background'},
+  {label: '其他', value: 'other'},
 ];
 </script>
 
@@ -319,6 +319,16 @@ const pictureTypeList = [
     color: var(--color-text-secondary) !important;
   }
 }
+
+@media screen and (max-width: 768px) {
+  :deep(.ant-upload-btn) {
+    .ant-upload-text, .ant-upload-hint {
+      display: none !important;
+    }
+  }
+
+}
+
 </style>
 <style>
 .resources {
