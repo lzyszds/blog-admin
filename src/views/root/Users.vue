@@ -1,22 +1,15 @@
 <script setup lang="ts">
-import {
-  addUser,
-  delUser,
-  editUser,
-  getAllHeadImg,
-  getUsersList,
-  uploadHeadImg,
-} from "@/api/user";
-import UserForm from "@/components/form/UserForm.vue";
-import useResetRefState from "@/hook/useResetRefState";
-import { getTableStore } from "@/store/useTableStore";
-import { useScrollY } from "@/hook/useTableConfig";
-import { multDelData } from "@/utils/tableHandles.ts";
-import { Key } from "ant-design-vue/es/_util/type";
-import TableHeaderOperation from "@/components/TableHeaderOperation.vue";
-import { TableProps } from "ant-design-vue";
-import { getUserColumns } from "@/table/userColumns";
-import { RequestResult } from "@/typings/Request";
+import {addUser, delUser, editUser, getAllHeadImg, getUsersList, uploadHeadImg,} from '@/api/user';
+import UserForm from '@/components/form/UserForm.vue';
+import useResetRefState from '@/hook/useResetRefState';
+import {getTableStore} from '@/store/useTableStore';
+import {useScrollY} from '@/hook/useTableConfig';
+import {multDelData} from '@/utils/tableHandles.ts';
+import {Key} from 'ant-design-vue/es/_util/type';
+import TableHeaderOperation from '@/components/TableHeaderOperation.vue';
+import {TableProps} from 'ant-design-vue';
+import {getUserColumns} from '@/table/userColumns';
+import {RequestResult} from '@/typings/Request';
 
 /* 获取表格滚动条高度 */
 const { scrollConfig } = useScrollY();
@@ -58,8 +51,7 @@ const data = ref<RequestResult["data"]>();
 
 const send = async (force: boolean = false) => {
   loading.value = true;
-  const dataRes = await getUsersList(searchCondition).send(force);
-  data.value = dataRes;
+  data.value = await getUsersList(searchCondition).send(force);
   loading.value = false;
 };
 send();

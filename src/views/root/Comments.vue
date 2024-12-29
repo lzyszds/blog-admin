@@ -10,6 +10,7 @@ import { TableProps } from "ant-design-vue";
 import { getcommentColumns } from "@/table/commentColumns";
 import dayjs from "dayjs";
 import { RequestResult } from "@/typings/Request";
+import LzyIcon from '@/components/LzyIcon.vue'
 
 /* 获取表格滚动条高度 */
 const { scrollConfig } = useScrollY();

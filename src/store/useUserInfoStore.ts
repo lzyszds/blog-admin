@@ -1,16 +1,17 @@
-import { defineStore } from "pinia";
-import { getUserInfoToken } from "@/api/user";
-import { UserAdmin } from "@/typings/User";
-import { useTabsState } from "@/store/useTabsStore";
-import routeItem from "@/router/config";
-import { TokenService } from "@/hook/useTokenService";
-import { useUserOnlineStore } from "@/store/useUserOnline.ts";
+import {defineStore} from 'pinia';
+import {getUserInfoToken} from '@/api/user';
+import {UserAdmin} from '@/typings/User';
+import {useTabsState} from '@/store/useTabsStore';
+import routeItem from '@/router/config';
+import {TokenService} from '@/hook/useTokenService';
+import {useUserOnlineStore} from '@/store/useUserOnline.ts';
+import {invalidateCache} from 'alova'
 
 const userOnlineStore = useUserOnlineStore();
 
 const tabsState = useTabsState();
 
-export const useUserInfoState = defineStore("useUserInfoState", () => {
+export const useUserInfoState = defineStore('useUserInfoState', () => {
   const userInfo = ref<UserAdmin>({});
   const isLogin = ref(false);
   const isAdmin = ref(false);
@@ -25,56 +26,59 @@ export const useUserInfoState = defineStore("useUserInfoState", () => {
     if (res.code === 200) {
       userInfo.value = res.data;
       isLogin.value = true;
-      isAdmin.value = res.data.role === "admin";
-      isEditor.value = res.data.role === "editor";
-      isUser.value = res.data.role === "user";
+      isAdmin.value = res.data.role === 'admin';
+      isEditor.value = res.data.role === 'editor';
+      isUser.value = res.data.role === 'user';
 
 
-      const url = import.meta.env.VITE_BASE_URL.replace("http", "ws").replace(
-        "https",
-        "wss",
+      const url = import.meta.env.VITE_BASE_URL.replace('http', 'ws').replace(
+        'https',
+        'wss',
       );
       //发送在线长连接
-      const socket = new WebSocket(url + "/websocket/onlineUsers");
+      const socket = new WebSocket(url + '/websocket/onlineUsers');
 
-      socket.addEventListener("open", () => {
-        console.log("已连接到服务器");
+      socket.addEventListener('open', () => {
+        console.log('已连接到服务器');
 
         // 登录，发送 userId 给服务器
         const userId = userInfo.value.uid; // 假设这是用户的唯一标识，你需要根据你的实际情况生成或获取
         socket.send(
-          JSON.stringify({ type: "在线", userId, token: TokenService.getToken() }),
+          JSON.stringify({type: '在线', userId, token: TokenService.getToken()}),
         );
       });
 
-      socket.addEventListener("message", (event) => {
+      socket.addEventListener('message', (event) => {
         const data = JSON.parse(event.data);
-        
-        if (data.type === "onlineUsers") {
-          console.log("Online users:", userOnlineStore.onlinePeople);
+
+        if (data.type === 'onlineUsers') {
+          console.log('Online users:', userOnlineStore.onlinePeople);
           // 在这里更新页面上的在线用户列表
           userOnlineStore.setUserOnline(data.data);
         }
       });
 
     } else {
-      await router.push("/login");
+      await router.push('/login');
     }
   };
 
   /* 退出登录 */
   const logout = async () => {
     TokenService.removeToken();
-    await router.push("/login");
-    setTimeout(() => {
-      router.go(0);
-    }, 0);
+    //清空所有localstorage
+    localStorage.clear();
+    // 清除所有Alova的缓存
+    await invalidateCache();
+
+    // router.go(0);
+    await router.push({name: 'login',});
   };
 
   /* 前往个人中心 */
   const goToUserCenter = async () => {
-    tabsState.setKeyArr(routeItem.find((item) => item.name === "userCenter")!);
-    router.push({ name: "userCenter" });
+    tabsState.setKeyArr(routeItem.find((item) => item.name === 'userCenter')!);
+    router.push({name: 'userCenter'});
   };
 
   // 初始化时调用一次

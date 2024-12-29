@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { login } from "@/api/user";
-import { useRequest } from "@/hook/useRequest";
-import { TokenService } from "@/hook/useTokenService";
-import { useTabsState } from "@/store/useTabsStore.ts"; // const baseURL = import.meta.env.VITE_BASE_URL;
+import {login} from '@/api/user';
+import {useRequest} from '@/hook/useRequest';
+import {TokenService} from '@/hook/useTokenService';
+import {useTabsState} from '@/store/useTabsStore'; // const baseURL = import.meta.env.VITE_BASE_URL;
+import {useUserInfoState} from '@/store/useUserInfoStore';
 
 const isTransition = ref(false);
 const router = useRouter();
@@ -12,24 +13,26 @@ const tabsState = useTabsState();
 //进入页面先判断是否登陆着,localStorage.getItem('token')是登陆时候存的token
 if (TokenService.isAuthenticated()) {
   //路由重定向
-  router.replace("/" + tabsState.tabsKeyArr[tabsState.activeKey].path);
+  router.replace('/' + tabsState.tabsKeyArr[Math.max(0, tabsState.activeKey)].path);
 }
 
 // 账号密码数据，用于提交
 const ruleForm = reactive({
-  username: "",
-  password: "",
-  email: "",
-  code: "",
+  username: '',
+  password: '',
+  email: '',
+  code: '',
   remember: false,
 });
 
-const { loading, send } = useRequest(login(ruleForm), {
+const {loading, send} = useRequest(login(ruleForm), {
   requestAfterCall: {
     success: (token: string) => {
       // console.log(res);
-      TokenService.setToken(token,ruleForm.remember);
-      router.replace("/" + tabsState.tabsKeyArr[tabsState.activeKey].path);
+      TokenService.setToken(token, ruleForm.remember);
+      router.replace('/' + tabsState.tabsKeyArr[tabsState.activeKey].path);
+      const {fetchUserInfo} = useUserInfoState();
+      fetchUserInfo()
     },
   },
 });
@@ -37,12 +40,12 @@ const { loading, send } = useRequest(login(ruleForm), {
 // 表单验证规则
 const rules = reactive({
   username: [
-    { required: true, message: "请输入账号", trigger: "blur" },
-    { min: 3, max: 16, message: "账号长度应该是6到16", trigger: "blur" },
+    {required: true, message: '请输入账号', trigger: 'blur'},
+    {min: 3, max: 16, message: '账号长度应该是6到16', trigger: 'blur'},
   ],
   password: [
-    { required: true, message: "请输入密码", trigger: "blur" },
-    { min: 6, max: 16, message: "密码长度应该是6到16", trigger: "blur" },
+    {required: true, message: '请输入密码', trigger: 'blur'},
+    {min: 6, max: 16, message: '密码长度应该是6到16', trigger: 'blur'},
   ],
 });
 
@@ -63,19 +66,19 @@ onMounted(() => {
       <div class="card" v-if="isTransition">
         <div class="item center" :class="{ loadBtn: loading }">
           <AForm
-            :model="ruleForm"
-            name="basic"
-            :label-col="{ span: 8 }"
-            :wrapper-col="{ span: 16 }"
-            autocomplete="off"
-            @finish="send"
+              :model="ruleForm"
+              name="basic"
+              :label-col="{ span: 8 }"
+              :wrapper-col="{ span: 16 }"
+              autocomplete="off"
+              @finish="send"
           >
             <p class="title">如约而至</p>
 
             <AFormItem name="username" :rules="rules.username">
               <AInput v-model:value="ruleForm.username">
                 <template #prefix>
-                  <LzyIcon name="ant-design:user-outlined" />
+                  <LzyIcon name="ant-design:user-outlined"/>
                   账号：
                 </template>
               </AInput>
@@ -84,23 +87,23 @@ onMounted(() => {
             <AFormItem name="password" :rules="rules.password">
               <AInputPassword v-model:value="ruleForm.password">
                 <template #prefix>
-                  <LzyIcon name="ant-design:lock-filled" />
+                  <LzyIcon name="ant-design:lock-filled"/>
                   密码：
                 </template>
               </AInputPassword>
             </AFormItem>
 
             <AFormItem name="remember">
-              <ACheckbox v-model:checked="ruleForm.remember"> 记住密码 </ACheckbox>
+              <ACheckbox v-model:checked="ruleForm.remember"> 记住密码</ACheckbox>
             </AFormItem>
 
             <AFormItem>
               <AButton type="primary" html-type="submit">
                 <Transition>
                   <LzyIcon
-                    name="majesticons:scan-fingerprint-line"
-                    style="margin-right: 5px"
-                    size="18px"
+                      name="majesticons:scan-fingerprint-line"
+                      style="margin-right: 5px"
+                      size="18px"
                   ></LzyIcon>
                 </Transition>
                 立即登陆
@@ -110,8 +113,8 @@ onMounted(() => {
         </div>
         <div class="illustartion">
           <img
-            :src="'/pictureBedImage/O-ZPA__Gg5S9ju7bNWAXyhcyFsLLFYjvlekUK7YYm9f8AAA'"
-            alt="logo"
+              :src="'/pictureBedImage/O-ZPA__Gg5S9ju7bNWAXyhcyFsLLFYjvlekUK7YYm9f8AAA'"
+              alt="logo"
           />
         </div>
       </div>
@@ -154,8 +157,7 @@ onMounted(() => {
     width: 45vw;
     height: 45vw;
     border-radius: 50%;
-    background: url("/pictureBedImage/OT1RprU1MQX5TKg7gwZAQsbCk8T6K5xafdjbGxzYgsoJ8AA")
-      no-repeat center;
+    background: url("/pictureBedImage/OT1RprU1MQX5TKg7gwZAQsbCk8T6K5xafdjbGxzYgsoJ8AA") no-repeat center;
     background-size: 120%;
     border: 5px solid #000;
     z-index: -1;
@@ -180,9 +182,9 @@ onMounted(() => {
 
     &:focus-within {
       box-shadow: 0 10px 10px rgba(0, 0, 0, 0.1),
-        0px -30px 4px -10px rgba(255, 255, 255, 0.3),
-        0px -60px 4px -20px rgba(255, 255, 255, 0.2),
-        0px -90px 4px -30px rgba(255, 255, 255, 0.1);
+      0px -30px 4px -10px rgba(255, 255, 255, 0.3),
+      0px -60px 4px -20px rgba(255, 255, 255, 0.2),
+      0px -90px 4px -30px rgba(255, 255, 255, 0.1);
     }
 
     .illustartion {

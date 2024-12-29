@@ -1,32 +1,47 @@
 <script setup lang="ts">
-import {useUserInfoState} from "@/store/useUserInfoStore.ts";
-import {getWeather} from "@/api/toolkit.ts";
+import {useUserInfoState} from '@/store/useUserInfoStore.ts';
+import {getWeather} from '@/api/toolkit.ts';
+import {useRequest} from 'alova/client'
 
 const userState = useUserInfoState();
 
+const weather = ref({
+  province: '',
+  city: '',
+  weather: '',
+  windpower: '',
+  winddirection: '',
+  temperature: ''
+});
+
 //获取天气
-let {data: weather} = await getWeather();
+useRequest(getWeather, {
+  immediate: true,
+  cacheKey: 'weather'
+}).onSuccess((res) => {
+  weather.value = res.data.data;
+})
 
 //早上好，下午好，晚上好
 const timeName = () => {
   const now = new Date();
   const hour = now.getHours();
   if (hour < 6) {
-    return "凌晨好";
+    return '凌晨好';
   } else if (hour < 9) {
-    return "早上好";
+    return '早上好';
   } else if (hour < 12) {
-    return "上午好";
+    return '上午好';
   } else if (hour < 14) {
-    return "中午好";
+    return '中午好';
   } else if (hour < 17) {
-    return "下午好";
+    return '下午好';
   } else if (hour < 19) {
-    return "傍晚好";
+    return '傍晚好';
   } else if (hour < 22) {
-    return "晚上好";
+    return '晚上好';
   } else {
-    return "夜深了，请注意休息";
+    return '夜深了，请注意休息';
   }
 };
 </script>
@@ -79,7 +94,7 @@ const timeName = () => {
       font-size: clamp(10px, 2vw, 12px);
       color: #666;
       grid-area: weather;
-      font-family: var(--font),serif;
+      font-family: var(--font), serif;
     }
   }
 }

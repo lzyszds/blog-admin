@@ -1,6 +1,6 @@
-import routeItem, { RouteItem } from "@/router/config";
+import routeItem, {RouteItem} from '@/router/config';
 
-import { defineStore } from "pinia";
+import {defineStore} from 'pinia';
 
 type TabskeyArr = RouteItem & {
   noClose?: boolean;
@@ -20,7 +20,7 @@ type TabsState = {
 };
 
 export const useTabsState = defineStore(
-  "tabsState",
+  'tabsState',
   (): TabsState => {
     /*  当前页签 */
     const activeKey = ref(0);
@@ -29,7 +29,7 @@ export const useTabsState = defineStore(
 
     /*  tabs页签 */
     const tabsKeyArr = ref<TabskeyArr[]>([
-      Object.assign({}, routeItem[0], { noClose: true }),
+      Object.assign({}, routeItem[0], {noClose: true}),
     ]);
 
     const setKeyArr = (item) => {
@@ -40,7 +40,7 @@ export const useTabsState = defineStore(
       const newKey = tabsKeyArr.value.findIndex((res: any) => {
         return res.name === item.name;
       });
-      activeKey.value = Number(newKey);
+      activeKey.value = Math.max(newKey, 0);
     };
     const getKeyArr = (key) => {
       return tabsKeyArr.value[key];
@@ -63,7 +63,7 @@ export const useTabsState = defineStore(
       if (activeKey.value == index) {
         /* 删除当前激活的标签，则激活前一个标签 */
         activeKey.value = tabsKeyArr.value.length - 1;
-        router.push({ name: getKeyArr(activeKey.value).name });
+        router.push({name: getKeyArr(activeKey.value).name});
       }
     };
 
@@ -102,17 +102,17 @@ export const useTabsState = defineStore(
       );
 
       /*  判断是否为首页 首页比较特殊 */
-      if (getKeyArr(activeKey.value).name == "dashboard") {
-        router.push("/");
+      if (getKeyArr(activeKey.value).name == 'dashboard') {
+        router.push('/');
       } else {
         /* 跳转当前选中的标签路由中 */
-        router.push({ name: getKeyArr(activeKey.value).name });
+        router.push({name: getKeyArr(activeKey.value).name});
       }
     };
 
     /* 根据路由获取当前页面的key */
     watchEffect(() => {
-      if(router.currentRoute.value.name == 'login') return;
+      if (router.currentRoute.value.name == 'login') return;
       activeKey.value = tabsKeyArr.value.findIndex(
         (item) => item.name == router.currentRoute.value.name,
       );

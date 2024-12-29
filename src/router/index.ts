@@ -32,9 +32,7 @@ export const router = createRouter({
     ? createWebHashHistory()
     : createWebHistory(),
   routes,
-  scrollBehavior(_to, _from, _savedPosition) { // 始终滚动到顶部
-    return { top: 0 }
-  }
+  strict: true,
 })
 
 // 简单配置
@@ -65,7 +63,7 @@ router.afterEach(() => {
 /** Setup Vue Router */
 export async function setupRouter(app: App) {
   app.use(router);
-  await router.isReady();
+  // await router.isReady();
 }
 
 
