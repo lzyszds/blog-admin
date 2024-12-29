@@ -5,14 +5,7 @@ import {useRequest} from 'alova/client'
 
 const userState = useUserInfoState();
 
-const weather = ref({
-  province: '',
-  city: '',
-  weather: '',
-  windpower: '',
-  winddirection: '',
-  temperature: ''
-});
+const weather = ref();
 
 //获取天气
 useRequest(getWeather, {
@@ -48,7 +41,12 @@ const timeName = () => {
 
 <template>
   <ACard>
-    <div class="item" v-if="weather">
+    <a-skeleton v-if="!weather" id="card-skeleton" :avatar="{
+      shape: 'circle',
+      size: 64
+    }" :paragraph="{ rows: 1 }" active/>
+
+    <div class="item" v-else>
       <a-avatar
           :size="64"
           width="100%"
@@ -69,6 +67,10 @@ const timeName = () => {
 </template>
 
 <style scoped>
+#card-skeleton :deep(.ant-skeleton-paragraph) {
+  margin-block-start: 0;
+}
+
 .item {
   display: grid;
   grid-template-columns: 60px 1fr;
