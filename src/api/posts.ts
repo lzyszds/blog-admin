@@ -50,3 +50,8 @@ export const addArticleCategory = (params) => {
 export const deleteArticleCategory = (params) => {
   return Alova.createPost("/article/deleteArticleType", params);
 };
+
+//禁用文章
+export const disableArticle = (params) => {
+  return Alova.createPost("/article/disableArticle", params);
+};

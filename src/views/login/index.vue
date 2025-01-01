@@ -10,10 +10,15 @@ const router = useRouter();
 const tabsState = useTabsState();
 // const openSliderVerificationCode = ref(false); // 验证码弹窗
 
+const enter = () => {
+  router.replace('/' + tabsState.tabsKeyArr[Math.max(0, tabsState.activeKey)].path);
+
+};
+
 //进入页面先判断是否登陆着,localStorage.getItem('token')是登陆时候存的token
 if (TokenService.isAuthenticated()) {
   //路由重定向
-  router.replace('/' + tabsState.tabsKeyArr[Math.max(0, tabsState.activeKey)].path);
+  enter();
 }
 
 // 账号密码数据，用于提交
@@ -30,7 +35,7 @@ const {loading, send} = useRequest(login(ruleForm), {
     success: (token: string) => {
       // console.log(res);
       TokenService.setToken(token, ruleForm.remember);
-      router.replace('/' + tabsState.tabsKeyArr[tabsState.activeKey].path);
+      enter()
       const {fetchUserInfo} = useUserInfoState();
       fetchUserInfo()
     },
