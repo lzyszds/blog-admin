@@ -16,7 +16,7 @@ const emit = defineEmits(["updateSystemData"]);
 const edit = (record: WebSystemType) => {
   const { configKey } = record;
   editableData[configKey] = cloneDeep(
-    data.value.filter((item) => configKey === item.configKey)[0],
+    data.value.filter((item) => configKey === item.configKey)[0]
   );
 };
 
@@ -25,13 +25,19 @@ const save = (record: WebSystemType) => {
   if (record.configKey == "load_animation_gif")
     return message.error("加载动画不可修改,请前往图片懒加载设置修改");
   const { configKey } = record;
-  Object.assign(
+  const arr = Object.assign(
     data.value.filter((item) => configKey === item.configKey)[0],
-    editableData[configKey],
+    editableData[configKey]
   );
+
   delete editableData[configKey];
-  console.log(editableData);
-  // emit("updateSystemData", data.value);
+  emit("updateSystemData", {
+    config_value: arr.configValue,
+    config_id: arr.configId,
+    config_key: arr.configKey,
+    config_type: arr.configType,
+    config_desc: arr.configDesc,
+  });
 };
 
 const cancel = (record: WebSystemType) => {
@@ -96,6 +102,7 @@ const selectShow = (column) => {
       :scroll="{ x: 750, y: 475 }"
     >
       <template #bodyCell="{ column, record, text }">
+        <!-- key 和 value -->
         <template v-if="inputShow(column) && editableData[record.configKey]">
           <a-input
             v-model:value="editableData[record.configKey][column.dataIndex]"
@@ -103,7 +110,7 @@ const selectShow = (column) => {
             :disabled="record.configKey === 'load_animation_gif'"
           />
         </template>
-
+        <!-- 类型 -->
         <template v-if="selectShow(column)">
           <ASelect
             v-if="editableData[record.configKey]"
@@ -120,9 +127,9 @@ const selectShow = (column) => {
               {{ item.label }}
             </ASelectOption>
           </ASelect>
-          <span v-else>{{
-            selectOption.filter((item) => item.value == text)[0].label
-          }}</span>
+          <span v-else>
+            {{ selectOption.filter((item) => item.value == text)[0].label }}
+          </span>
         </template>
 
         <template v-else-if="column.key === 'action'">
@@ -134,9 +141,7 @@ const selectShow = (column) => {
                 </AButton>
               </a-typography-link>
               <a-popconfirm title="确定取消?" @confirm="cancel(record)">
-                <AButton size="small" danger @click="edit(record)">
-                  取消
-                </AButton>
+                <AButton size="small" danger @click="edit(record)"> 取消 </AButton>
               </a-popconfirm>
             </span>
             <AButton v-else size="small" type="primary" @click="edit(record)">

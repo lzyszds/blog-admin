@@ -1,9 +1,5 @@
 <script setup lang="ts">
-import {
-  addSystemConfig,
-  getSystemConfig,
-  updateSystemConfig,
-} from "@/api/system";
+import { addSystemConfig, getSystemConfig, updateSystemConfig } from "@/api/system";
 import SetLoadGif from "@/components/webSet/SetLoadGif.vue";
 import { WebSystemType } from "@/typings/WebSetType";
 import { message } from "ant-design-vue";
@@ -16,21 +12,19 @@ const activeKey = useStorage("activeKey", "1");
 const { data } = await getSystemConfig();
 const result: WebSystemType[] = data;
 
-const updateSystemData = async (arr) => {
+const updateSystemData = async (item) => {
   try {
-    const resultPromise = await Promise.all(
-      arr.map((item) => {
-        const { config_id, ...arg } = item;
-        if (config_id != 0 && config_id != "") {
-          return updateSystemConfig(item);
-        } else {
-          return addSystemConfig(arg);
-        }
-      }),
-    );
-    return message.success(resultPromise[0].data);
+    const { config_id, ...arg } = item;
+    let result;
+    if (config_id && config_id !== 0) {
+      result = await updateSystemConfig(item);
+    } else {
+      result = await addSystemConfig(arg);
+    }
+    message.success(result.data);
   } catch (err) {
-    console.log("🚀 ~ updateSystemData ~ err:", err);
+    console.error("Error updating system data:", err);
+    message.error("更新系统数据时出错");
   }
 };
 </script>
@@ -45,7 +39,7 @@ const updateSystemData = async (arr) => {
       </ATab-pane>
       <ATab-pane key="2" tab="系统变量设置">
         <section class="webSetItem">
-          <SetSystem :result="result" />
+          <SetSystem :result="result" @updateSystemData="updateSystemData" />
         </section>
       </ATab-pane>
       <ATab-pane key="3" tab="Ai密钥配置">

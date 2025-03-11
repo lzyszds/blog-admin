@@ -104,6 +104,7 @@ const handleTableChange: TableProps['onChange'] = (pagination) => {
 getAllHeadImg().then(({data}) => {
   modalParams.value.headimgs = data;
 });
+
 /* 添加/编辑弹窗 */
 const setUserModal = async (params) => {
   const isEdit = !!params.uid;

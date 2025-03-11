@@ -14,9 +14,9 @@ Learn more about the recommended Project Setup and IDE Support in the [Vue Docs 
   ✨ feat: 添加新功能
   🐛 fix: 修复 bug
   📝 docs: 对文档进行修改
-  ♻️ refactor: 代码重构（既不是新增功能，也不是修改 bug 的代码变动）
+  ♻️ refactor: 代码重构（既不是新增功能，也不是修改 
+  🧑‍💻 dx: 优化开发体验bug 的代码变动）
   ⚡ perf: 提高性能的代码修改
-  🧑‍💻 dx: 优化开发体验
   🔨 workflow: 工作流变动
   🏷️ types: 类型声明修改
   🚧 wip: 工作正在进行中

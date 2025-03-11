@@ -21,9 +21,11 @@ const webData = ref<WebDataType>(
 //点击加载图片将图片地址设置为系统的加载图片
 const handleLoadGif = async (val: string) => {
   webData.value.load_animation_gif = val;
-  emit("updateSystemData", [
-    { config_value: val, config_id: 5, config_key: "load_animation_gif" },
-  ]);
+  emit("updateSystemData", {
+    config_value: val,
+    config_id: 5,
+    config_key: "load_animation_gif",
+  });
 };
 </script>
 
