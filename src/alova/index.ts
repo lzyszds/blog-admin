@@ -43,8 +43,13 @@ export const AlovaInstance = createAlova({
       }
 
       if (response.status >= 400) {
-        message.error(response.statusText);
-        throw new Error(response.statusText);
+        console.log(response);
+        if (response.statusText === 'Forbidden') {
+          message.error('权限不足，无法访问该资源');
+        } else {
+          message.error(response.statusText);
+        }
+        return []
       }
 
       const json = await response.json();

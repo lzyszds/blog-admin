@@ -20,11 +20,7 @@ import { createVNode } from "vue";
 import { useDateFormat } from "@vueuse/shared";
 import { Swiper, SwiperSlide } from "swiper/vue";
 
-import {
-  convertCronToArray,
-  convertToCronString,
-  removeInlineStyles,
-} from "@/utils";
+import { convertCronToArray, convertToCronString, removeInlineStyles } from "@/utils";
 
 const { width } = useWindowSize();
 const taskData = ref<any>([]);
@@ -115,10 +111,11 @@ const menuData = (item: Task): MenuData[] => [
       stackInstruction.value[id] = true;
       try {
         const result = await runTask(id);
+        if (!result.length)  throw new Error("执行失败");
         message.success(result.data);
+        await getTaskData();
       } catch (error) {}
       stackInstruction.value[id] = false;
-      await getTaskData();
     },
   },
   {

@@ -1,9 +1,12 @@
 <script setup lang="ts">
 import { getTaskLog } from "@/api/plantask.ts";
-
+let result: any = {
+  dependencies: [],
+};
 const { data } = await getTaskLog("e4b4b7bd-cee7-49b7-b1ae-15458e454427", 1);
-
-const result = JSON.parse(data[0].content);
+if (data) {
+  result = JSON.parse(data[0].content);
+}
 </script>
 
 <template>

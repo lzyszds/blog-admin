@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import LzyIcon from '@/components/LzyIcon.vue';
-import {deletePictureBedImage, getPictureBedImageList} from '@/api/toolkit.ts';
-import {message, Modal, UploadChangeParam} from 'ant-design-vue';
-import {PictureBedType} from '@/typings/PictureBedType.ts';
-import {createVNode} from 'vue';
-import {ExclamationCircleOutlined} from '@ant-design/icons-vue';
+import LzyIcon from "@/components/LzyIcon.vue";
+import { deletePictureBedImage, getPictureBedImageList } from "@/api/toolkit.ts";
+import { message, Modal, UploadChangeParam } from "ant-design-vue";
+import { PictureBedType } from "@/typings/PictureBedType.ts";
+import { createVNode } from "vue";
+import { ExclamationCircleOutlined } from "@ant-design/icons-vue";
 
 interface Props {
   type?: string;
@@ -13,16 +13,16 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  type: 'all',
+  type: "all",
   isSelector: false,
   previewStyle: {},
 });
 
-const emit = defineEmits(['select']);
+const emit = defineEmits(["select"]);
 
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
-const selectImageResult = ref<string>('');
+const selectImageResult = ref<string>("");
 
 // 是否正在上传
 const uploading = ref(false);
@@ -38,28 +38,27 @@ const selectType = ref({
 const filterValue = ref(props.type);
 
 // 拖拽上传
-const handleDrop = () => {
-};
+const handleDrop = () => {};
 
 const handleChange = (info: UploadChangeParam) => {
   // 是否正在上传
-  uploading.value = info.file.status === 'uploading';
-  if (info.file.status === 'done') {
-    if (info.file.response.code == '500') {
-      message.error('文件上传失败');
+  uploading.value = info.file.status === "uploading";
+  if (info.file.status === "done") {
+    if (info.file.response.code == "500") {
+      message.error("文件上传失败");
       return;
     }
 
     message.success(`${info.file.name} 文件上传成功`);
     getImageList();
-  } else if (info.file.status === 'error') {
+  } else if (info.file.status === "error") {
     message.error(`${info.file.name} 文件上传失败。`);
   }
 };
 
 // 图片上传前的钩子，让用户选择的当前图片的类别
 const beforeUpload = () => {
-  if (props.type !== 'all') {
+  if (props.type !== "all") {
     selectType.value.val = props.type;
     selectType.value.isOk = true;
     return true;
@@ -86,7 +85,7 @@ const imageList = ref<PictureBedType[]>([]);
 
 // 加载图片列表
 const getImageList = async () => {
-  const {data} = await getPictureBedImageList({
+  const { data } = await getPictureBedImageList({
     type: filterValue.value,
   }).send(true);
   imageList.value = data;
@@ -96,7 +95,7 @@ getImageList();
 // 预览图片
 const reserveSeat = ref({
   visible: false,
-  url: '',
+  url: "",
 });
 
 // 设置预览图片的显示状态
@@ -111,34 +110,38 @@ const openImage = (item: PictureBedType) => {
     reserveSeat.value.visible = true;
   } else {
     selectImageResult.value = item.url;
-    emit('select', item.url);
+    emit("select", item.url);
   }
 };
 
 // 右键菜单点击事件
-const onClick = async (item: PictureBedType, {key}) => {
+const onClick = async (item: PictureBedType, { key }) => {
   if (key == 1) {
     // 打开预览
     openImage(item);
   } else if (key == 2) {
     // 删除图片
     Modal.confirm({
-      title: '你确定要删除这张图片吗？',
+      title: "你确定要删除这张图片吗？",
       icon: createVNode(ExclamationCircleOutlined),
-      okText: '确定',
-      okType: 'danger',
-      cancelText: '取消',
+      okText: "确定",
+      okType: "danger",
+      cancelText: "取消",
       onOk() {
         return new Promise(async (resolve, _reject) => {
-          await deletePictureBedImage({id: item.id});
+          const result = await deletePictureBedImage({ id: item.id }).send();
+          if (!result || !result.length) {
+            return resolve(true);
+          }
+
           await getImageList();
+          message.success("删除成功");
           resolve(true);
-          message.success('删除成功');
-        }).catch(() => console.log('Oops errors!'));
+        }).catch(() => console.log("Oops errors!"));
       },
 
       onCancel() {
-        console.log('Cancel');
+        console.log("Cancel");
       },
     });
   } else if (key == 3) {
@@ -146,23 +149,23 @@ const onClick = async (item: PictureBedType, {key}) => {
     const text = window.location.origin + item.url;
     //将文本通过 clipboard 传入剪切板
     navigator.clipboard.writeText(text).then(
-        () => {
-          if (!text) return message.error('复制失败，图片地址为空');
-          message.success('图片地址已复制到剪切板');
-        },
-        function (res) {
-          console.log('lzy ~ res', res);
-        }
+      () => {
+        if (!text) return message.error("复制失败，图片地址为空");
+        message.success("图片地址已复制到剪切板");
+      },
+      function (res) {
+        console.log("lzy ~ res", res);
+      }
     );
   } else if (key == 4) {
     // 下载图片
-    const a = document.createElement('a');
+    const a = document.createElement("a");
     a.href = item.url;
     a.download = item.url;
     a.click();
   } else if (key == 5) {
     //选中当前图片
-    emit('select', item.url);
+    emit("select", item.url);
   }
 };
 
@@ -174,19 +177,19 @@ const onOk = () => {
 
 // 图片分类列表
 const pictureTypeList = [
-  {label: '文章', value: 'blog'},
-  {label: '头像', value: 'head'},
-  {label: '懒加载图片', value: 'loading'},
-  {label: '背景', value: 'background'},
-  {label: '其他', value: 'other'},
+  { label: "文章", value: "blog" },
+  { label: "头像", value: "head" },
+  { label: "懒加载图片", value: "loading" },
+  { label: "背景", value: "background" },
+  { label: "其他", value: "other" },
 ];
 </script>
 
 <template>
   <div style="height: 100%">
     <ACard
-        class="resources"
-        :body-style="{
+      class="resources"
+      :body-style="{
         height: '100%',
         display: 'grid',
         gridTemplateRows: '0 0 auto 30px 1fr 0',
@@ -196,31 +199,31 @@ const pictureTypeList = [
     >
       <!--   放大预览占位元素   -->
       <a-image
-          :style="{ display: 'none' }"
-          :preview="{
+        :style="{ display: 'none' }"
+        :preview="{
           visible: reserveSeat.visible,
           onVisibleChange: setVisible,
         }"
-          :src="reserveSeat.url"
+        :src="reserveSeat.url"
       />
 
       <!--   图片上传功能元素   -->
       <a-upload-dragger
-          :action="BASE_URL + '/api/toolkit/uploadImageToPictureBed'"
-          name="upload-image"
-          withCredentials
-          :showUploadList="false"
-          :multiple="true"
-          :data="{ type: selectType.val }"
-          :beforeUpload="beforeUpload"
-          @change="handleChange"
-          @drop="handleDrop"
-          :disabled="uploading"
+        :action="BASE_URL + '/api/toolkit/uploadImageToPictureBed'"
+        name="upload-image"
+        withCredentials
+        :showUploadList="false"
+        :multiple="true"
+        :data="{ type: selectType.val }"
+        :beforeUpload="beforeUpload"
+        @change="handleChange"
+        @drop="handleDrop"
+        :disabled="uploading"
       >
         <p class="ant-upload-drag-icon">
-          <LzyIcon v-if="!uploading" size="50" name="hugeicons:image-01"/>
+          <LzyIcon v-if="!uploading" size="50" name="hugeicons:image-01" />
           <template v-else>
-            <LzyIcon size="50" name="line-md:uploading-loop"/>
+            <LzyIcon size="50" name="line-md:uploading-loop" />
             <span>上传中...</span>
           </template>
         </p>
@@ -230,19 +233,19 @@ const pictureTypeList = [
       <!--   图片列表筛选   -->
       <ASpace :size="20">
         <a-select
-            v-model:value="filterValue"
-            style="width: 120px"
-            :options="[
+          v-model:value="filterValue"
+          style="width: 120px"
+          :options="[
             {
               label: '全部',
               value: 'all',
             },
             ...pictureTypeList,
           ]"
-            @change="getImageList"
+          @change="getImageList"
         >
           <template #suffixIcon>
-            <LzyIcon size="20" name="iconoir:filter-alt"/>
+            <LzyIcon size="20" name="iconoir:filter-alt" />
           </template>
         </a-select>
         <span>{{ imageList.length }}张图片</span>
@@ -251,16 +254,16 @@ const pictureTypeList = [
       <div class="preview" :style="previewStyle">
         <a-dropdown :trigger="['contextmenu']" v-for="item in imageList">
           <div
-              :class="{ active: item.url === selectImageResult }"
-              @click="openImage(item)"
+            :class="{ active: item.url === selectImageResult }"
+            @click="openImage(item)"
           >
             <img
-                height="140px"
-                class="preview-item"
-                :src="item.url"
-                onerror="this.src='error.png'"
-                alt="右键操作图片"
-                :data-title="item.id"
+              height="140px"
+              class="preview-item"
+              :src="item.url"
+              onerror="this.src='error.png'"
+              alt="右键操作图片"
+              :data-title="item.id"
             />
           </div>
           <template #overlay>
@@ -278,23 +281,23 @@ const pictureTypeList = [
     <a-modal v-model:open="selectType.visible" :closable="false" :footer="null">
       <div style="display: flex; gap: 5px">
         <ASelect
-            v-model:value="selectType.val"
-            style="width: 100%"
-            placeholder="选择图片要存放类型"
+          v-model:value="selectType.val"
+          style="width: 100%"
+          placeholder="选择图片要存放类型"
         >
           <ASelectOption
-              v-for="item in pictureTypeList"
-              :key="item.value"
-              :value="item.value"
+            v-for="item in pictureTypeList"
+            :key="item.value"
+            :value="item.value"
           >
             {{ item.label }}
           </ASelectOption>
         </ASelect>
         <AButton
-            type="primary"
-            :loading="uploading"
-            :disabled="!selectType.val"
-            @click="onOk"
+          type="primary"
+          :loading="uploading"
+          :disabled="!selectType.val"
+          @click="onOk"
         >
           确定
         </AButton>
@@ -322,13 +325,12 @@ const pictureTypeList = [
 
 @media screen and (max-width: 768px) {
   :deep(.ant-upload-btn) {
-    .ant-upload-text, .ant-upload-hint {
+    .ant-upload-text,
+    .ant-upload-hint {
       display: none !important;
     }
   }
-
 }
-
 </style>
 <style>
 .resources {

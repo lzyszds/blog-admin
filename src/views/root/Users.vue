@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {addUser, delUser, editUser, getAllHeadImg, getUsersList, uploadHeadImg,} from '@/api/user';
+import {addUser, delUser, editUser, getAllHeadImg, getUserList, uploadHeadImg,} from '@/api/user';
 import UserForm from '@/components/form/UserForm.vue';
 import useResetRefState from '@/hook/useResetRefState';
 import {getTableStore} from '@/store/useTableStore';
@@ -51,7 +51,7 @@ const data = ref<RequestResult['data']>();
 
 const send = async (force: boolean = false) => {
   loading.value = true;
-  data.value = await getUsersList(searchCondition).send(force);
+  data.value = await getUserList(searchCondition).send(force);
   loading.value = false;
 };
 send();

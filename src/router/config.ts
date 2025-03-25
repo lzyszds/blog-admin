@@ -93,11 +93,22 @@ const routeItem: RouteItem[] = [
         },
     },
     {
+        path: "permission",
+        name: "permission",
+        component: () => import("@/views/root/Permission.vue"),
+        meta: {
+            key: 9,
+            name: "权限设置",
+            uicon: "hugeicons:permanent-job",
+            component: "permission",
+        },
+    },
+    {
         path: "userCenter",
         name: "userCenter",
         component: () => import("@/views/root/UserCenter.vue"),
         meta: {
-            key: 9,
+            key: 10,
             name: "个人中心",
             uicon: "ph:user-circle-duotone",
             component: "userCenter",
@@ -109,7 +120,7 @@ const routeItem: RouteItem[] = [
         name: "resources",
         component: () => import("@/views/root/Resources.vue"),
         meta: {
-            key: 10,
+            key: 11,
             name: "资源管理",
             uicon: "iconoir:media-image-folder",
             component: "resources",
@@ -120,7 +131,7 @@ const routeItem: RouteItem[] = [
         name: "sysLogs",
         component: () => import("@/views/root/SysLogs.vue"),
         meta: {
-            key: 11,
+            key: 12,
             name: "系统日志",
             uicon: "iconoir:calendar",
             component: "sysLogs",
@@ -131,7 +142,7 @@ const routeItem: RouteItem[] = [
         name: "about",
         component: () => import("@/views/root/About.vue"),
         meta: {
-            key: 12,
+            key: 13,
             name: "关于项目",
             uicon:  "iconoir:rss-feed-tag",
             component: "about",
