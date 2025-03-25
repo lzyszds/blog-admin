@@ -1,0 +1,1697 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>沙漠种植游戏</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+
+    #gameCanvas {
+      display: block;
+      width: 100%;
+      height: 100vh;
+      touch-action: manipulation;
+    }
+
+    .loading {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 100;
+    }
+
+    .loading-text {
+      font-size: 24px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="loading">
+    <div class="loading-text">加载中...</div>
+  </div>
+  <canvas id="gameCanvas"></canvas>
+</body>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!-- <script src="game.js"></script> -->
+
+<script>
+  $(document).ready(() => {
+    const canvas = $('#gameCanvas')[0];
+    const ctx = canvas.getContext('2d');
+
+    // 浇水动画状态
+    const wateringAnimation = {
+      active: false,
+      startTime: 0,
+      duration: 3000, // 动画持续时间（毫秒）
+      kettleStartX: 400, // 水壶起始X位置
+      kettleStartY: 1100, // 水壶起始Y位置
+      kettleEndX: 380, // 水壶结束X位置
+      kettleEndY: 1000, // 水壶结束Y位置
+      kettleRotation: 0, // 水壶旋转角度
+      droplets: [], // 水滴数组
+      soilMoisture: 0 // 土壤湿润程度
+    };
+
+    // 施肥动画状态
+    const fertilizingAnimation = {
+      active: false,
+      startTime: 0,
+      duration: 3000, // 动画持续时间（毫秒）
+      bagStartX: 400, // 肥料袋起始X位置
+      bagStartY: 1100, // 肥料袋起始Y位置
+      bagEndX: 380, // 肥料袋结束X位置
+      bagEndY: 1000, // 肥料袋结束Y位置
+      bagRotation: 0, // 肥料袋旋转角度
+      particles: [], // 肥料粒子数组
+      soilFertility: 0 // 土壤肥力程度
+    };
+
+    // 除虫动画状态
+    const pesticideAnimation = {
+      active: false,
+      startTime: 0,
+      duration: 3000, // 动画持续时间（毫秒）
+      pesticideStartX: 400, // 喷虫剂起始X位置
+      pesticideStartY: 1100, // 喷虫剂起始Y位置
+      pesticideEndX: 380, // 喷虫剂结束X位置
+      pesticideEndY: 1000, // 喷虫剂结束Y位置
+      pesticideX: 400, // 当前X位置
+      pesticideY: 1100, // 当前Y位置
+      pesticideRotation: 0, // 喷虫剂旋转角度
+      particles: [] // 喷雾粒子数组
+    };
+
+    // 收获提示状态
+    const harvestHint = {
+      active: false,
+      scale: 1.0,
+      rotation: 0,
+      alpha: 1.0,
+      x: 0,
+      y: 0,
+      pulseDirection: 3,
+      pulseSpeed: 0.0005,
+      rotationSpeed: 0.2,
+      handImage: null // 你的手图片
+    };
+
+    // 水滴类
+    class WaterDroplet {
+      constructor(x, y) {
+        this.x = x;
+        this.y = y;
+        this.speed = 2 + Math.random() * 3;
+        this.size = 5 + Math.random() * 15;
+        this.alpha = 0.7 + Math.random() * 0.3;
+        this.active = true;
+      }
+
+      update() {
+        this.y += this.speed;
+        this.x += Math.sin(this.y / 20) * 0.5; // 轻微的左右摆动
+
+        // 当水滴到达土壤时
+        if (this.y > 1200) {
+          this.active = false;
+          // 增加土壤湿润度
+          wateringAnimation.soilMoisture += 0.05;
+          if (wateringAnimation.soilMoisture > 1) {
+            wateringAnimation.soilMoisture = 1;
+          }
+          return false;
+        }
+        return true;
+      }
+
+      draw(ctx) {
+        ctx.save();
+        ctx.globalAlpha = this.alpha;
+        ctx.fillStyle = '#4fa4ff';
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size / 2, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+    }
+
+    // 肥料粒子类
+    class FertilizerParticle {
+      constructor(x, y) {
+        this.x = x;
+        this.y = y;
+        this.startX = x;
+        this.speed = 1 + Math.random() * 2;
+        this.size = 3 + Math.random() * 8;
+        this.alpha = 0.8 + Math.random() * 0.2;
+        this.active = true;
+        this.angle = Math.random() * Math.PI * 2; // 随机角度
+        this.distance = 0;
+        this.maxDistance = 20 + Math.random() * 30; // 最大散布距离
+        this.color = Math.random() < 0.5 ? '#8B4513' : '#654321'; // 随机棕色
+      }
+
+      update() {
+        // 肥料粒子下落并向四周散开
+        this.distance += this.speed;
+        this.y += this.speed * 1.5;
+        this.x = this.startX + Math.cos(this.angle) * this.distance * 0.5;
+
+        // 当肥料粒子到达土壤或散布到最大距离时
+        if (this.y > 1220 || this.distance > this.maxDistance) {
+          this.active = false;
+          // 增加土壤肥力
+          if (this.y > 1220) {
+            fertilizingAnimation.soilFertility += 0.03;
+            if (fertilizingAnimation.soilFertility > 1) {
+              fertilizingAnimation.soilFertility = 1;
+            }
+          }
+          return false;
+        }
+        return true;
+      }
+
+      draw(ctx) {
+        ctx.save();
+        ctx.globalAlpha = this.alpha;
+        ctx.fillStyle = this.color;
+
+        // 绘制不规则形状的肥料粒子
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size / 2, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.restore();
+      }
+    }
+
+
+    // 杀虫剂喷雾粒子类
+    class PesticideParticle {
+      constructor(x, y, angle) {
+        this.x = x;
+        this.y = y;
+        this.startX = x;
+        this.startY = y;
+
+        // 随机速度和大小，使效果更自然
+        this.speed = 1 + Math.random() * 3;
+        this.size = 1 + Math.random() * 3;
+
+        // 在锥形范围内随机角度
+        const spreadAngle = 30; // 度数
+        const randomSpread = (Math.random() * spreadAngle - spreadAngle / 2) * Math.PI / 180;
+        this.angle = angle + randomSpread;
+
+        // 随机透明度和生命周期
+        this.alpha = 0.3 + Math.random() * 0.7;
+        this.lifespan = 30 + Math.random() * 60;
+        this.age = 0;
+
+        // 喷雾颜色变化（浅蓝到白色）
+        const blueValue = 200 + Math.floor(Math.random() * 55);
+        this.color = `rgba(${blueValue - 30},${blueValue},${blueValue},${this.alpha})`;
+
+        // 物理属性
+        this.gravity = 0.03;
+        this.velocityX = Math.cos(this.angle) * this.speed;
+        this.velocityY = Math.sin(this.angle) * this.speed;
+        this.active = true;
+      }
+
+      update() {
+        // 根据速度更新位置
+        this.x += this.velocityX;
+        this.y += this.velocityY;
+
+        // 应用重力
+        this.velocityY += this.gravity;
+
+        // 添加轻微随机移动，使喷雾更真实
+        this.x += (Math.random() - 0.5) * 0.5;
+        this.y += (Math.random() - 0.5) * 0.5;
+
+        // 随着粒子老化降低透明度
+        this.alpha = Math.max(0, this.alpha - 0.01);
+
+        // 增加年龄
+        this.age++;
+
+        // 检查粒子是否应该移除
+        if (this.age >= this.lifespan || this.alpha <= 0) {
+          this.active = false;
+          return false;
+        }
+
+        return true;
+      }
+
+      draw(ctx) {
+        ctx.save();
+        ctx.globalAlpha = this.alpha;
+        ctx.fillStyle = this.color;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+    }
+
+    // 设计尺寸 - 这是你设计游戏时使用的基准尺寸
+    const DESIGN_WIDTH = 785;
+    const DESIGN_HEIGHT = 1700;
+
+    // 按钮区域定义（基于设计尺寸）和状态
+    const buttons = {
+      water: {
+        x: 50, y: 1500, width: 140, height: 140,
+        isPressed: false,
+        scale: 1,
+        animationTime: 0
+      },
+      waterDrop: {
+        x: 240, y: 1500, width: 140, height: 140,
+        isPressed: false,
+        scale: 1,
+        animationTime: 0
+      },
+      fertilizer: {
+        x: 420, y: 1500, width: 140, height: 140,
+        isPressed: false,
+        scale: 1,
+        animationTime: 0
+      },
+      pesticide: {
+        x: 600, y: 1500, width: 140, height: 140,
+        isPressed: false,
+        scale: 1,
+        animationTime: 0
+      },
+      expressDelivery: {
+        x: 45, y: 1300, width: 140, height: 140,
+        isPressed: false,
+        scale: 1,
+        animationTime: 0
+      },
+      waterRecord: {
+        x: 610, y: 1300, width: 140, height: 140,
+        isPressed: false,
+        scale: 1,
+        animationTime: 0
+      }
+
+    };
+
+    // 按钮动画参数
+    const BUTTON_ANIMATION_DURATION = 300; // 动画持续时间（毫秒）
+    const BUTTON_MAX_SCALE = 1.2; // 按钮最大缩放比例
+    let lastTimestamp = 0;
+
+    // 调整canvas大小以适应窗口
+    function resizeCanvas() {
+      // 设置canvas的显示尺寸为窗口大小
+      canvas.style.width = window.innerWidth + 'px';
+      canvas.style.height = window.innerHeight + 'px';
+
+      // 设置canvas的实际尺寸（保持设计比例）
+      const ratio = Math.min(window.innerWidth / DESIGN_WIDTH, window.innerHeight / DESIGN_HEIGHT);
+      canvas.width = DESIGN_WIDTH;
+      canvas.height = DESIGN_HEIGHT;
+
+      // 保存缩放比例，用于点击检测
+      canvas.scaleX = window.innerWidth / canvas.width;
+      canvas.scaleY = window.innerHeight / canvas.height;
+
+      console.log("Canvas size:", canvas.width, "x", canvas.height);
+      console.log("Scale ratio:", canvas.scaleX, canvas.scaleY);
+    }
+
+    // 初始调整canvas大小
+    resizeCanvas();
+
+    // 窗口大小改变时重新调整canvas
+    window.addEventListener('resize', resizeCanvas);
+
+    const width = canvas.width;
+    const height = canvas.height;
+
+    // 云朵动画变量
+    let cloudX = 0;
+    const cloudSpeed = 1; // 云朵移动速度
+    let animationId;
+    let isImagesLoaded = false;
+
+    // 加载所有图像
+    const images = {
+      background: "./image/1d1b67e2-88d0-44d0-8993-ecac7b583319.299c9.png",
+      cloud: "./image/1d1b67e2-88d0-44d0-8993-ecac7b583319.299c9.png",
+      kettle: "./image/0993297e-1ff9-400a-8953-4fd374f6668a.5153f.png",
+      kettleing: "./image/7cd9161b-a243-4dd9-9208-46a52e00be9c.8c9d0.png",
+      tree: "./image/acf3e19f-f3f1-4c96-817d-1f30fcf1c729.30a1f.png",
+      tree1: "./image/acf3e19f-f3f1-4c96-817d-1f30fcf1c729.30a1f.png",
+      popup: "./image/3c47e696-85dc-43f8-86d0-3c42a7a20b58.a3f84.png",
+      feiliao: "./image/feiliao.png",
+      loading: "./image/00d5cd01-758e-475c-a895-d46ceded9829.91952.png",
+      message: "./image/3c0cd62e-a349-4658-a1f0-da03b86aced1.5e665.png",
+      harvest: "./image/b01de6ab-946b-489d-ae16-5e4c0da0e3c9.13484.png",
+      buttonBg1: "./image/aa602e1e-b4bd-4888-8ca2-196c22af8f00.8416a.png",
+      buttonBg4: "./image/e46fdff2-7a60-41f5-8f73-a5562dda61e5.17721.png",
+    }
+
+
+    const treeObjet = {
+      germinate: {
+        width: 155,
+        height: 270,
+        x: 1000,
+        y: 1485,
+        pX: 320,
+        pY: 1000,
+      },
+      immature: {
+        width: 575,
+        height: 535,
+        x: 580,
+        y: 0,
+        pX: 96,
+        pY: 745,
+      },
+      mature: {
+        width: 575,
+        height: 530,
+        x: 0,
+        y: 545,
+        pX: 90,
+        pY: 750,
+      },
+    }
+
+
+    // 当前游戏的所有状态
+    const gameState = {
+      current: 'germinate', // 当前树的状态
+      maturity: 0, // 成熟度
+      isAnimating: false, // 是否正在播放动画
+      user: {
+        water: 0, // 水滴
+        fertilizer: 0,  // 肥料
+        thereAreInsects: true, // 是否有害虫
+      },
+      messages: { // 游戏消息
+        show: true,
+        text: '还没有种植果实哦快去种植吧',
+      },
+    }
+
+    // 通知系统
+    const notification = {
+      active: false,
+      message: "",
+      startTime: 0,
+      duration: 2000, // 显示持续时间（毫秒）
+      animationDuration: 500, // 动画持续时间（毫秒）
+      y: 0, // 当前Y位置
+      targetY: 0, // 目标Y位置
+      state: "hidden", // 状态：hidden, appearing, visible, disappearing
+      width: 400,
+      height: 80,
+      padding: 20,
+      borderRadius: 10
+    };
+
+
+    // 当前树的状态
+    let currentTree = treeObjet[gameState.current];
+
+    // 当前游戏中弹窗的控制
+    const dialog = {
+      waterDrop: false,
+      fertilizer: false,
+    }
+
+
+    // 加载图像
+    let loadedImages = 0
+    const totalImages = Object.keys(images).length
+
+    for (const key in images) {
+      const img = new Image()
+      img.onload = () => {
+        loadedImages++
+        if (loadedImages === totalImages) {
+          isImagesLoaded = true
+          $(".loading").fadeOut(500)
+          // 初始化游戏并开始动画循环
+          startGame();
+        }
+      }
+      img.src = images[key]
+      images[key] = img
+    }
+
+    function startGame() {
+      // 开始游戏动画循环
+      lastTimestamp = performance.now();
+      animateGame(lastTimestamp);
+    }
+
+    function animateGame(timestamp) {
+      // 计算时间差（毫秒）
+      const deltaTime = timestamp - lastTimestamp;
+      lastTimestamp = timestamp;
+
+      // 更新按钮动画
+      updateButtonAnimations(deltaTime);
+
+      // 清除整个画布
+      ctx.clearRect(0, 0, width, height);
+
+
+      // 绘制背景
+      initBackground();
+
+      // 绘制移动的云朵
+      drawCloud();
+
+      // 更新云朵位置
+      updateCloud();
+
+      // 添加种植坑
+      drawPlantingPit();
+
+
+      // 绘制树
+      ctx.drawImage(
+        images.tree,
+        currentTree.x, currentTree.y, currentTree.width, currentTree.height,
+        currentTree.pX, currentTree.pY, currentTree.width, currentTree.height
+      );
+
+      // 绘制收获提醒及动画
+      drawHarvestNotification();
+
+      // 更新和绘制收获提示
+      updateHarvestHint(deltaTime);
+      drawHarvestHint();
+
+      // 绘制害虫
+      if (gameState.user.thereAreInsects && !harvestHint.active) {
+        drawInsects()
+      }
+
+      // 更新和绘制浇水动画
+      if (wateringAnimation.active) {
+        updateWateringAnimation(timestamp, deltaTime);
+        gameState.isAnimating = wateringAnimation.active;
+      }
+
+      // 更新和绘制施肥动画
+      if (fertilizingAnimation.active) {
+        updateFertilizingAnimation(timestamp, deltaTime);
+        gameState.isAnimating = fertilizingAnimation.active;
+      }
+
+      // 更新和绘制除虫动画
+      if (pesticideAnimation.active) {
+        updatePesticideAnimation(timestamp, deltaTime);
+        gameState.isAnimating = pesticideAnimation.active;
+      }
+
+      // 绘制成长进度条
+      drawGrowthBar();
+
+      // 消息提醒
+      if (!gameState.current) {
+        drawMessage();
+      }
+
+      // 绘制所有按钮
+      drawButtons();
+
+      // 绘制水滴弹窗
+      if (dialog.waterDrop) {
+        drawWaterDropDialog()
+      }
+
+      // 更新和绘制通知
+      updateNotification(timestamp);
+
+      // 继续动画循环
+      animationId = requestAnimationFrame(animateGame);
+    }
+
+    // 绘制种植坑
+    function drawPlantingPit() {
+      // 绘制基本种植坑
+      ctx.drawImage(images.background,
+        760, 650, 360, 120, // 裁剪"种植坑"
+        220, 1200, 360, 120   // 绘制到Canvas
+      );
+
+    }
+
+    // 更新浇水动画
+    function updateWateringAnimation(timestamp, deltaTime) {
+      const elapsed = timestamp - wateringAnimation.startTime;
+      const progress = Math.min(elapsed / wateringAnimation.duration, 1);
+
+      // 水壶移动和旋转
+      if (progress < 0.3) {
+        // 前30%的时间：水壶移动到位
+        const moveProgress = progress / 0.3;
+        wateringAnimation.kettleX = wateringAnimation.kettleStartX +
+          (wateringAnimation.kettleEndX - wateringAnimation.kettleStartX) * moveProgress;
+        wateringAnimation.kettleY = wateringAnimation.kettleStartY +
+          (wateringAnimation.kettleEndY - wateringAnimation.kettleStartY) * moveProgress;
+        wateringAnimation.kettleRotation = -45 * moveProgress; // 逐渐倾斜
+      } else if (progress < 0.8) {
+        // 30%-80%的时间：水壶保持位置，倾斜并产生水滴
+        wateringAnimation.kettleX = wateringAnimation.kettleEndX;
+        wateringAnimation.kettleY = wateringAnimation.kettleEndY;
+        wateringAnimation.kettleRotation = -45;
+
+        // 每帧有一定概率产生新水滴
+        if (Math.random() < 0.3) {
+          // 从水壶嘴部位置生成水滴
+          const dropX = wateringAnimation.kettleX + 50;
+          const dropY = wateringAnimation.kettleY + 70;
+          wateringAnimation.droplets.push(new WaterDroplet(dropX, dropY));
+        }
+      } else {
+        // 最后20%的时间：水壶回到原位
+        const returnProgress = (progress - 0.8) / 0.2;
+        wateringAnimation.kettleX = wateringAnimation.kettleEndX +
+          (wateringAnimation.kettleStartX - wateringAnimation.kettleEndX) * returnProgress;
+        wateringAnimation.kettleY = wateringAnimation.kettleEndY +
+          (wateringAnimation.kettleStartY - wateringAnimation.kettleEndY) * returnProgress;
+        wateringAnimation.kettleRotation = -45 * (1 - returnProgress);
+      }
+
+      // 更新所有水滴
+      wateringAnimation.droplets = wateringAnimation.droplets.filter(droplet => {
+        return droplet.update();
+      });
+
+      // 绘制水壶
+      drawWateringCan();
+
+      // 绘制所有水滴
+      wateringAnimation.droplets.forEach(droplet => {
+        droplet.draw(ctx);
+      });
+
+      // 动画结束
+      if (progress >= 1) {
+        wateringAnimation.active = false;
+        // 水滴可以继续下落直到全部消失
+        if (gameState.current == 'germinate') {
+          gameState.current = 'immature';
+          gameState.maturity = 30
+        } else if (gameState.current == 'immature') {
+          gameState.current = 'mature';
+          gameState.maturity = 100
+        }
+        currentTree = treeObjet[gameState.current];
+      }
+    }
+
+    // 更新施肥动画
+    function updateFertilizingAnimation(timestamp, deltaTime) {
+      const elapsed = timestamp - fertilizingAnimation.startTime;
+      const progress = Math.min(elapsed / fertilizingAnimation.duration, 1);
+
+      // 肥料袋移动和旋转
+      if (progress < 0.3) {
+        // 前30%的时间：肥料袋移动到位
+        const moveProgress = progress / 0.3;
+        fertilizingAnimation.bagX = fertilizingAnimation.bagStartX +
+          (fertilizingAnimation.bagEndX - fertilizingAnimation.bagStartX) * moveProgress;
+        fertilizingAnimation.bagY = fertilizingAnimation.bagStartY +
+          (fertilizingAnimation.bagEndY - fertilizingAnimation.bagStartY) * moveProgress;
+        fertilizingAnimation.bagRotation = 30 * moveProgress; // 逐渐倾斜
+      } else if (progress < 0.8) {
+        // 30%-80%的时间：肥料袋保持位置，倾斜并产生肥料粒子
+        fertilizingAnimation.bagX = fertilizingAnimation.bagEndX;
+        fertilizingAnimation.bagY = fertilizingAnimation.bagEndY;
+        fertilizingAnimation.bagRotation = 30;
+
+        // 每帧有一定概率产生新肥料粒子
+        if (Math.random() < 0.4) {
+          // 从肥料袋底部位置生成肥料粒子
+          const particleX = fertilizingAnimation.bagX + 30;
+          const particleY = fertilizingAnimation.bagY + 60;
+          fertilizingAnimation.particles.push(new FertilizerParticle(particleX, particleY));
+        }
+      } else {
+        // 最后20%的时间：肥料袋回到原位
+        const returnProgress = (progress - 0.8) / 0.2;
+        fertilizingAnimation.bagX = fertilizingAnimation.bagEndX +
+          (fertilizingAnimation.bagStartX - fertilizingAnimation.bagEndX) * returnProgress;
+        fertilizingAnimation.bagY = fertilizingAnimation.bagEndY +
+          (fertilizingAnimation.bagStartY - fertilizingAnimation.bagEndY) * returnProgress;
+        fertilizingAnimation.bagRotation = 30 * (1 - returnProgress);
+      }
+
+      // 更新所有肥料粒子
+      fertilizingAnimation.particles = fertilizingAnimation.particles.filter(particle => {
+        return particle.update();
+      });
+
+      // 绘制肥料袋
+      drawFertilizerBag();
+
+      // 绘制所有肥料粒子
+      fertilizingAnimation.particles.forEach(particle => {
+        particle.draw(ctx);
+      });
+
+      // 动画结束
+      if (progress >= 1 && fertilizingAnimation.particles.length === 0) {
+        fertilizingAnimation.active = false;
+      }
+    }
+
+    // 更新除虫动画
+    function updatePesticideAnimation(timestamp, deltaTime) {
+      // 使用pesticideAnimation的startTime
+      const elapsed = timestamp - pesticideAnimation.startTime;
+      const progress = Math.min(elapsed / pesticideAnimation.duration, 1);
+
+      // 喷虫剂移动和旋转
+      if (progress < 0.3) {
+        // 前30%的时间：喷虫剂移动到位
+        const moveProgress = progress / 0.3;
+        pesticideAnimation.pesticideX = pesticideAnimation.pesticideStartX +
+          (pesticideAnimation.pesticideEndX - pesticideAnimation.pesticideStartX) * moveProgress;
+        pesticideAnimation.pesticideY = pesticideAnimation.pesticideStartY +
+          (pesticideAnimation.pesticideEndY - pesticideAnimation.pesticideStartY) * moveProgress;
+        pesticideAnimation.pesticideRotation = 50 * moveProgress; // 逐渐倾斜
+      } else if (progress < 0.8) {
+        // 30%-80%的时间：喷虫剂保持位置，倾斜并产生喷雾粒子
+        pesticideAnimation.pesticideX = pesticideAnimation.pesticideEndX;
+        pesticideAnimation.pesticideY = pesticideAnimation.pesticideEndY;
+        pesticideAnimation.pesticideRotation = 50;
+
+        // 计算喷嘴位置
+        const nozzleX = pesticideAnimation.pesticideX + 60;
+        const nozzleY = pesticideAnimation.pesticideY + 50;
+
+        // 计算喷雾方向角度（向右上方喷射）
+        const sprayAngle = Math.PI / 1.3; // -30度
+
+        // 每帧有一定概率产生新喷雾粒子
+        if (Math.random() < 0.5) {
+          // 创建多个粒子形成喷雾效果
+          const particleCount = 3 + Math.floor(Math.random() * 3);
+          for (let i = 0; i < particleCount; i++) {
+            pesticideAnimation.particles.push(
+              new PesticideParticle(nozzleX, nozzleY, sprayAngle)
+            );
+          }
+        }
+      }
+
+      // 更新所有喷雾粒子
+      pesticideAnimation.particles = pesticideAnimation.particles.filter(particle => {
+        return particle.update();
+      });
+
+      // 绘制喷虫剂
+      drawPesticideBottle();
+
+      // 绘制所有喷雾粒子
+      pesticideAnimation.particles.forEach(particle => {
+        particle.draw(ctx);
+      });
+
+      // 动画结束时，将害虫状态设置为false（表示所有害虫已被杀死）
+      if (progress >= 1 && pesticideAnimation.particles.length === 0) {
+        gameState.user.thereAreInsects = false;
+        pesticideAnimation.active = false;
+      }
+    }
+
+
+    // 绘制浇水壶
+    function drawWateringCan() {
+      ctx.save();
+
+      // 移动到水壶的位置
+      ctx.translate(wateringAnimation.kettleX, wateringAnimation.kettleY);
+
+      // 旋转水壶
+      ctx.rotate(wateringAnimation.kettleRotation * Math.PI / 180);
+
+      // 绘制水壶
+      ctx.drawImage(
+        images.kettle,
+        0, 0, 250, 90,  // 裁剪区域
+        5, 0, 250, 90  // 绘制位置（以中心点为基准）
+      );
+
+      ctx.restore();
+    }
+
+    function drawFertilizerBag() {
+      ctx.save();
+
+      // 移动到肥料袋位置
+      ctx.translate(fertilizingAnimation.bagX, fertilizingAnimation.bagY);
+
+      // 旋转肥料袋
+      ctx.rotate(fertilizingAnimation.bagRotation * Math.PI / 180);
+
+      // 绘制肥料袋主体（带渐变效果）
+      const gradient = ctx.createLinearGradient(-40, -60, -40, 60);
+      gradient.addColorStop(0, '#8B4513'); // 深棕色顶部
+      gradient.addColorStop(1, '#A0522D'); // 浅棕色底部
+      ctx.fillStyle = gradient;
+      ctx.lineJoin = "round";
+      ctx.beginPath();
+      ctx.moveTo(-40, -60);
+      ctx.lineTo(40, -60);
+      ctx.quadraticCurveTo(45, 0, 40, 60); // 右侧圆润曲线
+      ctx.lineTo(-40, 60);
+      ctx.quadraticCurveTo(-45, 0, -40, -60); // 左侧圆润曲线
+      ctx.closePath();
+      ctx.fill();
+
+      // 添加袋子褶皱效果
+      ctx.strokeStyle = 'rgba(0, 0, 0, 0.2)';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(-20, -50);
+      ctx.quadraticCurveTo(0, -40, 20, -50);
+      ctx.stroke();
+
+      // 绘制标签（带阴影）
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
+      ctx.shadowBlur = 5;
+      ctx.shadowOffsetX = 2;
+      ctx.shadowOffsetY = 2;
+      ctx.fillStyle = '#FFD700'; // 金黄色标签
+      ctx.fillRect(-30, -40, 60, 50);
+
+      // 重置阴影
+      ctx.shadowColor = 'transparent';
+      ctx.shadowBlur = 0;
+
+      // 添加标签装饰线
+      ctx.strokeStyle = '#DAA520';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(-28, -38, 56, 46);
+
+      // 绘制文字
+      ctx.fillStyle = '#000';
+      ctx.font = 'bold 18px SimSun'; // 使用中文字体，更贴合中文
+      ctx.textAlign = 'center';
+      ctx.fillText('优质', 0, -20);
+      ctx.fillText('肥料', 0, 0);
+
+      ctx.restore();
+    }
+
+
+    // 绘制喷虫剂 - 使用你的图片
+    function drawPesticideBottle() {
+      ctx.save();
+
+      // 移动到喷虫剂位置
+      ctx.translate(pesticideAnimation.pesticideX, pesticideAnimation.pesticideY);
+
+      // 旋转喷虫剂
+      ctx.rotate(pesticideAnimation.pesticideRotation * Math.PI / 180);
+
+      // 绘制喷虫剂
+      ctx.drawImage(
+        images.kettle,
+        0, 100, 120, 130,  // 裁剪区域
+        50, -100, 120, 130  // 绘制位置（以中心点为基准）
+      );
+
+      ctx.restore();
+    }
+
+    // 开始浇水动画
+    function startWateringAnimation() {
+      if (!gameState.isAnimating) {
+        wateringAnimation.active = true;
+        wateringAnimation.startTime = performance.now();
+        wateringAnimation.droplets = [];
+        // 初始位置设置
+        wateringAnimation.kettleX = wateringAnimation.kettleStartX;
+        wateringAnimation.kettleY = wateringAnimation.kettleStartY;
+        wateringAnimation.kettleRotation = 0;
+        gameState.isAnimating = true;
+      }
+    }
+
+    // 开始施肥动画
+    function startFertilizingAnimation() {
+      if (!gameState.isAnimating) {
+        fertilizingAnimation.active = true;
+        fertilizingAnimation.startTime = performance.now();
+        fertilizingAnimation.particles = [];
+        // 初始位置设置
+        fertilizingAnimation.bagX = fertilizingAnimation.bagStartX;
+        fertilizingAnimation.bagY = fertilizingAnimation.bagStartY;
+        fertilizingAnimation.bagRotation = 0;
+        gameState.isAnimating = true;
+      }
+    }
+
+    // 开始除虫动画
+    function startPesticideAnimation() {
+      if (!gameState.isAnimating) {
+        pesticideAnimation.active = true;
+        pesticideAnimation.startTime = performance.now();
+        pesticideAnimation.particles = [];
+
+        // 初始位置设置
+        pesticideAnimation.bottleX = pesticideAnimation.bottleStartX;
+        pesticideAnimation.bottleY = pesticideAnimation.bottleStartY;
+        pesticideAnimation.bottleRotation = 0;
+
+        gameState.isAnimating = true;
+      }
+    }
+
+
+
+    // 更新按钮动画状态
+    function updateButtonAnimations(deltaTime) {
+
+      // 遍历所有按钮
+      for (const key in buttons) {
+        const button = buttons[key];
+
+        // 如果按钮被按下，更新动画时间和缩放
+        if (button.isPressed) {
+          button.animationTime += deltaTime;
+
+          if (button.animationTime >= BUTTON_ANIMATION_DURATION) {
+            // 动画结束，重置状态
+            button.isPressed = false;
+            button.animationTime = 0;
+            button.scale = 1;
+          } else {
+            // 计算当前缩放值（先放大后恢复）
+            const progress = button.animationTime / BUTTON_ANIMATION_DURATION;
+            if (progress < 0.5) {
+              // 前半段：从1放大到最大值
+              button.scale = 1 + (BUTTON_MAX_SCALE - 1) * (progress * 2);
+            } else {
+              // 后半段：从最大值缩小回1
+              button.scale = BUTTON_MAX_SCALE - (BUTTON_MAX_SCALE - 1) * ((progress - 0.5) * 2);
+            }
+          }
+        }
+      }
+    }
+
+    // 更新通知
+    function updateNotification(timestamp) {
+      if (!notification.active) return;
+
+      const elapsed = timestamp - notification.startTime;
+
+      // 根据当前状态更新通知
+      switch (notification.state) {
+        case "appearing":
+          const appearProgress = Math.min(elapsed / notification.animationDuration, 1);
+          // 从顶部向下滑动
+          notification.y = -notification.height - 20 + (notification.targetY + notification.height + 20) * easeOutBack(appearProgress);
+          // 动画完成后切换到可见状态
+          if (appearProgress === 1) {
+            notification.state = "visible";
+            notification.startTime = timestamp; // 重置计时器
+          }
+          break;
+
+        case "visible":
+          // 保持可见状态一段时间
+          if (elapsed >= notification.duration) {
+            notification.state = "disappearing";
+            notification.startTime = timestamp; // 重置计时器
+          }
+          break;
+
+        case "disappearing":
+          const disappearProgress = Math.min(elapsed / notification.animationDuration, 1);
+          // 向上滑动消失
+          notification.y = notification.targetY - (notification.targetY + notification.height + 20) * easeInBack(disappearProgress);
+          // 动画完成后隐藏通知
+          if (disappearProgress === 1) {
+            notification.active = false;
+            notification.state = "hidden";
+          }
+          break;
+      }
+
+      // 绘制通知
+      if (notification.active) {
+        drawNotification();
+      }
+    }
+
+
+
+    // 更新收获提示状态
+    function updateHarvestHint(deltaTime) {
+      // 只有当树有果实可以收获时才显示提示
+
+      // 假设你的手图片已经加载到images对象中
+      harvestHint.handImage = images.harvest;
+
+      if (gameState.current === 'mature' && gameState.maturity >= 100 && !gameState.isAnimating) {
+        harvestHint.active = true;
+
+        // 计算手的位置（指向树上的果实）
+        harvestHint.x = 380; // 调整为果实的x坐标
+        harvestHint.y = 950; // 调整为果实的y坐标
+
+        // 脉动效果（缩放）
+        harvestHint.scale += harvestHint.pulseDirection * harvestHint.pulseSpeed * deltaTime;
+        if (harvestHint.scale > 1.2) {
+          harvestHint.scale = 1.2;
+          harvestHint.pulseDirection = -1;
+        } else if (harvestHint.scale < 0.9) {
+          harvestHint.scale = 0.9;
+          harvestHint.pulseDirection = 1;
+        }
+
+        // 轻微摆动效果
+        harvestHint.rotation = 5 * Math.sin(performance.now() / 500);
+      } else {
+        harvestHint.active = false;
+      }
+    }
+
+    // 绘制收获提示
+    function drawHarvestHint() {
+
+      if (!harvestHint.active || !harvestHint.handImage) return;
+
+      ctx.save();
+
+      // 移动到手的位置
+      ctx.translate(harvestHint.x, harvestHint.y);
+
+      // 应用旋转
+      ctx.rotate(harvestHint.rotation * Math.PI / 180);
+
+      // 应用缩放
+      ctx.scale(harvestHint.scale, harvestHint.scale);
+
+      // 绘制手图片
+      const handWidth = 114; // 调整为你的手图片宽度
+      const handHeight = 110; // 调整为你的手图片高度
+      ctx.drawImage(
+        harvestHint.handImage,
+        -handWidth / 2, -handHeight / 2, // 以手的中心为基准点
+        handWidth, handHeight
+      );
+
+
+      // 添加闪光效果
+      const glowTime = performance.now() / 1000;
+      const glowIntensity = (Math.sin(glowTime * 2) + 1) / 2; // 0到1之间变化
+
+      ctx.globalAlpha = 0.7 * glowIntensity;
+      ctx.shadowColor = '#FFEB3B';
+      ctx.shadowBlur = 15 * glowIntensity;
+      ctx.strokeStyle = '#FFEB3B';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.arc(0, 0, handWidth / 2 + 10, 0, Math.PI * 2);
+      ctx.stroke();
+
+      ctx.restore();
+    }
+
+    // 处理收获点击
+    function handleHarvestClick(x, y) {
+      if (!harvestHint.active) return false;
+
+      // 检查点击是否在手的区域内
+      const dx = x - harvestHint.x;
+      const dy = y - harvestHint.y;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+
+      if (distance < 60) { // 点击半径
+        // 执行收获动作
+        harvestFruit();
+        return true;
+      }
+
+      return false;
+    }
+
+    // 收获果实
+    function harvestFruit() {
+      // 显示收获动画
+      showHarvestAnimation();
+
+      // 更新游戏状态
+      gameState.maturity = 0; // 重置成熟度
+      gameState.current = 'immature'; // 回到未成熟状态
+      currentTree = treeObjet[gameState.current]; // 更新树的状态
+
+      // 显示收获成功通知
+      showNotification("收获成功，快去领取吧！");
+
+      // 可以在这里添加果实计数或其他奖励
+    }
+
+    // 收获动画
+    function showHarvestAnimation() {
+      // 这里可以添加收获时的特效动画
+      // 例如：闪光、粒子效果、果实掉落等
+    }
+
+
+    function drawHarvestNotification() {
+      if (gameState.current === 'mature') {
+        // 绘制收获提醒
+        ctx.drawImage(
+          images.message,
+          0, 1216, 230, 58, // 裁剪"弹窗"
+          190, 650, 230, 58,  // 绘制到Canvas
+        );
+
+        ctx.drawImage(
+          images.message,
+          0, 1100, 230, 58, // 裁剪"弹窗"
+          190 + 220, 650, 230, 58,  // 绘制到Canvas
+        );
+
+        // 绘制文字
+        ctx.font = "24px 微软雅黑";
+        ctx.fillStyle = "#fff";
+        ctx.fillText("果实已成熟，可以收获啦！", 270, 688);
+
+        // ctx.drawImage(
+        //   images.harvest,
+        //   0, 0, 114, 110, // 裁剪"弹窗"
+        //   220, 660, 40, 40,  // 绘制到Canvas
+        // );
+      }
+    }
+
+
+    function drawGrowthBar() {
+      // 绘制背景
+      ctx.drawImage(
+        images.background,
+        753, 949.5, 300, 35, // 裁剪"背景"
+        250, 1385, 300, 35,  // 绘制到Canvas
+      );
+      ctx.drawImage(
+        images.background,
+        753, 987, 3 * gameState.maturity, 30, // 裁剪"背景"
+        254, 1389, 3 * gameState.maturity, 30,  // 绘制到Canvas
+      );
+
+      // 绘制文字
+      ctx.font = "20px 微软雅黑";
+      ctx.fillStyle = "#fff";
+      ctx.fillText("成长进度：" + Math.min(gameState.maturity, 100) + "%", 335, 1410);
+    }
+
+
+    // 绘制所有按钮
+    function drawButtons() {
+      // 绘制浇水按钮
+      drawButton(
+        buttons.water,
+        760, 1290, 140, 140,
+        "0g"
+      );
+      // 绘制水壶文字
+      ctx.drawImage(
+        images.background,
+        1050, 770, 70, 50, // 裁剪"水壶"
+        120, 1480, 70, 50   // 绘制到Canvas
+      )
+
+      ctx.font = "22px 微软雅黑";
+      ctx.fillStyle = "#fff";
+      ctx.save();
+      // 添加阴影
+      ctx.shadowBlur = 5;
+      ctx.shadowColor = 'rgba(0, 0, 0, 1)';
+      ctx.shadowOffsetX = 0;
+      ctx.shadowOffsetY = 0;
+      ctx.fillText("浇水", 130, 1510,);
+
+      ctx.restore();
+
+
+      // 绘制水滴按钮
+      drawButton(
+        buttons.waterDrop,
+        900, 1290, 140, 140,
+        "水滴"
+      );
+
+      // 绘制肥料按钮
+      drawButton(
+        buttons.fertilizer,
+        940, 1150, 140, 140,
+        "肥料"
+      );
+
+      // 绘制除虫按钮
+      drawButton(
+        buttons.pesticide,
+        1120, 650, 140, 140,
+        "除虫"
+      );
+
+      // 绘制快递按钮
+      drawButton(
+        buttons.expressDelivery,
+        895, 1015, 150, 140,
+        "快递"
+      );
+
+      // 绘制水滴记录
+      drawButton(
+        buttons.waterRecord,
+        900, 1428, 140, 140,
+        "水滴记录"
+      );
+    }
+
+    // 绘制单个按钮
+    function drawButton(button, srcX, srcY, srcWidth, srcHeight, label) {
+      // 保存当前上下文状态
+      ctx.save();
+
+      // 计算按钮中心点
+      const centerX = button.x + button.width / 2;
+      const centerY = button.y + button.height / 2;
+
+      // 移动到按钮中心点
+      ctx.translate(centerX, centerY);
+
+      // 应用缩放
+      ctx.scale(button.scale, button.scale);
+
+      // 移回原点，以便正确绘制按钮
+      ctx.translate(-button.width / 2, -button.height / 2);
+
+      // 绘制按钮
+      ctx.drawImage(
+        images.background,
+        srcX, srcY, srcWidth, srcHeight,
+        0, 0, button.width, button.height
+      );
+
+      // 绘制文字
+      ctx.font = "35px 微软雅黑";
+      ctx.fillStyle = "#fff";
+      let px = button.width / 2 - 30
+      let py = button.height - 25
+      if (label.length > 2) {
+        ctx.font = "29px 微软雅黑";
+        px = button.width / 2 - 55
+        py = button.height - 28
+      }
+      ctx.fillText(label, px, py);
+
+      // 恢复上下文状态
+      ctx.restore();
+    }
+
+    // 绘制消息提醒框 (图片形式)
+    function drawMessage() {
+      ctx.drawImage(
+        images.background, // 源图像
+        754, 585, 475, 65,
+        160, 800, 475, 65
+      );
+
+      // 绘制提醒文字
+      ctx.font = "24px 微软雅黑";
+      ctx.fillStyle = "#20B77A";
+      ctx.fillText(gameState.messages.text, 240, 835);
+    }
+
+    // 初始化背景
+    function initBackground() {
+      // 精灵图中左侧图片的区域
+      const sourceX = 0; // 裁剪的起始X坐标（左侧）
+      const sourceY = 0; // 裁剪的起始Y坐标（顶部）
+      const sourceWidth = 750; // 裁剪的宽度（左侧图片的宽度）
+      const sourceHeight = 1400; // 裁剪的高度（整个精灵图的高度）
+
+      // 目标Canvas的绘制区域
+      const destX = 0; // 绘制到Canvas的X坐标
+      const destY = 0; // 绘制到Canvas的Y坐标
+      const destWidth = canvas.width; // 绘制宽度（匹配Canvas宽度）
+      const destHeight = canvas.height; // 绘制高度（匹配Canvas高度）
+
+      //使用drawImage方法裁剪并绘制背景
+      ctx.drawImage(
+        images.background, // 源图像
+        sourceX, // 裁剪的起始X坐标
+        sourceY, // 裁剪的起始Y坐标
+        750, // 裁剪的宽度
+        1400, // 裁剪的高度
+        destX, // 绘制到Canvas的X坐标
+        destY, // 绘制到Canvas的Y坐标
+        destWidth, // 绘制宽度
+        destHeight // 绘制高度
+      );
+    }
+
+    // 绘制云朵
+    function drawCloud() {
+      const cloudWidth = 710;
+
+      // 绘制第一个云朵（当前位置）
+      ctx.drawImage(
+        images.background,
+        0, 1966 - 200, 710, 200, // 裁剪"云朵"
+        cloudX, 50, 710, 200   // 绘制到Canvas，x位置随cloudX变化
+      );
+
+      // 绘制第二个云朵（在第一个云朵右侧）
+      ctx.drawImage(
+        images.background,
+        0, 1966 - 200, 710, 200, // 裁剪"云朵"
+        cloudX - cloudWidth, 50, 710, 200   // 绘制到Canvas，紧接着第一个云朵
+      );
+    }
+
+    // 更新云朵位置
+    function updateCloud() {
+      // 移动云朵
+      cloudX += cloudSpeed;
+
+      // 当第一个云朵完全移出画面左侧时，重置位置
+      if (cloudX >= 710) {
+        cloudX = 0;
+      }
+    }
+
+
+    // 绘制水滴弹窗
+    function drawWaterDropDialog() {
+      // 绘制背景 灰色
+      ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      ctx.drawImage(
+        images.popup,
+        0, 0, 650, 960, // 裁剪"弹窗背景"
+        70, 250, 650, 960   // 绘制到Canvas
+      );
+
+      // 绘制关闭按钮
+      ctx.drawImage(
+        images.popup,
+        795, 890, 40, 40, // 裁剪"关闭按钮"
+        670, 260, 40, 40   // 绘制到Canvas
+      );
+
+      // 绘制文字 (领水任务)
+
+
+      // 保存当前状态
+      ctx.save();
+
+      // 移动到文字中心位置
+      ctx.rotate((-5 * Math.PI) / 180); // 转换为弧度，倾斜文字
+
+      // 添加阴影
+      ctx.shadowBlur = 5;
+      ctx.shadowColor = 'rgba(0, 0, 0, 1)';
+      ctx.shadowOffsetX = -5;
+      ctx.shadowOffsetY = -2;
+
+      // 绘制文字
+      ctx.fillStyle = '#E9FD95'; // 白色文字
+      ctx.font = `50px 黑体`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText("领水任务", 360, 365);
+
+      // 恢复状态
+      ctx.restore();
+
+
+      // 绘制领水任务 1
+      ctx.drawImage(
+        images.popup,
+        946, 826, 127, 131, // 裁剪"签到图标"
+        120, 430, 127, 131   // 绘制到Canvas
+      );
+
+      ctx.drawImage(
+        images.popup,
+        648, 876, 127, 55, // 裁剪"立即签到"
+        550, 510, 127, 55   // 绘制到Canvas
+      );
+      // 立即签到文字
+      ctx.save();
+      ctx.fillStyle = '#6BBF7F'; // 白色文字
+      ctx.font = `30px 黑体`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText("签到", 615, 540);
+      ctx.restore();
+      ctx.save();
+
+      // 具体任务文字描述标题
+      ctx.fillStyle = '#7C5A48'; // 白色文字
+      ctx.font = `30px 黑体`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText("连续签到", 320, 450);
+      ctx.restore();
+      ctx.save();
+
+      // 具体任务文字描述
+      ctx.fillStyle = '#888'; // 灰色文字
+      ctx.font = `20px 黑体`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText("每日签到可得水滴哦，您已连续签到", 420, 490,);
+      ctx.restore();
+      ctx.save();
+
+
+      ctx.fillStyle = '#888'; // 灰色文字
+      ctx.font = `20px 黑体`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText("1天。", 287, 520,);
+      ctx.restore();
+      ctx.save();
+
+      // 绘制领水任务 2
+      ctx.drawImage(
+        images.popup,
+        537, 1704, 127, 131, // 裁剪"分享图标"
+        120, 615, 127, 131   // 绘制到Canvas
+      );
+
+      ctx.drawImage(
+        images.popup,
+        648, 876, 127, 55, // 裁剪"去分享"
+        550, 695, 127, 55   // 绘制到Canvas
+      );
+      // 立即签到文字
+      ctx.save();
+      ctx.fillStyle = '#6BBF7F'; // 白色文字
+      ctx.font = `30px 黑体`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText("分享", 615, 540 + 185);
+      ctx.restore();
+      ctx.save();
+
+      // 具体任务文字描述标题
+      ctx.fillStyle = '#7C5A48'; // 白色文字
+      ctx.font = `30px 黑体`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText("分享好友", 320, 450 + 185);
+      ctx.restore();
+      ctx.save();
+
+      // 具体任务文字描述
+      ctx.fillStyle = '#888'; // 灰色文字
+      ctx.font = `20px 黑体`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText("分享好友可得5g水，每日限3次。", 408, 490 + 185,);
+      ctx.restore();
+      ctx.save();
+
+    }
+
+    // 绘制害虫
+    function drawInsects() {
+      ctx.drawImage(
+        images.background,
+        755, 780, 145, 120, // 裁剪"害虫"
+        350, 1050, 145, 120   // 绘制到Canvas
+      );
+    }
+
+    // 绘制通知
+    function drawNotification() {
+      const x = (canvas.width - notification.width) / 2;
+      const y = notification.y;
+
+      ctx.save();
+
+      // 绘制阴影
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
+      ctx.shadowBlur = 10;
+      ctx.shadowOffsetX = 0;
+      ctx.shadowOffsetY = 5;
+
+      // 绘制背景（圆角矩形）
+      ctx.fillStyle = '#FFFFFF';
+      ctx.beginPath();
+      ctx.roundRect(x, y, notification.width, notification.height, notification.borderRadius);
+      ctx.fill();
+
+      // 绘制边框
+      ctx.shadowColor = 'transparent';
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = '#4CAF50'; // 绿色边框
+      ctx.stroke();
+
+      // 绘制图标（感叹号）
+      ctx.fillStyle = '#905C2B';
+      ctx.beginPath();
+      ctx.arc(x + notification.padding + 15, y + notification.height / 2, 15, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = '#FFFFFF';
+      ctx.font = 'bold 20px SimSun';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('!', x + notification.padding + 15, y + notification.height / 2);
+
+      // 绘制消息文本
+      ctx.fillStyle = '#333333';
+      ctx.font = 'bold 22px SimSun';
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(notification.message, x + notification.padding + 40, y + notification.height / 2);
+
+      ctx.restore();
+    }
+
+    // 缓动函数 - 弹出效果
+    function easeOutBack(x) {
+      const c1 = 1.70158;
+      const c3 = c1 + 1;
+      return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2);
+    }
+
+    // 缓动函数 - 收回效果
+    function easeInBack(x) {
+      const c1 = 1.70158;
+      const c3 = c1 + 1;
+      return c3 * x * x * x - c1 * x * x;
+    }
+
+
+    // 检查点击是否在按钮区域内
+    function isPointInButton(x, y, button) {
+      // 计算按钮中心点
+      const centerX = button.x + button.width / 2;
+      const centerY = button.y + button.height / 2;
+
+      // 计算按钮当前的实际宽度和高度（考虑缩放）
+      const scaledWidth = button.width * button.scale;
+      const scaledHeight = button.height * button.scale;
+
+      // 计算按钮的实际边界
+      const left = centerX - scaledWidth / 2;
+      const right = centerX + scaledWidth / 2;
+      const top = centerY - scaledHeight / 2;
+      const bottom = centerY + scaledHeight / 2;
+
+      // 检查点击是否在按钮区域内
+      return (x >= left && x <= right && y >= top && y <= bottom);
+    }
+
+    // 触发按钮动画
+    function triggerButtonAnimation(buttonKey) {
+      const button = buttons[buttonKey];
+      button.isPressed = true;
+      button.animationTime = 0;
+
+      if (harvestHint.active) return showNotification("请先收获果实");
+
+      // 这里可以添加按钮点击的音效
+      // playSound('buttonClick');
+
+      switch (buttonKey) {
+        case 'water':
+          // 启动浇水动画
+          startWateringAnimation();
+          break;
+        case 'waterDrop':
+          // 在这里添加水滴功能
+          dialog.waterDrop = true
+          break;
+        case 'fertilizer':
+          // 在这里添加肥料功能
+          startFertilizingAnimation()
+          break;
+        case 'pesticide':
+          // 在这里添加除虫功能
+          if (!gameState.user.thereAreInsects) {
+            // 显示通知
+            showNotification("没有害虫，不需要喷洒杀虫剂");
+          } else {
+            // 启动除虫动画
+            startPesticideAnimation();
+          }
+          break;
+
+
+      }
+
+      console.log(`${buttonKey} 按钮被点击`);
+    }
+
+
+
+    // 点击事件
+    canvas.addEventListener('click', (e) => {
+      // 如果正在浇水，不处理点击
+      if (wateringAnimation.active) return;
+
+      // 如果有动画正在进行，不处理点击
+      if (gameState.isAnimating) return;
+
+      // 获取点击在视口中的坐标
+      const rect = canvas.getBoundingClientRect();
+      const viewportX = e.clientX - rect.left;
+      const viewportY = e.clientY - rect.top;
+
+      // 将视口坐标转换为画布内的坐标
+      const canvasX = (viewportX / canvas.scaleX);
+      const canvasY = (viewportY / canvas.scaleY);
+
+      console.log('视口坐标:', viewportX, viewportY);
+      console.log('画布坐标:', canvasX, canvasY);
+
+      // 检查点击的是哪个按钮
+      for (let key in buttons) {
+        if (isPointInButton(canvasX, canvasY, buttons[key])) {
+          triggerButtonAnimation(key)
+        }
+      }
+
+      // 领水弹窗事件
+      if (dialog.waterDrop) {
+        // 在任务弹窗中点击关闭按钮
+        if (isPointInButton(canvasX, canvasY, { x: 670, y: 260, width: 40, height: 40, scale: 1, })) {
+          dialog.waterDrop = false
+        }
+        // 在任务弹窗中点击签到按钮
+        if (isPointInButton(canvasX, canvasY, { x: 550, y: 510, width: 127, height: 55, scale: 1, })) {
+          console.log('签到');
+        }
+
+        // 在任务弹窗中点击分享按钮
+        if (isPointInButton(canvasX, canvasY, { x: 550, y: 695, width: 127, height: 55, scale: 1, })) {
+          console.log('分享');
+        }
+      }
+    });
+
+    // 添加触摸事件支持
+    canvas.addEventListener('touchstart', (e) => {
+
+      e.preventDefault(); // 防止滚动和缩放
+      // 如果有动画正在进行，不处理点击
+      if (gameState.isAnimating) return;
+
+      // 如果正在浇水，不处理触摸
+      if (wateringAnimation.active) return;
+
+      if (e.touches.length > 0) {
+        const touch = e.touches[0];
+        const rect = canvas.getBoundingClientRect();
+        const viewportX = touch.clientX - rect.left;
+        const viewportY = touch.clientY - rect.top;
+
+        // 将视口坐标转换为画布内的坐标
+        const canvasX = (viewportX / canvas.scaleX);
+        const canvasY = (viewportY / canvas.scaleY);
+
+        console.log('触摸坐标:', canvasX, canvasY);
+
+
+        // 检查点击的是哪个按钮
+        for (let key in buttons) {
+          if (isPointInButton(canvasX, canvasY, buttons[key])) {
+            triggerButtonAnimation(key)
+          }
+        }
+
+        // 点击的是收获按钮
+        if (harvestHint.active && handleHarvestClick(canvasX, canvasY)) {
+          // 收获成功
+          console.log('收获成功');
+        }
+
+        // 领水弹窗事件
+        if (dialog.waterDrop) {
+          // 在任务弹窗中点击关闭按钮
+          if (isPointInButton(canvasX, canvasY, { x: 670, y: 260, width: 40, height: 40, scale: 1, })) {
+            dialog.waterDrop = false
+          }
+          // 在任务弹窗中点击签到按钮
+          if (isPointInButton(canvasX, canvasY, { x: 550, y: 510, width: 127, height: 55, scale: 1, })) {
+            console.log('签到');
+          }
+
+          // 在任务弹窗中点击分享按钮
+          if (isPointInButton(canvasX, canvasY, { x: 550, y: 695, width: 127, height: 55, scale: 1, })) {
+            console.log('分享');
+          }
+        }
+      }
+    }, { passive: false });
+
+    // 显示通知
+    function showNotification(message) {
+      notification.message = message;
+      notification.active = true;
+      notification.startTime = performance.now();
+      notification.state = "appearing";
+      notification.y = -notification.height - 20; // 开始位置（画布顶部以上）
+      notification.targetY = 100; // 目标位置（距离顶部100像素）
+    }
+  });
+</script>
+
+</html>

@@ -129,7 +129,11 @@ watch(current, (value) => {
     >
       <template #extra>
         <div style="display: flex; gap: 10px">
-          <a-input style="width: auto" placeholder="搜索接口名称或路径..." />
+          <a-input
+            v-model:value="searchValue"
+            style="width: auto"
+            placeholder="搜索接口名称或路径..."
+          />
         </div>
       </template>
       <main class="contentCard">

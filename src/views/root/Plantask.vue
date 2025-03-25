@@ -111,7 +111,7 @@ const menuData = (item: Task): MenuData[] => [
       stackInstruction.value[id] = true;
       try {
         const result = await runTask(id);
-        if (!result.length)  throw new Error("执行失败");
+        if (!result.length) throw new Error("执行失败");
         message.success(result.data);
         await getTaskData();
       } catch (error) {}
@@ -531,9 +531,6 @@ watch(editTaskDrawer, (val) => {
     height: 60vh;
     overflow: auto;
     margin-top: 30px;
-
-    section {
-    }
   }
 }
 
