@@ -5,6 +5,7 @@ import SidebarMenu from "@/layout/context/SidebarMenu.vue"; // 导入侧边菜�
 import HeaderComponent from "@/layout/context/HeaderComponent.vue"; // 导入头部组件
 import ContentArea from "@/layout/context/ContentArea.vue";
 import CacheNavigation from "@/layout/context/CacheNavigation.vue"; // 导入内容区域组件
+import { message } from "ant-design-vue";
 
 // 定义 layout 引用，用于获取布局元素
 const layout = ref<HTMLElement | null>(null);
@@ -20,25 +21,44 @@ const router = useRouter(); // 获取 Vue Router 实例
 const tabsState = useTabsState(); // 获取标签页状态
 const refreshKey = ref(0); // 刷新键，用于触发内容区域的刷新
 
-// 跳转到选中的路由
+const lastSwitchTime = ref(0); // 记录上一次切换的时间
+const minInterval = 600; // 最小切换间隔（毫秒）
+let timer ; // 定时器
+// 带防抖和提醒的 pushRouter
 const pushRouter = (item) => {
+  const currentTime = Date.now();
+  const timeDiff = currentTime - lastSwitchTime.value;
+
+  // 检查切换间隔是否太短
+  if (timeDiff < minInterval) {
+    message.warning("请勿频繁切换页面，请稍后再试！"); // 显示提醒
+
+    if(timer) clearTimeout(timer); // 清除定时器
+    timer = setTimeout(() => {
+      selectedKeys.value = [router.currentRoute.value.meta.key as number]; // 更新选中键
+    }, 200);
+
+    return; // 阻止本次跳转
+  }
+
   // 如果 item 是数字，则获取对应的菜单项
-  if (typeof item == "number") {
+  if (typeof item === "number") {
     item = tabsState.getKeyArr(item);
   }
 
   if (router.hasRoute(item.name)) {
     router.push({ name: item.name });
+    lastSwitchTime.value = currentTime; // 更新切换时间
   } else {
     console.error("Invalid route name:", item.name);
-    // 处理路由不存在的情况，例如跳转到 404 页面
-    router.push({ name: "NotFound" }); // 假设你有一个名为 NotFound 的路由
+    router.push({ name: "NotFound" });
+    lastSwitchTime.value = currentTime; // 更新切换时间
   }
 
-  selectedKeys.value = [item.meta.key]; // 更新选中的菜单键
-  selected.value = item; // 更新当前选中的菜单项
-  tabsState.setKeyArr(item); // 更新标签页状态
-};
+  selectedKeys.value = [item.meta.key];
+  selected.value = item;
+  tabsState.setKeyArr(item);
+}; // 防抖延迟 300ms
 
 // 处理响应式布局断点
 const handleBreakpoint = (broken) => {

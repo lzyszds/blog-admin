@@ -1,15 +1,13 @@
 <script setup lang="ts">
+const { refreshKey } = inject<any>("paramsRef");
 
-const {refreshKey} = inject<any>('paramsRef');
-
-const {width} = useWindowSize();
+const { width } = useWindowSize();
 const collapsed = computed(() => width.value < 576);
-
 </script>
 
 <template>
   <ALayout-content
-      :style="{
+    :style="{
       padding: collapsed ? '10px' : '14px',
       overflow: 'hidden auto',
       minHeight: '500px',
@@ -18,7 +16,7 @@ const collapsed = computed(() => width.value < 576);
   >
     <RouterView v-slot="{ Component }">
       <Transition name="router" mode="out-in">
-        <component :is="Component" :key="refreshKey"/>
+        <component :is="Component" :key="refreshKey" />
       </Transition>
     </RouterView>
   </ALayout-content>
