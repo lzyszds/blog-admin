@@ -5,7 +5,7 @@
 @import url('./swiper.css');
 
 :root {
-    --themeColor: rgb(81, 97, 206);
+    --themeColor: #55ACEE;
     --themeColorRgb: 81, 97, 206;
     --bgcolor: #fff !important;
     --selectionColor: #344449;

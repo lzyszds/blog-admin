@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { getBelongs, getPermissionAll } from "@/api/permission";
+import { getBelongs, getPermissionAll, getComponent, getByName } from "@/api/permission";
 
-interface Tabledata {
+interface ApiData {
   key: string;
   belong: string;
   title: string;
@@ -10,6 +10,16 @@ interface Tabledata {
   createdAt: string;
   permissions: number;
 }
+
+interface ComponentData {
+  id: string;
+  key: string;
+  permissions: number;
+  name: string;
+  description: string;
+  createdAt: string;
+}
+
 const tableWrapperRef = ref<HTMLElement | null>(null);
 const { height } = useElementSize(tableWrapperRef);
 
@@ -46,9 +56,13 @@ const powerList = ref([
   },
 ]);
 
-const tableData = ref<Tabledata[]>([]); // 表格数据
-const oldData = ref<Tabledata[]>([]); // 旧数据
+const apiData = ref<ApiData[]>([]); // 接口权限数据
+const oldApiData = ref<ApiData[]>([]); // 旧接口权限数据
+const componentData = ref<ComponentData[]>([]); // 组件权限数据
+const oldComponentData = ref<ComponentData[]>([]); // 旧组件权限数据
+
 const searchValue = ref(""); // 搜索值
+
 const belongs = ref([
   { label: "全部接口", value: "all" },
   { label: "公开访问", value: "public" },
@@ -57,47 +71,95 @@ const belongs = ref([
   { label: "特殊权限", value: "special" },
 ]);
 
+const permissionLevels = [
+  { index: 0, permissions: [0], labale: "所有人", color: "#eee" },
+  { index: 1, permissions: [0, 1], labale: "普通用户", color: "#55ACEE" },
+  { index: 2, permissions: [0, 1, 2], labale: "管理员", color: "#ff4d4f" },
+  { index: 3, permissions: [3], labale: "特殊权限", color: "#5161ce" },
+];
+
+// 处理接口权限数据
+const processApiData = (apiList, isCache = true) => {
+  apiData.value = apiList.map((item) => ({
+    key: item.interfaceId,
+    belong: item.interfaceBelong,
+    title: item.interfaceName,
+    method: item.interfaceMethod,
+    description: item.interfaceDesc,
+    createdAt: item.createdAt,
+    permissions: item.interfacePermissions,
+  }));
+  if (!isCache) return;
+  oldApiData.value = [...toRaw(apiData.value)];
+};
+
+// 处理组件权限数据
+const processComponentData = (componentList) => {
+  componentData.value = componentList.map((item) => ({
+    id: item.componentId,
+    key: item.componentKey,
+    permissions: item.componentPermissions,
+    name: item.componentName,
+    description: item.description,
+    createdAt: item.createdAt,
+  }));
+  oldComponentData.value = [...toRaw(componentData.value)];
+};
+// 初始化请求
 const initData = async (force: boolean = false) => {
-  const { data } = await getPermissionAll().send(force);
+  const { data: apiList } = await getPermissionAll().send(force);
+  const { data: componentList } = await getComponent().send(force);
   const { data: belongsList } = await getBelongs().send(force);
-  if (!data || !belongs) return;
+  if (!apiList || !belongs || !componentList) return;
+
   belongsList.forEach((item) => {
-    belongs.value.push({
-      label: item.ibLabel,
-      value: item.ibValue,
-    });
+    belongs.value.push({ label: item.ibLabel, value: item.ibValue });
   });
-  tableData.value = data.map((item) => {
-    return {
-      key: item.interfaceId,
-      belong: item.interfaceBelong,
-      title: item.interfaceName,
-      method: item.interfaceMethod,
-      description: item.interfaceDesc,
-      createdAt: item.createdAt,
-      permissions: item.interfacePermissions,
-    };
+
+  processApiData(apiList);
+  processComponentData(componentList);
+
+  // 计算权限数量
+  const calculatePermissionCount = (permissions: number[]) => {
+    return apiData.value.filter((item) => permissions.includes(item.permissions)).length;
+  };
+  permissionLevels.forEach(({ index, permissions }) => {
+    powerList.value[index].sumValue = calculatePermissionCount(permissions);
   });
-  oldData.value = [...toRaw(tableData.value)];
 };
 
 await initData();
 
+// 权限过滤器
+const permissionFilters: Record<string, (item: ApiData) => boolean> = {
+  all: () => true,
+  public: (item) => item.permissions === 0,
+  userAdmin: (item) => item.permissions === 1,
+  admin: (item) => item.permissions === 2,
+  special: (item) => item.permissions === 3,
+};
+
 watch(current, (value) => {
-  if (value === "all") {
-    tableData.value = [...toRaw(oldData.value)];
-  } else if (value === "public") {
-    tableData.value = oldData.value.filter((item) => item.permissions == 0);
-  } else if (value === "userAdmin") {
-    tableData.value = oldData.value.filter((item) => item.permissions == 1);
-  } else if (value === "admin") {
-    tableData.value = oldData.value.filter((item) => item.permissions == 2);
-  } else if (value === "special") {
-    tableData.value = oldData.value.filter((item) => item.permissions == 3);
-  } else {
-    tableData.value = oldData.value.filter((item) => item.belong == value);
-  }
+  const filterFn = permissionFilters[value] || ((item) => item.belong === value);
+  apiData.value = oldApiData.value.filter(filterFn);
 });
+
+// 控制显示或隐藏
+const filterHide = (arr: any[], value) => {
+  if (value == 0 && arr[0] == 0) {
+    return false;
+  }
+  return arr.includes(value);
+};
+
+// 搜索功能
+const searchChange = async () => {
+  const { data } = await getByName({
+    name: searchValue.value,
+  }).send(true);
+  if (!data) apiData.value = oldApiData.value;
+  processApiData(data, false);
+};
 </script>
 
 <template>
@@ -121,9 +183,9 @@ watch(current, (value) => {
       </main>
     </ACard>
     <ACard
-      title="接口权限列表"
+      title="接口权限、组件权限列表"
       :bordered="false"
-      :body-style="{ overflow: 'auto', padding: '10px 0', height: '90%' }"
+      :body-style="{ padding: '10px 0', height: '90%' }"
       :style="{ height: height - 150, overflow: 'hidden' }"
       ref="tableWrapperRef"
     >
@@ -131,35 +193,14 @@ watch(current, (value) => {
         <div style="display: flex; gap: 10px">
           <a-input
             v-model:value="searchValue"
-            style="width: auto"
+            style="width: 240px"
             placeholder="搜索接口名称或路径..."
+            @keydown.enter="searchChange"
           />
         </div>
       </template>
       <main class="contentCard">
-        <a-list item-layout="horizontal" :data-source="tableData ?? []">
-          <template #renderItem="{ item }">
-            <a-list-item>
-              <a-list-item-meta>
-                <template #description>
-                  <a-tag color="default" style="user-select: all; cursor: pointer">
-                    {{ item.title }}
-                  </a-tag>
-                </template>
-                <template #title>
-                  {{ item.description }}
-                </template>
-                <template #avatar>
-                  <a-tag color="blue">{{ item.method }} </a-tag>
-                  <p style="margin: 6px 5px; color: #999; font-size: 12px">
-                    #{{ item.key }}
-                  </p>
-                </template>
-              </a-list-item-meta>
-            </a-list-item>
-          </template>
-        </a-list>
-        <section class="selectBelong">
+        <div class="selectBelong">
           <button
             v-for="item in belongs"
             @click="current = item.value"
@@ -167,6 +208,66 @@ watch(current, (value) => {
           >
             {{ item.label }}
           </button>
+        </div>
+        <section class="apiPermission">
+          <h3>接口权限管理</h3>
+          <a-list item-layout="horizontal" :data-source="apiData ?? []">
+            <template #renderItem="{ item }">
+              <a-list-item>
+                <a-list-item-meta>
+                  <template #description>
+                    <a-tag color="default" style="user-select: all; cursor: pointer">
+                      {{ item.title }}
+                    </a-tag>
+                    <!-- 权限允许人员标签 -->
+                    <a-tag
+                      v-for="level in permissionLevels"
+                      v-show="filterHide(level.permissions, item.permissions)"
+                      :color="level.color"
+                    >
+                      {{ level.labale }}
+                    </a-tag>
+                  </template>
+                  <template #title>
+                    {{ item.description }}
+                  </template>
+                  <template #avatar>
+                    <a-tag color="blue">{{ item.method }} </a-tag>
+                    <p style="margin: 6px 5px; color: #999; font-size: 12px">
+                      #{{ item.key }}
+                    </p>
+                  </template>
+                </a-list-item-meta>
+              </a-list-item>
+            </template>
+          </a-list>
+        </section>
+        <section class="componentPermission">
+          <h3>组件权限管理</h3>
+          <a-list item-layout="horizontal" :data-source="componentData ?? []">
+            <template #renderItem="{ item }">
+              <a-list-item>
+                <a-list-item-meta>
+                  <template #description>
+                    <a-tag color="default" style="user-select: all; cursor: pointer">
+                      {{ item.description }}
+                    </a-tag>
+                    <!-- 权限允许人员标签 -->
+                    <a-tag
+                      v-for="level in permissionLevels"
+                      v-show="filterHide(level.permissions, item.permissions)"
+                      :color="level.color"
+                    >
+                      {{ level.labale }}
+                    </a-tag>
+                  </template>
+                  <template #title>
+                    {{ item.name }}
+                  </template>
+                </a-list-item-meta>
+              </a-list-item>
+            </template>
+          </a-list>
         </section>
       </main>
     </ACard>
@@ -214,19 +315,23 @@ watch(current, (value) => {
 }
 
 .contentCard {
+  display: grid;
   position: relative;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto 1fr;
+  grid-template-areas:
+    "selectBelong selectBelong"
+    "apiPermission componentPermission";
+  padding: 0 24px;
+  height: 100%;
+  gap: 20px;
 
   .selectBelong {
+    grid-area: selectBelong;
     padding: 5px;
     background-color: var(--color-card-bg);
-    z-index: 99;
-    width: 95%;
+    width: calc(100% - 24px);
     border-radius: 10px;
-    position: sticky;
-    bottom: 0%;
-    left: 2%;
-    box-shadow: 0px 0px 2px 0px #0000001f;
-    border: 1px solid #000000;
     display: flex;
     flex-wrap: wrap;
     gap: 2px;
@@ -250,11 +355,36 @@ watch(current, (value) => {
       }
     }
   }
+
+  .apiPermission,
+  .componentPermission {
+    grid-area: apiPermission;
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr;
+    height: 100%;
+    overflow: auto;
+    .ant-list {
+      height: 100%;
+      overflow-y: auto;
+    }
+  }
+  .componentPermission {
+    grid-area: componentPermission;
+  }
+
+  :deep(.ant-list-item) {
+    padding-left: 4px;
+  }
+
   :deep(h4) {
     margin: 0;
   }
   :deep(.ant-list-item-meta-avatar) {
     width: 40px;
+  }
+  :deep(.ant-tag) {
+    margin-inline-end: 2px;
   }
 }
 
@@ -283,6 +413,16 @@ watch(current, (value) => {
         font-size: 12px;
       }
     }
+  }
+  .contentCard {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr auto;
+    grid-template-areas: "selectBelong" "apiPermission" "componentPermission";
+    height: auto;
+    overflow: scroll;
+  }
+  :deep(.ant-card-body) {
+    overflow-y: auto;
   }
 }
 </style>
