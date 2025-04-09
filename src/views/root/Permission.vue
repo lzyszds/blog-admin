@@ -1,5 +1,8 @@
 <script setup lang="ts">
 import { getBelongs, getPermissionAll, getComponent, getByName } from "@/api/permission";
+import { useScrollY } from "@/hook/useTableConfig";
+import { getPermissionColumns } from "@/table/permissionColumns";
+
 
 interface ApiData {
   key: string;
@@ -20,10 +23,15 @@ interface ComponentData {
   createdAt: string;
 }
 
+
+const {scrollConfig} = useScrollY();
+
+
 const tableWrapperRef = ref<HTMLElement | null>(null);
 const { height } = useElementSize(tableWrapperRef);
 
-const current = ref("all");
+const showValue = ref("api"); // 当前显示的权限类型（接口/组件）
+const current = ref("public"); // 当前选中的api权限类型
 
 const powerList = ref([
   {
@@ -72,10 +80,10 @@ const belongs = ref([
 ]);
 
 const permissionLevels = [
-  { index: 0, permissions: [0], labale: "所有人", color: "#eee" },
-  { index: 1, permissions: [0, 1], labale: "普通用户", color: "#55ACEE" },
-  { index: 2, permissions: [0, 1, 2], labale: "管理员", color: "#ff4d4f" },
-  { index: 3, permissions: [3], labale: "特殊权限", color: "#5161ce" },
+  { index: 0, permissions: [0], label: "所有人", color: "#eee" },
+  { index: 1, permissions: [0, 1], label: "普通用户", color: "#55ACEE" },
+  { index: 2, permissions: [0, 1, 2], label: "管理员", color: "#ff4d4f" },
+  { index: 3, permissions: [3], label: "特殊权限", color: "#5161ce" },
 ];
 
 // 处理接口权限数据
@@ -139,10 +147,16 @@ const permissionFilters: Record<string, (item: ApiData) => boolean> = {
   special: (item) => item.permissions === 3,
 };
 
-watch(current, (value) => {
-  const filterFn = permissionFilters[value] || ((item) => item.belong === value);
-  apiData.value = oldApiData.value.filter(filterFn);
-});
+watch(
+  current,
+  (value) => {
+    const filterFn = permissionFilters[value] || ((item) => item.belong === value);
+    apiData.value = oldApiData.value.filter(filterFn);
+  },
+  {
+    immediate: true,
+  }
+);
 
 // 控制显示或隐藏
 const filterHide = (arr: any[], value) => {
@@ -160,6 +174,8 @@ const searchChange = async () => {
   if (!data) apiData.value = oldApiData.value;
   processApiData(data, false);
 };
+
+const columns = getPermissionColumns(permissionLevels);
 </script>
 
 <template>
@@ -185,8 +201,8 @@ const searchChange = async () => {
     <ACard
       title="接口权限、组件权限列表"
       :bordered="false"
-      :body-style="{ padding: '10px 0', height: '90%' }"
-      :style="{ height: height - 150, overflow: 'hidden' }"
+      :body-style="{ padding: '10px 0', height: '90%',overflow: 'hidden', }"
+      :style="{ height: height - 150, overflow: 'hidden', flex: 1 }"
       ref="tableWrapperRef"
     >
       <template #extra>
@@ -200,75 +216,67 @@ const searchChange = async () => {
         </div>
       </template>
       <main class="contentCard">
-        <div class="selectBelong">
-          <button
-            v-for="item in belongs"
-            @click="current = item.value"
-            :class="{ checked: current === item.value }"
-          >
-            {{ item.label }}
-          </button>
-        </div>
-        <section class="apiPermission">
-          <h3>接口权限管理</h3>
-          <a-list item-layout="horizontal" :data-source="apiData ?? []">
-            <template #renderItem="{ item }">
-              <a-list-item>
-                <a-list-item-meta>
-                  <template #description>
-                    <a-tag color="default" style="user-select: all; cursor: pointer">
-                      {{ item.title }}
-                    </a-tag>
-                    <!-- 权限允许人员标签 -->
-                    <a-tag
-                      v-for="level in permissionLevels"
-                      v-show="filterHide(level.permissions, item.permissions)"
-                      :color="level.color"
-                    >
-                      {{ level.labale }}
-                    </a-tag>
-                  </template>
-                  <template #title>
-                    {{ item.description }}
-                  </template>
-                  <template #avatar>
-                    <a-tag color="blue">{{ item.method }} </a-tag>
-                    <p style="margin: 6px 5px; color: #999; font-size: 12px">
-                      #{{ item.key }}
-                    </p>
-                  </template>
-                </a-list-item-meta>
-              </a-list-item>
-            </template>
-          </a-list>
-        </section>
-        <section class="componentPermission">
-          <h3>组件权限管理</h3>
-          <a-list item-layout="horizontal" :data-source="componentData ?? []">
-            <template #renderItem="{ item }">
-              <a-list-item>
-                <a-list-item-meta>
-                  <template #description>
-                    <a-tag color="default" style="user-select: all; cursor: pointer">
-                      {{ item.description }}
-                    </a-tag>
-                    <!-- 权限允许人员标签 -->
-                    <a-tag
-                      v-for="level in permissionLevels"
-                      v-show="filterHide(level.permissions, item.permissions)"
-                      :color="level.color"
-                    >
-                      {{ level.labale }}
-                    </a-tag>
-                  </template>
-                  <template #title>
-                    {{ item.name }}
-                  </template>
-                </a-list-item-meta>
-              </a-list-item>
-            </template>
-          </a-list>
-        </section>
+        <!-- 切换权限组件（接口/组件） -->
+        <a-radio-group v-model:value="showValue" button-style="solid">
+          <a-radio-button value="api">接口权限管理</a-radio-button>
+          <a-radio-button value="components">组件权限管理</a-radio-button>
+        </a-radio-group>
+
+        <!-- 接口权限管理 -->
+        <template v-if="showValue == 'api'">
+          <div class="selectBelong">
+            <button
+              v-for="item in belongs"
+              @click="current = item.value"
+              :class="{ checked: current === item.value }"
+            >
+              {{ item.label }}
+            </button>
+          </div>
+          <section class="apiPermission">
+            <ATable
+              ref="tableWrapperRef"
+              :columns="columns"
+              :data-source="apiData ?? []"
+              :scroll="{
+                x: scrollConfig.x,
+                y: scrollConfig.y - 120,
+              }"
+              size="small"
+              row-key="uid"
+            />
+          </section>
+        </template>
+
+        <template v-else>
+          <section class="componentPermission">
+            <h3>组件权限管理</h3>
+            <a-list item-layout="horizontal" :data-source="componentData ?? []">
+              <template #renderItem="{ item }">
+                <a-list-item>
+                  <a-list-item-meta>
+                    <template #description>
+                      <a-tag color="default" style="user-select: all; cursor: pointer">
+                        {{ item.description }}
+                      </a-tag>
+                      <!-- 权限允许人员标签 -->
+                      <a-tag
+                        v-for="level in permissionLevels"
+                        v-show="filterHide(level.permissions, item.permissions)"
+                        :color="level.color"
+                      >
+                        {{ level.label }}
+                      </a-tag>
+                    </template>
+                    <template #title>
+                      {{ item.name }}
+                    </template>
+                  </a-list-item-meta>
+                </a-list-item>
+              </template>
+            </a-list>
+          </section>
+        </template>
       </main>
     </ACard>
   </section>
@@ -315,22 +323,42 @@ const searchChange = async () => {
 }
 
 .contentCard {
-  display: grid;
+  display: flex;
+  flex-direction: column;
   position: relative;
-  grid-template-columns: 1fr 1fr;
-  grid-template-rows: auto 1fr;
-  grid-template-areas:
-    "selectBelong selectBelong"
-    "apiPermission componentPermission";
   padding: 0 24px;
   height: 100%;
-  gap: 20px;
+  gap: 13px;
 
-  .selectBelong {
-    grid-area: selectBelong;
+  .ant-radio-group {
+    border-radius: 5px;
     padding: 5px;
     background-color: var(--color-card-bg);
-    width: calc(100% - 24px);
+    display: flex;
+
+    .ant-radio-button-wrapper {
+      border-radius: 5px;
+      border: none;
+      flex: 1;
+      text-align: center;
+      background-color: #fff;
+      color: #000;
+    }
+
+    :not(.ant-radio-button-wrapper-checked) {
+      border: none;
+      background-color: transparent;
+      color: #999;
+    }
+    ::before {
+      display: none;
+    }
+  }
+
+  .selectBelong {
+    padding: 5px;
+    background-color: var(--color-card-bg);
+    width: 100%;
     border-radius: 10px;
     display: flex;
     flex-wrap: wrap;
@@ -358,33 +386,19 @@ const searchChange = async () => {
 
   .apiPermission,
   .componentPermission {
-    grid-area: apiPermission;
-    display: grid;
-    grid-template-columns: 1fr;
-    grid-template-rows: auto 1fr;
     height: 100%;
-    overflow: auto;
-    .ant-list {
-      height: 100%;
-      overflow-y: auto;
-    }
-  }
-  .componentPermission {
-    grid-area: componentPermission;
-  }
-
-  :deep(.ant-list-item) {
-    padding-left: 4px;
   }
 
   :deep(h4) {
     margin: 0;
   }
-  :deep(.ant-list-item-meta-avatar) {
-    width: 40px;
-  }
   :deep(.ant-tag) {
     margin-inline-end: 2px;
+  }
+
+  :deep(.ant-table-wrapper) .ant-table-pagination.ant-pagination {
+    margin: 0;
+    margin-top: 10px;
   }
 }
 

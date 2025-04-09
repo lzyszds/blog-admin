@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import {getGithubFrontCommit} from '@/api/toolkit';
-import {setTimeAgoLocalMessages} from '@/utils';
-import {useRequest} from 'alova/client'
+import { getGithubFrontCommit } from "@/api/toolkit";
+import { setTimeAgoLocalMessages } from "@/utils";
+import { useRequest } from "alova/client";
 
 type StepData = {
   title: string;
@@ -10,50 +10,57 @@ type StepData = {
   id: number;
 };
 
+const loading = ref<boolean>(true);
+
 const stepsData = ref<StepData[]>([]);
 
 useRequest(getGithubFrontCommit, {
   immediate: true,
-  cacheKey: 'getGithubFrontCommit',
-}).onSuccess(({data}) => {
+  cacheKey: "getGithubFrontCommit",
+}).onSuccess(({ data }) => {
   stepsData.value = data.data.runInfoList.map((item) => {
     const description = useTimeAgo(item.createdAt, setTimeAgoLocalMessages).value;
     return {
       title: item.commitMessage,
-      description: description + ' by ' + item.commitAuthor,
+      description: description + " by " + item.commitAuthor,
       conclusion: item.conclusion,
       id: item.id,
     };
   });
-})
+  loading.value = false;
+});
 
 //虚拟滚动
-const {list, containerProps, wrapperProps} = useVirtualList(stepsData, {
+const { list, containerProps, wrapperProps } = useVirtualList(stepsData, {
   // Keep `itemHeight` in sync with the item's row.
   itemHeight: 22,
 });
 
 //标题处理 换行
 const titleHandler = (title: string) => {
-  return title.replaceAll('- ', '<br/>- ');
+  return title.replaceAll("- ", "<br/>- ");
 };
 </script>
 
 <template>
-  <div v-bind="containerProps" style="height: 400px">
-    <a-timeline v-bind="wrapperProps">
-      <a-timeline-item
-          v-for="item in list"
-          :key="item.data.id"
-          :color="item.data.conclusion == 'success' ? '#5161ce' : 'red'"
-      >
-        <span v-html="titleHandler(item.data.title)"></span>
-        <!--        <span :title="item.data.title">-->
-        <!--          {{ item.data.title.split("\n")[0] }}-->
-        <!--        </span>-->
-      </a-timeline-item>
-    </a-timeline>
-  </div>
+  <a-space direction="vertical" style="width: 100%" :size="16">
+    <a-skeleton :loading="loading">
+      <div v-bind="containerProps" style="height: 400px">
+        <a-timeline v-bind="wrapperProps">
+          <a-timeline-item
+            v-for="item in list"
+            :key="item.data.id"
+            :color="item.data.conclusion == 'success' ? '#5161ce' : 'red'"
+          >
+            <span v-html="titleHandler(item.data.title)"></span>
+            <!--        <span :title="item.data.title">-->
+            <!--          {{ item.data.title.split("\n")[0] }}-->
+            <!--        </span>-->
+          </a-timeline-item>
+        </a-timeline>
+      </div>
+    </a-skeleton>
+  </a-space>
 </template>
 
 <style scoped>
