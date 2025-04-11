@@ -75,8 +75,9 @@ md.use(mdMark);
 md.use(mdEmoji);
 md.use(mdBracketedSpans);
 md.use(mdInlineComments);
+//给图片路径添加前缀 比如说： /图片地址 变成 http://localhost:3000/图片地址
 md.use(mdImagePlugin, {
-    baseUrl: import.meta.env.VITE_BASE_URL,
+    baseUrl: import.meta.env.VITE_HTTPS_URL,
 });
 setDirectoryId(md);
 mdTipsCollectPlugin(md);

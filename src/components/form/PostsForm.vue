@@ -153,6 +153,8 @@ const getSelectImage = () => {
  */
 async function setData(): Promise<ArticleDataType> {
   const {aid, title, content, coverImg} = information.value;
+  console.log(content);
+  
   const first = document.querySelector('.ck-editor__main>div')?.children;
   let firstText = '';
   //遍历所有子元素 如果tagname 标题h1 h2 h3 h4 h5 h6 则跳过
@@ -166,7 +168,8 @@ async function setData(): Promise<ArticleDataType> {
   const md = (await import('@/utils/markdownInit.ts')).default;
 
   const main = md.render(content || '');
-
+  console.log(main);
+  
   // 初始化文章数据
   const data = {
     title, // 文章标题
