@@ -7,8 +7,6 @@ const { isFixed, selectedKeys, collapsed } = inject<any>("paramsRef");
 
 const emit = defineEmits(["breakpoint", "push-router"]);
 
-let routeItems = routeItem.filter((item) => !item.meta.isHide);
-
 const { data: datas } = await getComponent();
 const { userInfo } = useUserInfoState();
 const permissionMap: any = {
@@ -17,15 +15,21 @@ const permissionMap: any = {
   3: [2], // 特殊权限
 };
 // 根据用户权限过滤路由
-routeItems = routeItems.filter((item) => {
-  const { componentPermissions } = datas.find((data) => data.componentKey == item.name);
+const routeItems = computed(() =>
+  routeItem
+    .filter((item) => !item.meta.isHide)
+    .filter((item) => {
+      const { componentPermissions } = datas.find(
+        (data) => data.componentKey == item.name
+      );
 
-  const power = permissionMap[componentPermissions];
+      const power = permissionMap[componentPermissions];
 
-  if (power && power.includes(userInfo.power)) {
-    return item;
-  }
-});
+      if (power && power.includes(userInfo.power)) {
+        return item;
+      }
+    })
+);
 </script>
 
 <template>
