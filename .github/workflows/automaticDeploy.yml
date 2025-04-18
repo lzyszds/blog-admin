@@ -37,15 +37,15 @@ jobs:
                   SOURCE: 'dist/'  # 源目录
                   REMOTE_HOST: ${{ secrets.SERVER_HOST }}  # 服务器地址
                   REMOTE_USER: 'root'  # 用户名
-                  TARGET: '/www/wwwroot/lzyszds.cn'  # 目标路径，注意这里应该是一个有效的路径
+                  TARGET: '/opt/1panel/apps/openresty/openresty/www/sites/lzyszds.cn/index'  # 目标路径，注意这里应该是一个有效的路径
 
-          # 上传 package.json
-            - name: 上传 package.json
-              uses: easingthemes/ssh-deploy@v2.1.1
-              env:
-                SSH_PRIVATE_KEY: ${{ secrets.SERVER_SSH_KEY }}
-                ARGS: '-avzr'  # 这里不需要 --delete
-                SOURCE: './package.json' # 如果是 npm 项目，这里修改为: './package.json,./package-lock.json'
-                REMOTE_HOST: ${{ secrets.SERVER_HOST }}
-                REMOTE_USER: 'root'
-                TARGET: '/www/wwwroot/lzyszds.cn' # 上传到相同的目标目录
+          # # 上传 package.json
+          #   - name: 上传 package.json
+          #     uses: easingthemes/ssh-deploy@v2.1.1
+          #     env:
+          #       SSH_PRIVATE_KEY: ${{ secrets.SERVER_SSH_KEY }}
+          #       ARGS: '-avzr'  # 这里不需要 --delete
+          #       SOURCE: './package.json' # 如果是 npm 项目，这里修改为: './package.json,./package-lock.json'
+          #       REMOTE_HOST: ${{ secrets.SERVER_HOST }}
+          #       REMOTE_USER: 'root'
+          #       TARGET: '/www/wwwroot/lzyszds.cn' # 上传到相同的目标目录
