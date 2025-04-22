@@ -91,7 +91,6 @@ const saveForm = (content?: string) => {
     tags: tagData.value,
     partialContent: information.value.partialContent,
   };
-  console.log(formState.value[params.aid || 'add']);
   const values: any = Object.values(
       isEqual(formState.value[params.aid || 'add'], params)
   );
@@ -151,8 +150,6 @@ const handleUploadImage = async ([insertImage, files]) => {
 const getSelectImage = () => {
   information.value.coverImg = selectImage.value + '';
   resourceModal.value = false;
-
-  console.log(information.value.coverImg);
 };
 
 /**
@@ -161,7 +158,6 @@ const getSelectImage = () => {
  */
 async function setData(): Promise<ArticleDataType> {
   const {aid, title, content, coverImg} = information.value;
-  console.log(content);
   
   const first = document.querySelector('.ck-editor__main>div')?.children;
   let firstText = '';
@@ -173,10 +169,9 @@ async function setData(): Promise<ArticleDataType> {
     }
   }
 
-  const md = (await import('@/utils/markdownInit.ts')).default;
+  const md = (await import('@/components/markdown/markdownInit')).default;
 
   const main = md.render(content || '');
-  console.log(main);
   
   // 初始化文章数据
   const data = {
