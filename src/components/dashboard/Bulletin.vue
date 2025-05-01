@@ -56,7 +56,7 @@ const timeName = () => {
       <a-avatar
         :size="64"
         width="100%"
-        src="/picture/OQli-X5pRicN9w9cAhUfgLRSFdNs0Zl76hzKIXdyoxg0gAA"
+        src="/pictureBedImage/OQli-X5pRicN9w9cAhUfgLRSFdNs0Zl76hzKIXdyoxg0gAA"
       >
       </a-avatar>
 
