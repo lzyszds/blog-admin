@@ -97,6 +97,7 @@ export const getcommentColumns = (params: Params) => {
               cancelText: "取消",
               okText: "确定",
               onConfirm: async () => {
+                console.log(record)
                 const result: any = await params.delData(record);
                 if (result.data) {
                   message.success(result.data);

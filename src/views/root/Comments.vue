@@ -10,7 +10,7 @@ import { TableProps } from "ant-design-vue";
 import { getcommentColumns } from "@/table/commentColumns";
 import dayjs from "dayjs";
 import { RequestResult } from "@/typings/Request";
-import LzyIcon from '@/components/LzyIcon.vue'
+import LzyIcon from "@/components/LzyIcon.vue";
 
 /* 获取表格滚动条高度 */
 const { scrollConfig } = useScrollY();
@@ -29,9 +29,10 @@ const selectedRowKeys = ref<Key[]>([]);
 
 /* 表格选择 */
 const onSelectChange = (keys: Key[]) => {
+  console.log(keys);
+  
   selectedRowKeys.value = keys;
 };
-
 
 //这里不能封装hook，否则效果不好使
 const loading = ref(false);
@@ -69,7 +70,7 @@ const getTable = getTableStore();
 /* 设置表格列表数据的回调方法 */
 getTable.setCallbackArr({
   refreshData: () => send(),
-  delData: ({ commentId }) => deleteComment({ commentId }),
+  delData: ({ commentId }) => deleteComment({ ids: commentId }),
   columns: getcommentColumns,
 });
 
@@ -169,7 +170,7 @@ const multipleDel = () => {
           :loading="loading"
           :pagination="pagination"
           size="small"
-          row-key="uid"
+          row-key="commentId"
           @change="handleTableChange"
         />
       </main>

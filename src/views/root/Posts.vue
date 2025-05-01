@@ -206,7 +206,7 @@ const multipleDel = () => {
           :loading="loading"
           :pagination="pagination"
           size="small"
-          row-key="uid"
+          row-key="aid"
           @change="handleTableChange"
         />
       </main>
