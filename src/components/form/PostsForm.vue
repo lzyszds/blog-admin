@@ -24,6 +24,10 @@ type ModalParamsType = {
   };
 };
 
+
+/* 提交状态 */
+const sumbitted = ref(false);
+
 /* 模态框参数 */
 const {modalParams} = defineProps<ModalParamsType>();
 
@@ -87,7 +91,6 @@ const saveForm = (content?: string) => {
     tags: tagData.value,
     partialContent: information.value.partialContent,
   };
-  console.log(formState.value[params.aid || 'add']);
   const values: any = Object.values(
       isEqual(formState.value[params.aid || 'add'], params)
   );
@@ -103,10 +106,11 @@ const saveForm = (content?: string) => {
 
 // 确认提交
 const submitForm = async () => {
+  // 修改提交状态
+  sumbitted.value = true;
   const data = await setData();
   // 检查内容是否相同
   modalParams.sureCallback.callback(data).then((res) => {
-    console.log('提交数据', res);
     if (res.code !== 200) return
     message.success('保存成功！');
     /* 推出模态框 */
@@ -118,6 +122,9 @@ const submitForm = async () => {
 
     /* 删除缓存 */
     delete formState.value[modalParams.params.aid || 'add'];
+
+    // 完成后重置提交状态
+    sumbitted.value = false;
   });
 };
 
@@ -143,8 +150,6 @@ const handleUploadImage = async ([insertImage, files]) => {
 const getSelectImage = () => {
   information.value.coverImg = selectImage.value + '';
   resourceModal.value = false;
-
-  console.log(information.value.coverImg);
 };
 
 /**
@@ -153,7 +158,6 @@ const getSelectImage = () => {
  */
 async function setData(): Promise<ArticleDataType> {
   const {aid, title, content, coverImg} = information.value;
-  console.log(content);
   
   const first = document.querySelector('.ck-editor__main>div')?.children;
   let firstText = '';
@@ -165,10 +169,9 @@ async function setData(): Promise<ArticleDataType> {
     }
   }
 
-  const md = (await import('@/utils/markdownInit.ts')).default;
+  const md = (await import('@/components/markdown/markdownInit')).default;
 
   const main = md.render(content || '');
-  console.log(main);
   
   // 初始化文章数据
   const data = {
@@ -368,12 +371,12 @@ provide('infoCard', infoCard);
           <LzyIcon size="18" name="mdi:content-save"/>
           <span class="intact">保存草稿</span>
         </a-button>
-        <a-button type="primary" @click="submitForm">
+        <a-button type="primary" :loading="sumbitted" @click="submitForm">
           <LzyIcon size="18" name="mdi:publish"/>
           <span class="intact">发布文章</span>
         </a-button>
       </div>
-    </template>
+    </template> 
   </ADrawer>
   <AModal v-model:open="resourceModal" width="100%" wrap-class-name="resource-modal">
     <Resources type="blog" :is-selector="true" @select="(val) => (selectImage = val)"/>

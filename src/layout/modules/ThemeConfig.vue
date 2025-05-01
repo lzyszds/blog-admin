@@ -1,7 +1,7 @@
 <script setup lang="ts">
 const themeArr = {
-  light: "material-symbols:light-mode-rounded",
-  dark: "material-symbols:dark-mode-rounded",
+  light: "iconoir:sun-light",
+  dark: "iconoir:half-moon",
   // system: "material-symbols:brightness-auto-rounded",
 };
 const themeMode = useStorage<"light" | "dark">("themeMode", "light");

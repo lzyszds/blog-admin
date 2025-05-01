@@ -30,3 +30,8 @@ export const uploadImageToPictureBed = (data: any) => {
 export const deletePictureBedImage = (data: any) => {
   return Alova.createPost("/toolkit/deletePictureBedImage", data);
 };
+
+// 清空redis中所有缓存
+export const clearRedisCacheAll = () => {
+  return Alova.createGet("/toolkit/clearRedisCacheAll");
+};

@@ -3,6 +3,7 @@ import CollapseButton from "@/layout/modules/CollapseButton.vue";
 import Breadcrumb from "@/layout/modules/Breadcrumb.vue";
 import ThemeConfig from "@/layout/modules/ThemeConfig.vue";
 import UserMenu from "@/layout/modules/UserMenu.vue";
+import ClearReidsCache from "@/layout/modules/ClearReidsCache.vue";
 
 defineEmits(["toggle-collapse"]);
 </script>
@@ -12,6 +13,7 @@ defineEmits(["toggle-collapse"]);
     <CollapseButton />
     <Breadcrumb />
     <div class="right">
+      <ClearReidsCache />
       <ThemeConfig />
       <UserMenu />
     </div>
@@ -35,7 +37,7 @@ defineEmits(["toggle-collapse"]);
 
 @media screen and (max-width: 568px) {
   .ant-layout-header {
-    padding:0
+    padding: 0;
   }
 }
 </style>
