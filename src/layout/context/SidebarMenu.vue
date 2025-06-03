@@ -19,11 +19,14 @@ const routeItems = computed(() =>
   routeItem
     .filter((item) => !item.meta.isHide)
     .filter((item) => {
-      const { componentPermissions } = datas.find(
-        (data) => data.componentKey == item.name
-      );
+      const info = datas.find((data) => {
+        return data.componentKey == item.name;
+      });
+      if (!info || !info.componentPermissions) {
+        return true; // 如果没有权限信息，则显示该路由
+      }
 
-      const power = permissionMap[componentPermissions];
+      const power = permissionMap[info.componentPermissions];
 
       if (power && power.includes(userInfo.power)) {
         return item;

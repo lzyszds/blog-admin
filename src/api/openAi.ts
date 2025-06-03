@@ -14,3 +14,8 @@ export const addAiKeyApi = (data: object) => {
 export const updateAiKeyApi = (data: object) => {
   return Alova.createPost("/openAI/updateAiKey", data);
 };
+
+//发送聊天
+export const sendChatApi = (data) => {
+  return Alova.createPost("/openAI/sendChat", data);
+};

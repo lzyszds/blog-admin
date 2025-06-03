@@ -1,4 +1,4 @@
-import {RouteRecordRaw} from "vue-router";
+import { RouteRecordRaw } from "vue-router";
 
 export type Meta = {
     key: number;
@@ -138,13 +138,24 @@ const routeItem: RouteItem[] = [
         },
     },
     {
+        path: "chat",
+        name: "chat",
+        component: () => import("@/views/root/Chat.vue"),
+        meta: {
+            key: 13,
+            name: "Ai聊天",
+            uicon: "iconoir:chat-bubble-translate",
+            component: "chat",
+        },
+    },
+    {
         path: "about",
         name: "about",
         component: () => import("@/views/root/About.vue"),
         meta: {
-            key: 13,
+            key: 14,
             name: "关于项目",
-            uicon:  "iconoir:rss-feed-tag",
+            uicon: "iconoir:rss-feed-tag",
             component: "about",
         },
     },
