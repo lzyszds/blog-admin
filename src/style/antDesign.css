@@ -157,3 +157,17 @@
         padding: 20px;
     }
 }
+
+
+.ant-statistic-title {
+  color: #000;
+}
+
+html[data-theme="dark"] .ant-statistic-title {
+  color: #fff;
+}
+
+.ant-card{
+      border: 1px solid #f0f0f0;
+
+}

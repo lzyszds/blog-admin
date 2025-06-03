@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import * as echarts from "echarts";
+const themeMode = useStorage<"light" | "dark">("themeMode", "light");
 
 const echatsDom = ref(null);
 
@@ -8,7 +9,10 @@ let chart: echarts.ECharts | null = null;
 const initChart = () => {
   if (!echatsDom.value) return;
 
-  chart = echarts.init(echatsDom.value);
+  chart = echarts.init(echatsDom.value, 'dark', {
+    renderer: "canvas",
+    useDirtyRect: false, // 禁用脏矩形优化
+  });
   updateChartOption();
 };
 
@@ -20,9 +24,7 @@ let barData: any[] = [];
 
 for (let i = 0; i < 20; i++) {
   let date = new Date((dottedBase += 3600 * 24 * 1000));
-  category.push(
-    [date.getFullYear(), date.getMonth() + 1, date.getDate()].join("-"),
-  );
+  category.push([date.getFullYear(), date.getMonth() + 1, date.getDate()].join("-"));
   let b = Math.random() * 200;
   let d = Math.random() * 200;
   barData.push(b);
@@ -33,7 +35,7 @@ const updateChartOption = () => {
   if (!chart) return;
 
   chart.setOption({
-    backgroundColor: "#fff",
+    backgroundColor:  themeMode.value === "dark" ? "#141414" : "#fff",
     grid: {
       left: "3%", // 减小左边距
       right: "4%", // 减小右边距
@@ -61,6 +63,7 @@ const updateChartOption = () => {
         },
       },
     },
+    // 设置y轴
     yAxis: {
       splitLine: { show: false },
       axisLine: {
@@ -87,7 +90,7 @@ const updateChartOption = () => {
           borderRadius: 5,
           color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
             { offset: 0, color: "#14c8d4" },
-            { offset: 1, color: "#43eec6" },
+            { offset: 1, color: "#545BE3" },
           ]),
         },
         data: barData,
@@ -97,6 +100,7 @@ const updateChartOption = () => {
         type: "bar",
         barGap: "-100%",
         barWidth: 10,
+        // 使用渐变色
         itemStyle: {
           color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
             { offset: 0, color: "rgba(20,200,212,0.5)" },
@@ -112,7 +116,7 @@ const updateChartOption = () => {
         type: "pictorialBar",
         symbol: "rect",
         itemStyle: {
-          color: "#fff",
+          color:  themeMode.value === "dark" ? "#141414" : "#fff",
         },
         symbolRepeat: true,
         symbolSize: [12, 4],
@@ -127,13 +131,14 @@ const updateChartOption = () => {
 const { width } = useElementSize(echatsDom);
 
 watchDebounced(
-  width,
+  [width, themeMode],
   () => {
     if (chart) {
-      chart.resize();
+      chart.dispose();
+      initChart();
     }
   },
-  { debounce: 0, maxWait: 200 },
+  { debounce: 0, maxWait: 200 }
 );
 
 onMounted(() => {
@@ -143,20 +148,17 @@ onMounted(() => {
 
 <template>
   <div class="card-wrapper">
-    <div
-      ref="echatsDom"
-      class="echarts"
-      style="height: 360px; width: 100%"
-    ></div>
+    <div ref="echatsDom" class="echarts" style="height: 360px; width: 100%"></div>
   </div>
 </template>
 
 <style scoped>
 .card-wrapper {
-  background-color: #fff;
+  background-color: var( --color-bg);
   border-radius: 8px;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
   padding: 16px;
+  border: 1px solid #f0f0f0;
 
   canvas {
     margin: 0 auto;

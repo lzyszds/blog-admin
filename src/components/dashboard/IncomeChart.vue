@@ -2,7 +2,8 @@
 import { onMounted, ref } from "vue";
 import * as echarts from "echarts";
 
-const domRef = ref<HTMLElement | null>(null);
+const themeMode = useStorage<"light" | "dark">("themeMode", "light");
+const echatsDom = ref<HTMLElement | null>(null);
 let chart: echarts.ECharts | null = null;
 
 const frontDataset = ref([
@@ -20,9 +21,13 @@ const backendDataset = ref([
 ]);
 
 const initChart = () => {
-  if (!domRef.value) return;
+  if (!echatsDom.value) return;
 
-  chart = echarts.init(domRef.value);
+  chart = echarts.init(echatsDom.value);
+  chart = echarts.init(echatsDom.value, "dark", {
+    renderer: "canvas",
+    useDirtyRect: false, // 禁用脏矩形优化
+  });
   updateChartOption();
 };
 
@@ -30,6 +35,7 @@ const updateChartOption = () => {
   if (!chart) return;
 
   chart.setOption({
+    backgroundColor: themeMode.value === "dark" ? "#141414" : "#fff",
     tooltip: {
       trigger: "item",
       formatter: "{a} <br/>{b} : {c} ({d}%)",
@@ -37,6 +43,10 @@ const updateChartOption = () => {
     title: {
       text: "前端技术栈和后端技术栈",
       x: "center",
+      textStyle: {
+        color: themeMode.value === "dark" ? "#fff" : "#141414",
+        fontSize: 20,
+      },
     },
     series: [
       {
@@ -46,7 +56,7 @@ const updateChartOption = () => {
         avoidLabelOverlap: false,
         itemStyle: {
           borderRadius: 10,
-          borderColor: "#fff",
+          borderColor: themeMode.value === "dark" ? "#fff" : "#141414",
           borderWidth: 1,
         },
         emphasis: {
@@ -69,7 +79,7 @@ const updateChartOption = () => {
         avoidLabelOverlap: false,
         itemStyle: {
           borderRadius: 5,
-          borderColor: "#fff",
+          borderColor: themeMode.value === "dark" ? "#fff" : "#141414",
           borderWidth: 1,
         },
         emphasis: {
@@ -89,16 +99,17 @@ const updateChartOption = () => {
   });
 };
 
-const { width } = useElementSize(domRef);
+const { width } = useElementSize(echatsDom);
 
 watchDebounced(
-  width,
+  [width, themeMode],
   () => {
     if (chart) {
-      chart.resize();
+      chart.dispose();
+      initChart();
     }
   },
-  { debounce: 0, maxWait: 200 },
+  { debounce: 0, maxWait: 200 }
 );
 
 onMounted(() => {
@@ -108,16 +119,17 @@ onMounted(() => {
 
 <template>
   <div class="card-wrapper">
-    <div ref="domRef" style="height: 360px; width: 100%"></div>
+    <div ref="echatsDom" style="height: 360px; width: 100%"></div>
   </div>
 </template>
 
 <style scoped>
 .card-wrapper {
-  background-color: #fff;
+  background-color: var(--color-bg);
   border-radius: 8px;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
   padding: 16px;
+  border: 1px solid #f0f0f0;
 
   canvas {
     transition: 0.3s;
