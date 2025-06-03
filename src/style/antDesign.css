@@ -22,7 +22,7 @@
     --color-input-bg: #ffffff;
     --color-input-border: var(--color-border);
     --color-table-header-bg: #fafafa;
-    --color-table-row-hover-bg: #5161ce15;
+    --color-table-row-hover-bg: #5860f615;
 }
 
 :root[data-theme='dark'] {

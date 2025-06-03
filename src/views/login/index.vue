@@ -222,7 +222,7 @@ onMounted(() => {
           left: 0;
           height: 8px;
           width: 100%;
-          background: content-box radial-gradient(#5161ce, #3fefef);
+          background: content-box radial-gradient(#5860f6, #3fefef);
           border-radius: 8px;
           filter: drop-shadow(0 0 20px #3fefef) drop-shadow(0 0 100px #3fefef);
           animation: animate_line 3s ease-in-out infinite;

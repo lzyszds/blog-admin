@@ -98,22 +98,22 @@
 
   .slice:nth-child(1)::before,
   .slice:nth-child(1)::after {
-    background-color: #5161ce;
+    background-color: #5860f6;
   }
 
   .slice:nth-child(2)::before,
   .slice:nth-child(2)::after {
-    background-color: #5161ce;
+    background-color: #5860f6;
   }
 
   .slice:nth-child(3)::before,
   .slice:nth-child(3)::after {
-    background-color: #5161ce;
+    background-color: #5860f6;
   }
 
   .slice:nth-child(4)::before,
   .slice:nth-child(4)::after {
-    background-color: #5161ce;
+    background-color: #5860f6;
   }
 
   .slice:nth-child(5)::before,

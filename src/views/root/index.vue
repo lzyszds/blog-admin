@@ -29,6 +29,9 @@ const layoutMain = templateRef<HTMLElement>("layoutMain");
     overflow: hidden; /* 隐藏溢出内容 */
   }
 }
+html[data-theme='dark'] .layoutMain {
+  background-color: var(--darkBgcolor);
+}
 
 @media screen and (min-width: 768px) and (max-width: 991px) {
   .layoutMain {

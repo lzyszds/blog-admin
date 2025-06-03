@@ -99,7 +99,7 @@ export const getArticleColumns = (params: Params) => {
             default: () => {
               return h(
                 Tag,
-                {color: text == 1 ? '#5161ce' : '#ff4d4f', style: {cursor: 'pointer'}},
+                {color: text == 1 ? '#5860f6' : '#ff4d4f', style: {cursor: 'pointer'}},
                 () => (text == 1 ? '启用' : '禁用'), // 使用函数形式
               );
             },

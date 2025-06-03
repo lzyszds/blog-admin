@@ -49,7 +49,7 @@ export const getPermissionColumns = (permissionLevels) => {
         })
         if (tags.length == 0) {
           return h(Tag,
-            { color: '#5161ce', style: { cursor: 'pointer', border: 'none', } },
+            { color: '#5860f6', style: { cursor: 'pointer', border: 'none', } },
             () => '所有人'
           );
         }

@@ -83,7 +83,7 @@ const permissionLevels = [
   { index: 0, permissions: [0], label: "所有人", color: "#eee" },
   { index: 1, permissions: [0, 1], label: "普通用户", color: "#55ACEE" },
   { index: 2, permissions: [0, 1, 2], label: "管理员", color: "#ff4d4f" },
-  { index: 3, permissions: [3], label: "特殊权限", color: "#5161ce" },
+  { index: 3, permissions: [3], label: "特殊权限", color: "#5860f6" },
 ];
 
 // 处理接口权限数据

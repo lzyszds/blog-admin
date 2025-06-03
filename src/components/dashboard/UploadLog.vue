@@ -50,7 +50,7 @@ const titleHandler = (title: string) => {
           <a-timeline-item
             v-for="item in list"
             :key="item.data.id"
-            :color="item.data.conclusion == 'success' ? '#5161ce' : 'red'"
+            :color="item.data.conclusion == 'success' ? '#5860f6' : 'red'"
           >
             <span v-html="titleHandler(item.data.title)"></span>
             <!--        <span :title="item.data.title">-->
@@ -90,7 +90,7 @@ const titleHandler = (title: string) => {
     flex-direction: column;
 
     &:hover {
-      color: #5161ce;
+      color: #5a61ed;
     }
 
     span {

@@ -99,7 +99,7 @@ const multipleDel = () => {
 
 <template>
   <section style="display: flex; flex-direction: column; gap: 10px; height: 100%">
-    <ACard title="搜索工具" :bordered="false">
+    <ACard title="搜索工具" :bordered="false" :body-style="{ padding: '16px 24px' }">
       <main class="searchCard">
         <section>
           <span>评论邮箱</span>

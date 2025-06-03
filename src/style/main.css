@@ -35,6 +35,13 @@
     }
 }
 
+.contentCard {
+
+    :deep(.ant-table-pagination.ant-pagination) {
+        margin-bottom: 0px;
+    }
+}
+
 :deep(.ant-table-body) {
     overflow-y: auto;
 }

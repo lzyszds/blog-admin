@@ -11,8 +11,8 @@ const theme = computed(() => {
   else document.documentElement.removeAttribute("data-theme");
   return {
     token: {
-      colorPrimary: "#5161ce",
-      colorPrimaryBg: "#5161ce15",
+      colorPrimary: "#5860f6",
+      colorPrimaryBg: "#5860f615",
       colorPrimaryBgHover: "#bae0ff",
       colorBgContainer: isDark ? "#141414" : "#ffffff",
       colorText: isDark ? "#FFFFFF75" : "#000000",

@@ -3,11 +3,14 @@ import { VueDraggable } from "vue-draggable-plus";
 
 import { getTableStore } from "@/store/useTableStore";
 const getTable = getTableStore();
-
 </script>
 
 <template>
-  <APopover placement="left" trigger="click" >
+  <APopover
+    placement="bottomRight"
+    trigger="click"
+    overlayClassName="draggable-card"
+  >
     <AButton>
       <template #icon>
         <LzyIcon name="iconoir:settings" size="18" />
@@ -28,9 +31,12 @@ const getTable = getTableStore();
 </template>
 
 <style scoped>
+.draggable-card{
+  
+}
 .draggable-item {
   width: auto;
-  height: 40px;
+  height: 32px;
   display: flex;
   gap: 5px;
   margin: 0;
@@ -45,7 +51,7 @@ const getTable = getTableStore();
     height: 100%;
     line-height: 40px;
     width: 20px;
-    padding-left: 10px;
+    padding-left: 4px;
   }
 
   &:hover,
