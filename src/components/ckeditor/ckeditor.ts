@@ -98,7 +98,7 @@ export const editorConfig: any = {
     ImageCaption, // 图片标题：允许用户为图片添加标题。
     ImageInline, // 行内图片：将图片呈现为一个行内元素，可以与其他文本内容混合排列。
     ImageInsertViaUrl, // 通过 URL 插入图片：允许用户通过输入图片的 URL 地址来插入图片。
-    ImageResize, // 图片缩放：允许用户调整图片的大小。
+    // ImageResize, // 图片缩放：允许用户调整图片的大小。
     ImageStyle, // 图片样式：提供不同的图片样式选项，如边框、阴影等。
     ImageTextAlternative, // 图片替代文本：允许用户为图片添加替代文本（alt 属性），用于无障碍访问和 SEO。
     ImageToolbar, // 图片工具栏：当用户选择图片时，显示一个包含图片相关操作的工具栏。

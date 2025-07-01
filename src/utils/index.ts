@@ -144,7 +144,7 @@ export function base64toBlob(dataurl) {
 }
 
 /* 将文件转换为base64 */
-export function getBase64(file: File) {
+export function getBase64(file: File): Promise<string | ArrayBuffer | null> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.readAsDataURL(file);
@@ -359,4 +359,28 @@ export function convertCronToArray(cronString) {
     hour: parseInt(hour),
     minute: parseInt(minute),
   };
+}
+
+
+/**
+ * 将字节数转换为可读的字符串格式（例如：1.5 MB）
+ * @param {number} bytes - 字节数
+ * @param {number} [decimals=2] - 小数位数
+ * @param {boolean} [useBinary=true] - 是否使用二进制单位 (KiB, MiB, GiB)
+ * @returns {string} 格式化后的字符串
+ */
+export function formatBytes(bytes, decimals = 2, useBinary = true) {
+  if (bytes === null || bytes === undefined || bytes < 0) {
+    return 'N/A'; // 或者 '0 Bytes'，取决于你的需求
+  }
+  const dm = decimals < 0 ? 0 : decimals;
+  const sizes = useBinary
+    ? ['Bytes', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB']
+    : ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+  const i = bytes === 0 ? 0 : Math.floor(Math.log(bytes) / Math.log(useBinary ? 1024 : 1000));
+  // 使用 toFixed 来处理小数位数，并确保结果是字符串
+  // 如果 bytes 为 0，则 i 为 0，结果为 "0 Bytes"
+  // 如果 bytes > 0，则计算结果
+  const formattedValue = parseFloat((bytes / Math.pow(useBinary ? 1024 : 1000, i)).toFixed(dm));
+  return `${formattedValue} ${sizes[i]}`;
 }

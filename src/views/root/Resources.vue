@@ -5,6 +5,9 @@ import { message, Modal, UploadChangeParam } from "ant-design-vue";
 import { PictureBedType } from "@/typings/PictureBedType.ts";
 import { createVNode } from "vue";
 import { ExclamationCircleOutlined } from "@ant-design/icons-vue";
+import { getBase64, formatBytes } from "@/utils";
+import { useRouter } from "vue-router";
+import { updateSystemConfig } from "@/api/system";
 
 interface Props {
   type?: string;
@@ -27,11 +30,21 @@ const selectImageResult = ref<string>("");
 // 是否正在上传
 const uploading = ref(false);
 
+const nowUploadFile = ref<File | null>(null);
+
 // 选择类型弹窗的显示状态
 const selectType = ref({
   visible: false,
   val: undefined as any,
   isOk: false,
+  fileBase64: "" as string,
+  fileInfo: {} as File,
+});
+
+// 重新获取的token模态框参数
+const token = ref({
+  visible: false,
+  val: "",
 });
 
 // 图片列表筛选
@@ -45,10 +58,16 @@ const handleChange = (info: UploadChangeParam) => {
   uploading.value = info.file.status === "uploading";
   if (info.file.status === "done") {
     if (info.file.response.code == "500") {
-      message.error("文件上传失败");
+      if (info.file.response.msg.includes("token失效")) {
+        token.value.visible = true;
+      } else {
+        message.error({
+          content: info.file.response.msg,
+          duration: 3,
+        });
+      }
       return;
     }
-
     message.success(`${info.file.name} 文件上传成功`);
     getImageList();
   } else if (info.file.status === "error") {
@@ -57,17 +76,23 @@ const handleChange = (info: UploadChangeParam) => {
 };
 
 // 图片上传前的钩子，让用户选择的当前图片的类别
-const beforeUpload = () => {
+const beforeUpload = async (file: File) => {
   if (props.type !== "all") {
     selectType.value.val = props.type;
     selectType.value.isOk = true;
     return true;
   }
+
   // 这里可以让用户选择当前图片的类别
   selectType.value.visible = true;
   // 重置选择类型的状态
   selectType.value.val = undefined;
   selectType.value.isOk = false;
+
+  // 获取图片的 base64 编码
+  const fileBase64 = await getBase64(file);
+  selectType.value.fileBase64 = String(fileBase64);
+  selectType.value.fileInfo = file;
 
   //任务延时，直到用户选择了图片的类型
   return new Promise((resolve) => {
@@ -130,19 +155,19 @@ const onClick = async (item: PictureBedType, { key }) => {
       onOk() {
         return new Promise(async (resolve, _reject) => {
           const result = await deletePictureBedImage({ id: item.id }).send();
-          if (!result || !result.length) {
+
+          if (!result || result.code !== 200) {
+            message.error("删除失败");
             return resolve(true);
           }
 
           await getImageList();
-          message.success("删除成功");
+          message.success(result.data);
           resolve(true);
         }).catch(() => console.log("Oops errors!"));
       },
 
-      onCancel() {
-        console.log("Cancel");
-      },
+      onCancel() {},
     });
   } else if (key == 3) {
     // 复制图片地址
@@ -183,6 +208,133 @@ const pictureTypeList = [
   { label: "背景", value: "background" },
   { label: "其他", value: "other" },
 ];
+
+// 跳转至图床登录页
+const getTokenHref = () => {
+  //复制代码
+  navigator.clipboard
+    .writeText(
+      `
+      async function setupTokenCopyButton(buttonSelector, statusSelector) {
+        const copyButton = document.querySelector(buttonSelector);
+        const statusElement = document.querySelector(statusSelector);
+
+        // 如果找不到按钮或状态显示元素，则退出
+        if (!copyButton) {
+          return;
+        }
+
+        // 确保状态显示元素存在，如果不存在则创建一个临时的
+        let tempStatusElement = null;
+        if (!statusElement) {
+          tempStatusElement = document.createElement("p");
+          tempStatusElement.style.marginLeft = "10px"; // 简单样式
+          tempStatusElement.style.display = "inline-block";
+          copyButton.parentNode.insertBefore(tempStatusElement, copyButton.nextSibling);
+        }
+        const displayElement = statusElement || tempStatusElement;
+
+        // 为按钮添加点击事件监听器
+        copyButton.addEventListener("click", async () => {
+          // 清除之前的状态
+          if (displayElement) displayElement.textContent = "正在获取 Token...";
+
+          try {
+            // 1. 从 cookieStore 获取 token
+            const data = await cookieStore.get("omaccesstoken");
+
+            if (data && data.value) {
+              const tokenValue = data.value;
+
+              // 2. 尝试复制到剪贴板
+              try {
+                await navigator.clipboard.writeText(tokenValue);
+                if (displayElement) displayElement.textContent = "✅ Token 已复制！";
+                // 可以在这里设置一个定时器，让提示消息自动消失
+                setTimeout(() => {
+                  if (displayElement) displayElement.textContent = "";
+                }, 3000); // 3秒后清除
+              } catch (err) {
+                console.error("Failed to copy token:", err);
+                if (displayElement) displayElement.textContent = "❌ 复制失败！请手动复制。";
+                // Fallback 尝试：
+                // fallbackCopyTextToClipboard(tokenValue);
+                // 如果需要 fallback, 请在此处调用 fallbackCopyTextToClipboard 函数
+                console.log("%c请手动复制 Token: + tokenValue", "color: orange;");
+              }
+            } else {
+              // 未找到 token
+              if (displayElement) displayElement.textContent = "⚠️ 未找到 Token！";
+            }
+          } catch (error) {
+            // 捕获 cookieStore 或其他操作可能抛出的错误
+            console.error("An error occurred:", error);
+            if (displayElement) displayElement.textContent = "❌ 操作出错！";
+          }
+        });
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        setupTokenCopyButton("#myCopyTokenBtn", "#copyStatus");
+      });
+
+      // --- 如果你没有现成的按钮，可以动态创建一个 ---
+      function createAndSetupCopyButton() {
+        const container = document.body; // 或者选择一个你想要的容器
+
+        const button = document.createElement("button");
+        button.id = "generatedCopyTokenButton"; // 给它一个 ID
+        button.textContent = "复制 Token";
+        button.style.margin = "10px"; // 简单样式
+        button.style.fontSize = "50px"; // 简单样式
+
+        button.style.position = "fixed";
+        button.style.top = "50%";
+        button.style.left = "50%";
+        button.style.transform = "translate(-50%, -50%)";
+
+        const statusMsg = document.createElement("p");
+        statusMsg.id = "generatedCopyStatus";
+        statusMsg.style.marginLeft = "10px";
+        statusMsg.style.display = "inline-block";
+        statusMsg.style.color = "#666";
+        statusMsg.style.position = "fixed";
+        statusMsg.style.top = "55%";
+        statusMsg.style.left = "50%";
+        statusMsg.style.transform = "translate(-50%, -50%)";
+        statusMsg.style.background = "#eee"
+
+
+        container.appendChild(button);
+        container.appendChild(statusMsg);
+
+        // 然后设置复制功能
+        setupTokenCopyButton("#generatedCopyTokenButton", "#generatedCopyStatus");
+      }
+
+      // 如果你想动态创建一个按钮，可以调用这个函数
+      createAndSetupCopyButton();
+    `
+    )
+    .then(() => {
+      window.open("https://om.qq.com/userAuth/index", "_blank");
+    });
+};
+
+// 提交新token
+const submitToken = async () => {
+  const res = await updateSystemConfig({
+    config_id: 6,
+    config_key: "picture_bed_token",
+    config_type: "string",
+    config_value: token.value.val,
+  });
+  message.success(res.data);
+  if (res.code === 200) {
+    // 刷新页面
+    window.location.reload();
+  }
+};
 </script>
 
 <template>
@@ -279,7 +431,22 @@ const pictureTypeList = [
       </div>
     </ACard>
     <a-modal v-model:open="selectType.visible" :closable="false" :footer="null">
-      <div style="display: flex; gap: 5px">
+      <div class="select-type">
+        <!-- 图片分类选择器 -->
+        <h2 style="margin: 0; text-align: center">确认图片信息</h2>
+        <div class="info">
+          <img :src="selectType.fileBase64" alt="" />
+          <p>
+            图片大小： <span> {{ formatBytes(selectType.fileInfo.size) }} </span>
+          </p>
+          <p>
+            图片类型： <span> {{ selectType.fileInfo.type }} </span>
+          </p>
+          <p>
+            图片名称： <span> {{ selectType.fileInfo.name }} </span>
+          </p>
+        </div>
+        选择图片要存放类型：
         <ASelect
           v-model:value="selectType.val"
           style="width: 100%"
@@ -301,6 +468,43 @@ const pictureTypeList = [
         >
           确定
         </AButton>
+      </div>
+    </a-modal>
+
+    <!-- token失效 获取token 模态框 -->
+    <a-modal v-model:open="token.visible" :closable="false" :footer="null">
+      <div class="select-type">
+        <h2>提示</h2>
+
+        <p style="margin-bottom: 10px">
+          Token失效，请前往腾讯图床进行登录并获取新的Token 是否立即前往获取？
+          <span style="color: #999"
+            >（复制代码前往，登陆之后打开开发者工具F12 粘贴代码 即可获取Token）</span
+          >
+        </p>
+
+        <AInput v-model:value="token.val" placeholder="输入获取回来的Token"></AInput>
+
+        <div class="tools">
+          <AButton
+            type="primary"
+            :loading="uploading"
+            :disabled="!selectType.val"
+            @click="token.visible = false"
+          >
+            取消
+          </AButton>
+          <AButton type="primary" @click="getTokenHref"> 前往获取 </AButton>
+
+          <AButton
+            type="primary"
+            :loading="uploading"
+            :disabled="!selectType.val"
+            @click="submitToken"
+          >
+            提交Token
+          </AButton>
+        </div>
       </div>
     </a-modal>
   </div>
@@ -390,6 +594,41 @@ const pictureTypeList = [
     &::-webkit-scrollbar-thumb {
       background: transparent !important;
     }
+  }
+}
+
+.select-type {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  justify-content: center;
+
+  img {
+    height: 100%;
+    max-height: 200px;
+    width: 100%;
+    object-fit: contain;
+    background-color: #999;
+  }
+  p {
+    margin: 0;
+    span {
+      text-decoration: solid underline;
+      user-select: all;
+    }
+    &:nth-child(2){ 
+      margin-top: 10px;
+    }
+    &:last-child {
+      margin-bottom: 10px;
+    }
+  }
+
+  .tools {
+    margin-top: 10px;
+    display: flex;
+    gap: 20px;
+    justify-content: end;
   }
 }
 </style>
