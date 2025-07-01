@@ -6,7 +6,6 @@ import { PictureBedType } from "@/typings/PictureBedType.ts";
 import { createVNode } from "vue";
 import { ExclamationCircleOutlined } from "@ant-design/icons-vue";
 import { getBase64, formatBytes } from "@/utils";
-import { useRouter } from "vue-router";
 import { updateSystemConfig } from "@/api/system";
 
 interface Props {
@@ -30,7 +29,6 @@ const selectImageResult = ref<string>("");
 // 是否正在上传
 const uploading = ref(false);
 
-const nowUploadFile = ref<File | null>(null);
 
 // 选择类型弹窗的显示状态
 const selectType = ref({

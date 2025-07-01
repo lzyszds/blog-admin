@@ -24,7 +24,7 @@ import {
   ImageCaption,
   ImageInline,
   ImageInsertViaUrl,
-  ImageResize,
+  // ImageResize,
   ImageStyle,
   ImageTextAlternative,
   ImageToolbar,
