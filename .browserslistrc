@@ -1,0 +1,14 @@
+# .browserslistrc
+# 这是我常用的配置，覆盖了绝大多数的现代浏览器以及一些旧版本浏览器
+# "> 1%" 意味着大于 1% 使用率的浏览器都会被包含
+# "last 2 versions" 意味着每个浏览器引擎的最后两个版本
+# "not dead" 意味着排除那些已经被标记为死亡的浏览器（例如 IE10 及以下可能被排除）
+# "ie >= 11" 明确包含 IE11
+
+> 0.5%
+last 2 versions
+ie >= 11
+safari >= 10
+ios_saf >= 10
+android >= 6
+firefox ESR
