@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import LzyIcon from "@/components/LzyIcon.vue";
 import { deletePictureBedImage, getPictureBedImageList } from "@/api/toolkit.ts";
-import { message, Modal, UploadChangeParam } from "ant-design-vue";
+import { message, Modal } from "ant-design-vue";
 import { PictureBedType } from "@/typings/PictureBedType.ts";
 import { createVNode } from "vue";
 import { ExclamationCircleOutlined } from "@ant-design/icons-vue";
@@ -48,12 +48,8 @@ const token = ref({
 // 图片列表筛选
 const filterValue = ref(props.type);
 
-// 拖拽上传
-const handleDrop = () => {};
-
 // 图片上传前的钩子，让用户选择的当前图片的类别
 const beforeUpload = async (file: File) => {
-
   //从其他组件进入
   if (props.type !== "all") {
     selectType.value.val = props.type;

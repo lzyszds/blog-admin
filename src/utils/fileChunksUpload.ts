@@ -2,7 +2,7 @@ import { Alova } from "@/alova/api";
 import { message } from "ant-design-vue";
 
 
-const BASE_URL = import.meta.env.VITE_BASE_URL;
+// const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 
 export const getFileChunks = (formData: FormData, name: string, CHUNK_SIZE_MB: number = 0.2) => {
