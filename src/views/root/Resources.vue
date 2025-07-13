@@ -5,14 +5,17 @@ import { message, Modal, UploadChangeParam } from "ant-design-vue";
 import { PictureBedType } from "@/typings/PictureBedType.ts";
 import { createVNode } from "vue";
 import { ExclamationCircleOutlined } from "@ant-design/icons-vue";
-import { getBase64, formatBytes } from "@/utils";
+import { getBase64, formatBytes, randomPassword } from "@/utils";
+import { getFileChunks, uploadFileChunks } from "@/utils/fileChunksUpload";
 import { updateSystemConfig } from "@/api/system";
-
+import { useUserInfoState } from "@/store/useUserInfoStore";
 interface Props {
   type?: string;
   isSelector?: boolean;
   previewStyle?: any;
 }
+
+const userStore = useUserInfoState();
 
 const props = withDefaults(defineProps<Props>(), {
   type: "all",
@@ -22,21 +25,18 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits(["select"]);
 
-const BASE_URL = import.meta.env.VITE_BASE_URL;
-
 const selectImageResult = ref<string>("");
 
 // 是否正在上传
 const uploading = ref(false);
 
-
 // 选择类型弹窗的显示状态
 const selectType = ref({
   visible: false,
   val: undefined as any,
-  isOk: false,
   fileBase64: "" as string,
   fileInfo: {} as File,
+  compress: true as boolean, // 是否是compress文件
 });
 
 // 重新获取的token模态框参数
@@ -51,56 +51,27 @@ const filterValue = ref(props.type);
 // 拖拽上传
 const handleDrop = () => {};
 
-const handleChange = (info: UploadChangeParam) => {
-  // 是否正在上传
-  uploading.value = info.file.status === "uploading";
-  if (info.file.status === "done") {
-    if (info.file.response.code == "500") {
-      if (info.file.response.msg.includes("token失效")) {
-        token.value.visible = true;
-      } else {
-        message.error({
-          content: info.file.response.msg,
-          duration: 3,
-        });
-      }
-      return;
-    }
-    message.success(`${info.file.name} 文件上传成功`);
-    getImageList();
-  } else if (info.file.status === "error") {
-    message.error(`${info.file.name} 文件上传失败。`);
-  }
-};
-
 // 图片上传前的钩子，让用户选择的当前图片的类别
 const beforeUpload = async (file: File) => {
+
+  //从其他组件进入
   if (props.type !== "all") {
     selectType.value.val = props.type;
-    selectType.value.isOk = true;
-    return true;
+    selectType.value.fileInfo = file;
+    formalUpload();
+  } else {
+    // 这里可以让用户选择当前图片的类别
+    selectType.value.visible = true;
+    // 重置选择类型的状态
+    selectType.value.val = undefined;
+    // 获取图片的 base64 编码
+    const fileBase64 = await getBase64(file);
+    selectType.value.fileBase64 = String(fileBase64);
+    selectType.value.fileInfo = file;
   }
 
-  // 这里可以让用户选择当前图片的类别
-  selectType.value.visible = true;
-  // 重置选择类型的状态
-  selectType.value.val = undefined;
-  selectType.value.isOk = false;
-
-  // 获取图片的 base64 编码
-  const fileBase64 = await getBase64(file);
-  selectType.value.fileBase64 = String(fileBase64);
-  selectType.value.fileInfo = file;
-
-  //任务延时，直到用户选择了图片的类型
-  return new Promise((resolve) => {
-    const timer = setInterval(() => {
-      if (selectType.value.isOk && selectType.value.val) {
-        clearInterval(timer);
-        resolve(true);
-      }
-    }, 100);
-  });
+  // 取消上传 走手动上传
+  return false;
 };
 
 // 要展示的图片列表
@@ -193,9 +164,29 @@ const onClick = async (item: PictureBedType, { key }) => {
 };
 
 // 将图片类型提交至图片中一并提交
-const onOk = () => {
+const formalUpload = async () => {
+  // 是否正在上传
+  uploading.value = true;
+
   selectType.value.visible = false;
-  selectType.value.isOk = true;
+  const formData = new FormData();
+  formData.append("upload-image", selectType.value.fileInfo);
+  formData.append("type", selectType.value.val);
+  formData.append("compress", String(selectType.value.compress));
+  formData.append("taskId", userStore.userInfo.uid + randomPassword(16));
+
+  const chunks = getFileChunks(formData, "upload-image", 1);
+
+  const res = await uploadFileChunks(chunks, formData, "upload-image");
+  if (res === "success") {
+    message.success(`${res} 文件上传成功`);
+    getImageList();
+  } else if (res.includes("token失效")) {
+    token.value.visible = true;
+  } else {
+    message.error(`${res} 文件上传失败。`);
+  }
+  uploading.value = false;
 };
 
 // 图片分类列表
@@ -359,15 +350,10 @@ const submitToken = async () => {
 
       <!--   图片上传功能元素   -->
       <a-upload-dragger
-        :action="BASE_URL + '/api/toolkit/uploadImageToPictureBed'"
-        name="upload-image"
         withCredentials
         :showUploadList="false"
         :multiple="true"
-        :data="{ type: selectType.val }"
         :beforeUpload="beforeUpload"
-        @change="handleChange"
-        @drop="handleDrop"
         :disabled="uploading"
       >
         <p class="ant-upload-drag-icon">
@@ -428,6 +414,7 @@ const submitToken = async () => {
         </a-dropdown>
       </div>
     </ACard>
+
     <a-modal v-model:open="selectType.visible" :closable="false" :footer="null">
       <div class="select-type">
         <!-- 图片分类选择器 -->
@@ -458,11 +445,19 @@ const submitToken = async () => {
             {{ item.label }}
           </ASelectOption>
         </ASelect>
+
+        <a-switch
+          v-model:checked="selectType.compress"
+          checked-children="压缩图片：开"
+          un-checked-children="压缩图片：关"
+          style="margin-top: 10px"
+        />
+
         <AButton
           type="primary"
           :loading="uploading"
           :disabled="!selectType.val"
-          @click="onOk"
+          @click="formalUpload"
         >
           确定
         </AButton>
@@ -614,7 +609,7 @@ const submitToken = async () => {
       text-decoration: solid underline;
       user-select: all;
     }
-    &:nth-child(2){ 
+    &:nth-child(2) {
       margin-top: 10px;
     }
     &:last-child {

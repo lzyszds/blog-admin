@@ -2,8 +2,7 @@
 import { Method } from "alova";
 import { AlovaInstance } from "./index"; // 请求头
 // 请求头
-const headers = {
-  "Content-Type": "application/json;charset=UTF-8",
+const commonHeaders = {
   "x-real-ip": import.meta.env.VITE_IP_ADDRESS,
 };
 
@@ -23,9 +22,22 @@ export const Alova = {
     data?: Record<string, any>,
     options?: Record<string, any>,
   ) {
-    
+
+    // 检查 data 是否为 FormData 实例
+    const isFormData = data instanceof FormData;
+
+    // 构建请求头
+    const requestHeaders = {
+      ...commonHeaders, // 添加公共请求头
+      ...options?.headers, // 合并用户传入的headers（如果api.js调用时有传递）
+    };
+
+    if (isFormData) {
+      delete requestHeaders["Content-Type"];
+    }
+
     return AlovaInstance.Post(url, data, {
-      headers,
+      headers: requestHeaders,
       ...options,
       credentials: "include",
     }) as Method<any>;

@@ -151,6 +151,7 @@ const onSubmit = async () => {
     const scale = file.value.size < 300 * 1024 ? 1 : 0.5;
     /* 压缩图片 */
     const {fileCompress} = await optimizeImage(file.value, scale);
+    
     /* 将头像上传 */
     uploadHeadImg(fileCompress).then((res) => {
       message.success("头像上传成功 即将保存用户信息！");

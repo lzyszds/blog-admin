@@ -15,11 +15,23 @@ export const AlovaInstance = createAlova({
 
   // 设置全局的请求拦截器，与axios相似
   beforeRequest: (method) => {
-    method.config.headers = {
-      "x-real-ip": import.meta.env.VITE_IP_ADDRESS,
-      "Content-Type": "application/json",
-      // ... 其他全局请求头
-    };
+
+    // 获取参数
+    const requestBody = method.data
+
+    // 检查请求体是否是 FormData
+    if (!(requestBody instanceof FormData)) {
+      // 如果不是 FormData (通常是 JSON 数据)，则设置 application/json
+      method.config.headers = {
+        "x-real-ip": import.meta.env.VITE_IP_ADDRESS,
+        "Content-Type": "application/json;charset=UTF-8", // 明确设置 JSON 的 Content-Type
+      };
+    } else {
+      // 如果是 FormData，则不设置 Content-Type，让 Alova 自动处理 (multipart/form-data)
+      method.config.headers = {
+        "x-real-ip": import.meta.env.VITE_IP_ADDRESS,
+      };
+    }
   },
   responded: {
     // 请求成功的拦截器

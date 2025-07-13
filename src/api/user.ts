@@ -5,7 +5,7 @@ import { Alova } from "@/alova/api.ts"; /* 根据id获取用户信息 */
 /* 根据id获取用户信息 */
 export const getUserInfo = (params: any) => {
   if (isRef(params)) params = unref(params);
-  return Alova.createGet(`/user/getUserInfo`, {params});
+  return Alova.createGet(`/user/getUserInfo`, { params });
 };
 
 /* 根据token获取用户信息 */
@@ -17,7 +17,7 @@ export const getUserInfoToken = () => {
 export const getUserList = (params: any) => {
   if (isRef(params)) params = unref(params);
   params.pages = params.pages;
-  return Alova.createGet(`/user/getUserList`, {params});
+  return Alova.createGet(`/user/getUserList`, { params });
 };
 
 /* 添加用户 */
@@ -65,9 +65,7 @@ export const uploadHeadImg = (file: any) => {
   // 创建 FormData 对象
   const formData = new FormData();
   formData.append("file", file); // 'headImg' 为服务器端预期的字段名
-  return Alova.createPost("/user/uploadHeadImg", formData, {
-    headers: {
-      "Content-Type": "multipart/form-data",
-    },
-  });
+  console.log(formData);
+
+  return Alova.createPost("/user/uploadHeadImg", formData);
 };
